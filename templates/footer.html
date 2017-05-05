@@ -1,24 +1,12 @@
 <!--
 	Footer has the following values that needs to be replaced when injected:
+  - SNAPSHOT_DATE - date the snapshot was created
+  - IPNS_HASH - IPNS hash for this language-version of wikipedia
 
-	- ARTICLE_TITLE - Pretty title to use in social sharing, looks like Ana Sayfa
-	- ARTICLE_NAME - Wiki-name to use in links, looks like Ana_Sayfa
-	- ARTICLE_ID - ID of the version this mirror was taken from, number
-	- ARTICLE_DATE - Date that the article was mirrored
+  These values can be inserted by javascript on the client side:
+  - ARTICLE_URL - window.location.url
+  - ARTICLE_PATHNAME - pathname to the article (from window.location.pathname)
 -->
-<div style="clear:both; background-image:linear-gradient(180deg, #E8E8E8, white); border-top: dashed 2px #AAAAAA; padding: 0.5em 0.5em 2em 0.5em; margin-top: 1em; direction: ltr;">
-  <p>
-    This page was generated and distributed by the <a class="external text" href="https://github.com/ipfs/distributed-wikipedia-mirror">Distributed Wikipedia Mirror project</a>, from the article <a class="external text" href="https://{{LANGUAGE_CODE}}.wikipedia.org/wiki/{{ARTICLE_NAME}}?oldid={{ARTICLE_ID}}">{{ARTICLE_NAME}}</a>, as of {{ARTICLE_DATE}}. For the most recent version of the article, see <>. The text is available under a <a class="external text" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution/Share Alike</a> license, by Wikipedia authors. Media files are available under similar licenses; see the original file for details. The Distributed Wikipedia Mirror is a global effort, independent from Wikipedia.
-  </p>
-  <p>
-    From Snapshot: /ipfs/QmQP99yW82xNKPxXLroxj1rMYMGF6Grwjj2o4svsdmGh7S<br/>
-		Created on: {{ARTICLE_DATE}}<br/>
-    IPFS Link: dweb://ipfs/QmQP99yW82xNKPxXLroxj1rMYMGF6Grwjj2o4svsdmGh7S/out/A/Anasayfa.html<br/>
-    HTTP Link: <a class="external text" href="https://ipfs.io/ipfs/QmQP99yW82xNKPxXLroxj1rMYMGF6Grwjj2o4svsdmGh7S/out/A/Anasayfa.html">https://ipfs.io/ipfs/QmQP99yW82xNKPxXLroxj1rMYMGF6Grwjj2o4svsdmGh7S/out/A/Anasayfa.html</a><br/>
-    <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
-  </p>
-
-</div>
 <style>
 .footer-wrapper {
 	background-color: white;
@@ -67,6 +55,17 @@
 	margin: 5px;
 }
 </style>
+<div style="clear:both; background-image:linear-gradient(180deg, #E8E8E8, white); border-top: dashed 2px #AAAAAA; padding: 0.5em 0.5em 2em 0.5em; margin-top: 1em; direction: ltr;">
+  <p>
+    This snapshot was generated and distributed by the <a class="external text" href="https://github.com/ipfs/distributed-wikipedia-mirror">Distributed Wikipedia Mirror project</a> The Distributed Wikipedia Mirror is a global effort, independent from Wikipedia.
+  </p>
+  <p>
+    Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a><br/>
+    IPFS Link: dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}<br/>
+    HTTP Link: <a class="external text" href="https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a><br/>
+    <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
+  </p>
+</div>
 <div class="footer-wrapper">
 	<div class="footer-logo">
 		<img src="../assets/distributed-wikipedia.png" width="100"/>
