@@ -56,6 +56,9 @@ const documentToPrint = `
 </style>
 <div class="pre-footer-wrapper">
   <div>
+    This snapshot was generated and distributed by the <a class="external text" href="https://github.com/ipfs/distributed-wikipedia-mirror">Distributed Wikipedia Mirror project</a> The Distributed Wikipedia Mirror is a global effort, independent from Wikipedia.
+  </div>
+  <div>
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
   <div>
