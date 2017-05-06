@@ -4,7 +4,7 @@ const documentToPrint = `
 .pre-footer-wrapper, .footer-wrapper {
 	width: 500px;
 	margin: 0px auto;
-	font-family: sans-serif;
+	font-family:'Linux Libertine',Georgia,Times,serif;
 }
 .pre-footer-wrapper div {
   margin-bottom: 10px;
@@ -62,7 +62,7 @@ const documentToPrint = `
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
   <div>
-    IPFS Link: dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}
+    IPFS Link: <a class="external text" href="dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a>
   </div>
   <div>
     HTTP Link: <a class="external text" href="https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a>
