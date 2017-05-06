@@ -73,7 +73,7 @@ const documentToPrint = `
 </div>
 <div class="footer-wrapper">
 	<div class="footer-logo">
-    <img src=../I/s/wikipedia-on-ipfs.png" width="100"/>
+    <img src="../I/s/wikipedia-on-ipfs.png" width="100"/>
 	</div>
 	<div class="footer-titles">
 		<div class="footer-titles-title">Distributed Wikipedia</div>
