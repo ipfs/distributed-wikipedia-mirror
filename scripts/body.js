@@ -62,7 +62,7 @@ const documentToPrint = `
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
   <div>
-    IPFS Link: <a class="external text ipns" href="dweb://ipns/{{IPNS_HASH}}">dweb://ipns/{{IPNS_HASH}}</a>
+    IPFS Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">dweb://ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
     HTTP Link: <a class="external text ipns" href="https://ipfs.io/ipns/{{IPNS_HASH}}">https://ipfs.io/ipns/{{IPNS_HASH}}</a>
@@ -73,7 +73,7 @@ const documentToPrint = `
 </div>
 <div class="footer-wrapper">
 	<div class="footer-logo">
-    <img src="../../wikipedia-on-ipfs.png" width="100"/>
+    <img src=../I/s/wikipedia-on-ipfs.png" width="100"/>
 	</div>
 	<div class="footer-titles">
 		<div class="footer-titles-title">Distributed Wikipedia</div>
