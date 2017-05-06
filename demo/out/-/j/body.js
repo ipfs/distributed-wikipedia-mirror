@@ -1,13 +1,18 @@
 // This script adds a footer on all pages
 const documentToPrint = `
 <style>
-.footer-wrapper {
-	background-color: white;
-	font-family: sans-serif;
-	border: 2px solid lightgrey;
-	border-radius: 10px;
+.pre-footer-wrapper, .footer-wrapper {
 	width: 500px;
 	margin: 0px auto;
+	font-family: sans-serif;
+}
+.pre-footer-wrapper div {
+  margin-bottom: 10px;
+}
+.footer-wrapper {
+	background-color: white;
+	border: 2px solid lightgrey;
+	border-radius: 10px;
   margin-bottom: 25px;
 }
 .footer-wrapper a {
@@ -49,6 +54,20 @@ const documentToPrint = `
 	margin: 5px;
 }
 </style>
+<div class="pre-footer-wrapper">
+  <div>
+    Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
+  </div>
+  <div>
+    IPFS Link: dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}
+  </div>
+  <div>
+    HTTP Link: <a class="external text" href="https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a>
+  </div>
+  <div>
+    <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
+  </div>
+</div>
 <div class="footer-wrapper">
 	<div class="footer-logo">
     <img src="../../wikipedia-on-ipfs.png" width="100"/>
