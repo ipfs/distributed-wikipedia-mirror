@@ -2,7 +2,7 @@
 const documentToPrint = `
 <style>
 .pre-footer-wrapper, .footer-wrapper {
-	width: 500px;
+	width: 55.8em;
 	margin: 0px auto;
 	font-family:'Linux Libertine',Georgia,Times,serif;
 }
@@ -33,11 +33,13 @@ const documentToPrint = `
 }
 .footer-logo {
 	width: 100px;
+	padding-left: 10px;
 }
 .footer-titles, .footer-sharing {
 	padding-top: 20px;
 }
 .footer-titles {
+	width: 470px;
 }
 .footer-titles-title {
 	font-size: 19px;
@@ -62,10 +64,10 @@ const documentToPrint = `
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
   <div>
-    IPFS Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">dweb://ipns/{{IPNS_HASH}}</a>
+    IPFS Link: <a class="external text ipns" href="dweb://ipns/{{IPNS_HASH}}">dweb://ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
-    HTTP Link: <a class="external text ipns" href="https://ipfs.io/ipns/{{IPNS_HASH}}">https://ipfs.io/ipns/{{IPNS_HASH}}</a>
+    HTTP Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
     <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
@@ -112,7 +114,7 @@ document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
   link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
 });
 document.querySelectorAll('a.ipns').forEach((link) => {
-	link.href = link.href + window.location.pathname
+	link.href = link.href + window.location.pathname.split("/").slice(2).join("/")
   link.textContent = link.href
 });
 
