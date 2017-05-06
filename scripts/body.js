@@ -1,9 +1,7 @@
 // This script adds a footer on all pages
 const documentToPrint = `
 <style>
-.pre-footer-wrapper, .footer-wrapper {
-	width: 55.8em;
-	margin: 0px auto;
+.pre-footer-wrapper, .footer-wrapper { width: 55.8em; margin: 0px auto;
 	font-family:'Linux Libertine',Georgia,Times,serif;
 }
 .pre-footer-wrapper div {
@@ -114,7 +112,7 @@ document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
   link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
 });
 document.querySelectorAll('a.ipns').forEach((link) => {
-	link.href = link.href + window.location.pathname.split("/").slice(2).join("/")
+	link.href = link.href + window.location.pathname.split("/").slice(3).join("/")
   link.textContent = link.href
 });
 
