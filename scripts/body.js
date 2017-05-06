@@ -112,7 +112,7 @@ document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
   link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
 });
 document.querySelectorAll('a.ipns').forEach((link) => {
-	link.href = link.href + window.location.pathname.split("/").slice(3).join("/")
+	link.href = link.href + "/" + window.location.pathname.split("/").slice(3).join("/")
   link.textContent = link.href
 });
 
