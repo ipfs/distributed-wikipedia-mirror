@@ -1,5 +1,4 @@
-// Instead of changing it directly, please change the `template/footer.html` file
-// and paste here
+// This script adds a footer on all pages
 const documentToPrint = `
 <style>
 .footer-wrapper {
