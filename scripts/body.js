@@ -62,10 +62,10 @@ const documentToPrint = `
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
   <div>
-    IPFS Link: <a class="external text" href="dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a>
+    IPFS Link: <a class="external text ipns" href="dweb://ipns/{{IPNS_HASH}}">dweb://ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
-    HTTP Link: <a class="external text" href="https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a>
+    HTTP Link: <a class="external text ipns" href="https://ipfs.io/ipns/{{IPNS_HASH}}">https://ipfs.io/ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
     <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
@@ -109,7 +109,12 @@ const documentToPrint = `
 document.write(documentToPrint);
 document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
 	link.href = link.href.replace('{ARTICLE_URL}', window.location.href)
-})
+  link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
+});
+document.querySelectorAll('a.ipns').forEach((link) => {
+	link.href = link.href + window.location.pathname
+  link.textContent = link.href
+});
 
 // (window.RLQ=window.RLQ||[]).push(function(){mw.log.warn("Gadget \"ReferenceTooltips\" styles loaded twice. Migrate to type=general. See \u003Chttps://phabricator.wikimedia.org/T42284\u003E.");});
 
