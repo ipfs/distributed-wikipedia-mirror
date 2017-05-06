@@ -1,12 +1,6 @@
-<!--
-	Footer has the following values that needs to be replaced when injected:
-  - SNAPSHOT_DATE - date the snapshot was created
-  - IPNS_HASH - IPNS hash for this language-version of wikipedia
-
-  These values can be inserted by javascript on the client side:
-  - ARTICLE_URL - window.location.url
-  - ARTICLE_PATHNAME - pathname to the article (from window.location.pathname)
--->
+// Instead of changing it directly, please change the `template/footer.html` file
+// and paste here
+const documentToPrint = `
 <style>
 .footer-wrapper {
 	background-color: white;
@@ -15,6 +9,7 @@
 	border-radius: 10px;
 	width: 500px;
 	margin: 0px auto;
+  margin-bottom: 25px;
 }
 .footer-wrapper a {
 	color: #0084b4;
@@ -55,23 +50,12 @@
 	margin: 5px;
 }
 </style>
-<div style="clear:both; background-image:linear-gradient(180deg, #E8E8E8, white); border-top: dashed 2px #AAAAAA; padding: 0.5em 0.5em 2em 0.5em; margin-top: 1em; direction: ltr;">
-  <p>
-    This snapshot was generated and distributed by the <a class="external text" href="https://github.com/ipfs/distributed-wikipedia-mirror">Distributed Wikipedia Mirror project</a> The Distributed Wikipedia Mirror is a global effort, independent from Wikipedia.
-  </p>
-  <p>
-    Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a><br/>
-    IPFS Link: dweb://ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}<br/>
-    HTTP Link: <a class="external text" href="https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}">https://ipfs.io/ipns/{{IPNS_HASH}}{ARTICLE_PATHNAME}</a><br/>
-    <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
-  </p>
-</div>
 <div class="footer-wrapper">
 	<div class="footer-logo">
-		<img src="../assets/distributed-wikipedia.png" width="100"/>
+    <img src="../../wikipedia-on-ipfs.png" width="100"/>
 	</div>
 	<div class="footer-titles">
-		<div class="footer-titles-title">Distributed Wikipedia Mirror</div>
+		<div class="footer-titles-title">Distributed Wikipedia</div>
 		<div class="footer-titles-subtitle">Powered by <a href="https://ipfs.io">IPFS</a></div>
 	</div>
 	<div class="footer-sharing">
@@ -98,7 +82,14 @@
 	<div style="clear: both"></div>
 </div>
 <script>
+</script>
+`
+
+document.write(documentToPrint);
 document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
 	link.href = link.href.replace('{ARTICLE_URL}', window.location.href)
 })
-</script>
+
+// (window.RLQ=window.RLQ||[]).push(function(){mw.log.warn("Gadget \"ReferenceTooltips\" styles loaded twice. Migrate to type=general. See \u003Chttps://phabricator.wikimedia.org/T42284\u003E.");});
+
+// (window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":62,"wgHostname":"mw1218"});});

@@ -9,6 +9,7 @@ const documentToPrint = `
 	border-radius: 10px;
 	width: 500px;
 	margin: 0px auto;
+  margin-bottom: 25px;
 }
 .footer-wrapper a {
 	color: #0084b4;
@@ -51,7 +52,7 @@ const documentToPrint = `
 </style>
 <div class="footer-wrapper">
 	<div class="footer-logo">
-		<img src="../assets/distributed-wikipedia.png" width="100"/>
+    <img src="../../wikipedia-on-ipfs.png" width="100"/>
 	</div>
 	<div class="footer-titles">
 		<div class="footer-titles-title">Distributed Wikipedia</div>
