@@ -1,6 +1,9 @@
 // This script adds a footer on all pages
 const documentToPrint = `
 <style>
+.globegris {
+  background-image:url(../../wikipedia-on-ipfs-offset.png);
+}
 .pre-footer-wrapper, .footer-wrapper {
 	width: 500px;
 	margin: 0px auto;
