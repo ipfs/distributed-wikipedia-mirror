@@ -27,6 +27,8 @@ A full read-write version (2) would require a strong collaboration with Wikipedi
 
 If you would like to create an updated Wikipedia snapshot on IPFS, you can follow these steps.
 
+**Note: This is a work in progress.**. We intend to make it easy for anyone to create their own wikipedia snapshots and add them to IPFS, but our first emphasis has been to get the initial snapshots onto the network. This means some of the steps aren't as easy as we want them to be. If you run into trouble, seek help through a github issue, commenting in the #ipfs channel in IRC, or by posting a thread on https://discuss.ipfs.io.
+
 ### Step 1: Download the latest snapshot from kiwix.org
 Download the latest snapshot of Wikipedia (in ZIM format) from http://wiki.kiwix.org/wiki/Content_in_all_languages
 
@@ -34,19 +36,52 @@ Download the latest snapshot of Wikipedia (in ZIM format) from http://wiki.kiwix
 Unpack the ZIM snapshot using https://github.com/dignifiedquire/zim/commit/a283151105ab4c1905d7f5cb56fb8eb2a854ad67
 
 ### Step 3: Enable Directory Sharding on your IPFS Node
-Configure your IPFS node to enable directory sharding 
+Configure your IPFS node to enable directory sharding
 ```sh
 $ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
 ### Step 4: Add the data to IPFS
-Add all the data the node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2.
+Add all the data the node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2. **Don't share the hash yet.**
 
 ```sh
 $ ipfs add -w -r --raw-leaves $upacked_wiki
 ```
 
-Save the last hash of the output from that process. It is the hash of your new Wikipedia snapshot.
+Save the last hash of the output from that process. You will use that in the next step.
 
-### Step 5: Share the hash
+### Step 5: Add mirror info and search bar to the snapshot
+**IMPORTANT: The snapshots must say who disseminated them.** This effort to mirror Wikipedia snapshots is not affiliated with Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. _The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia._
+
+We have provided a script that adds the necessary information. It also adds a decentralized, serverless search utility to the page.
+
+Clone the distributed-wikipedia-mirror git repository
+
+```sh
+$ git clone git@github.com:ipfs/distributed-wikipedia-mirror.git
+```
+
+then `cd` into that directory
+
+```sh
+$ cd distributed-wikipedia-mirror
+```
+
+Write a copy of the snapshot from IPFS to `/root` on your machine
+
+```sh
+$ ipfs files cp /ipfs/$YOUR_WIKI_HASH /root
+```
+
+_[We intend to make this part easier. See [the issue](https://github.com/ipfs/distributed-wikipedia-mirror/issues/21)]_ Within `execute-changes.sh` update `IPNS_HASH` and `SNAP_DATE`. `IPNS_HASH` value should be the IPNS hash for the language-verison of Wikipedia you're adding. `SNAP_DATE` should be today's date.
+
+Now run the script. It will process the content you copied into `/root`
+
+```sh
+$ ./execute-changes.sh
+```
+
+This will apply the modifications to your snapshot, add the modified version of the snapshot to IPFS, and return the hash of your new, modified version. That is the hash you want to share.
+
+### Step 6: Share the hash
 Share the hash of your new snapshot so people can access it and replicate it onto their machines.
