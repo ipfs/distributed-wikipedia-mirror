@@ -62,13 +62,10 @@ const documentToPrint = `
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
   <div>
-    IPFS Link: <a class="external text ipns" href="dweb://ipns/{{IPNS_HASH}}">dweb://ipns/{{IPNS_HASH}}</a>
+    IPFS Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
-    HTTP Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
-  </div>
-  <div>
-    <a class="external text" href="https://dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
+    <a class="external text" href="https://ipfs.io/ipns/dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
   </div>
 </div>
 <div class="footer-wrapper">
@@ -112,8 +109,9 @@ document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
   link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
 });
 document.querySelectorAll('a.ipns').forEach((link) => {
-	link.href = link.href + "/" + window.location.pathname.split("/").slice(3).join("/")
-  link.textContent = link.href
+	var loc = window.location.pathname.split("/").slice(3).join("/");
+	link.href = link.href + '/' + window.location.pathname.split("/").slice(3).join("/");
+  link.textContent = link.textContent + '/' + loc;
 });
 
 

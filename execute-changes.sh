@@ -12,7 +12,7 @@ ipfs-replace() {
 }
 
 ipfs files rm "$ROOT/-/j/body.js" 
-ipfs files cp /ipfs/$(sed -e 's/{{SNAPSHOT_DATE}}/'"$SNAP_DATE"'/' -e 's/{{IPNS_HASH}}/'"$IPNS_HASH"'/' \
+ipfs files cp /ipfs/$(sed -e 's/{{SNAPSHOT_DATE}}/'"$SNAP_DATE"'/g' -e 's/{{IPNS_HASH}}/'"$IPNS_HASH"'/g' \
 	scripts/body.js | ipfs add -Q) "$ROOT/-/j/body.js" 
 ipfs files rm "$ROOT/I/s/Wikipedia-logo-v2-200px-transparent.png"
 ipfs files cp /ipfs/$(ipfs add -Q assets/wikipedia-on-ipfs-small-flat-cropped-offset-min.png) "$ROOT/I/s/Wikipedia-logo-v2-200px-transparent.png"
@@ -30,6 +30,8 @@ HEAD_JS_HASH="$(ipfs cat "$HEAD_JS_LOCATION" | sed -e "s|^\tdocument.getElements
 
 ipfs files rm "$ROOT/-/j/head.js"
 ipfs files cp "/ipfs/$HEAD_JS_HASH" "$ROOT/-/j/head.js"
+
+ipfs-replace /ipfs/$(ipfs add -Q redirect-page/index.html) "/wiki/index.html"
 
 ipfs files stat "$ROOT"
 
