@@ -33,13 +33,36 @@ Download the latest snapshot of Wikipedia (in ZIM format) from http://wiki.kiwix
 ### Step 2: Unpack the ZIM snapshot
 Unpack the ZIM snapshot using https://github.com/dignifiedquire/zim/commit/a283151105ab4c1905d7f5cb56fb8eb2a854ad67
 
-### Step 3: Enable Directory Sharding on your IPFS Node
-Configure your IPFS node to enable directory sharding 
+### Step 3: Add mirror info and search bar to the snapshot
+**IMPORTANT: The snapshots must say who disseminated them.** This effort to mirror Wikipedia snapshots is not affiliated with Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. _The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia._
+
+We have provided a script that adds the necessary information. It also adds a decentralized, serverless search utility to the page.
+
+Clone the distributed-wikipedia-mirror git repository
+
+```sh
+$ git clone git@github.com:ipfs/distributed-wikipedia-mirror.git
+```
+
+then `cd` into that directory
+
+```sh
+$ cd distributed-wikipedia-mirror
+```
+
+Follow the instructions in the file `execute-changes.sh` to configure the script, then run it
+
+```sh
+$ ./execute-changes.sh
+```
+
+### Step 4: Enable Directory Sharding on your IPFS Node
+Configure your IPFS node to enable directory sharding
 ```sh
 $ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
-### Step 4: Add the data to IPFS
+### Step 5: Add the data to IPFS
 Add all the data the node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2.
 
 ```sh
@@ -48,5 +71,5 @@ $ ipfs add -w -r --raw-leaves $upacked_wiki
 
 Save the last hash of the output from that process. It is the hash of your new Wikipedia snapshot.
 
-### Step 5: Share the hash
+### Step 6: Share the hash
 Share the hash of your new snapshot so people can access it and replicate it onto their machines.
