@@ -32,6 +32,7 @@ ipfs files rm "$ROOT/-/j/head.js"
 ipfs files cp "/ipfs/$HEAD_JS_HASH" "$ROOT/-/j/head.js"
 
 ipfs-replace /ipfs/$(ipfs add -Q redirect-page/index.html) "/wiki/index.html"
+ipfs-replace /ipfs/$(ipfs add -Q redirect-page/index_root.html) "/index.html"
 
 ipfs files stat "$ROOT"
 
