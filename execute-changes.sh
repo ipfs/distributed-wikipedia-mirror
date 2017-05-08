@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 ROOT="/root"
 
-IPNS_HASH="QmQP99yW82xNKPxXLroxj1rMYMGF6Grwjj2o4svsdmGh7S"
+IPNS_HASH="QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W"
 SNAP_DATE="2017-04"
 
 ipfs-replace() {
