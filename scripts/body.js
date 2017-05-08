@@ -1,9 +1,7 @@
 // This script adds a footer on all pages
 const documentToPrint = `
 <style>
-.pre-footer-wrapper, .footer-wrapper { width: 55.8em; margin: 0px auto;
-	font-family:'Linux Libertine',Georgia,Times,serif;
-}
+.pre-footer-wrapper, .footer-wrapper { width: 55.8em; margin: 0px auto; font-family:'Linux Libertine',Georgia,Times,serif; }
 .pre-footer-wrapper div {
   margin-bottom: 10px;
 }
@@ -65,6 +63,9 @@ const documentToPrint = `
     IPFS Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
   </div>
   <div>
+    HTTP Link: <a class="external text http-ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
+  </div>
+  <div>
     <a class="external text" href="https://ipfs.io/ipns/dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
   </div>
 </div>
@@ -114,6 +115,11 @@ document.querySelectorAll('a.ipns').forEach((link) => {
   link.textContent = link.textContent + '/' + loc;
 });
 
+document.querySelectorAll('a.http-ipns').forEach((link) => {
+	var loc = window.location.pathname.split("/").slice(3).join("/");
+	link.href = link.href + '/' + window.location.pathname.split("/").slice(3).join("/");
+  link.textContent = link.href
+});
 
 // following section adds search functions
 
