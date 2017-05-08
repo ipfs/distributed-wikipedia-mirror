@@ -112,13 +112,13 @@ document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
 document.querySelectorAll('a.ipns').forEach((link) => {
 	var loc = window.location.pathname.split("/").slice(3).join("/");
 	link.href = link.href + '/' + window.location.pathname.split("/").slice(3).join("/");
-  link.textContent = link.textContent + '/' + loc;
+  link.textContent = decodeURIComponent(link.textContent + '/' + loc);
 });
 
 document.querySelectorAll('a.http-ipns').forEach((link) => {
 	var loc = window.location.pathname.split("/").slice(3).join("/");
 	link.href = link.href + '/' + window.location.pathname.split("/").slice(3).join("/");
-  link.textContent = link.href
+  link.textContent = decodeURIComponent(link.href)
 });
 
 // following section adds search functions
