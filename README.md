@@ -94,3 +94,7 @@ This will apply the modifications to your snapshot, add the modified version of 
 
 ### Step 6: Share the hash
 Share the hash of your new snapshot so people can access it and replicate it onto their machines.
+
+# How to Help
+
+If you would like to contribute to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted)
