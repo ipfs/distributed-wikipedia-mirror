@@ -1,5 +1,14 @@
-# Distributed Wikipedia Mirror Project
+
+<p align="center">
+<img src="https://camo.githubusercontent.com/cb217efab8ea638d8169e4ec15b006f194ae6e02/68747470733a2f2f697066732e696f2f697066732f516d62344b4b615a79524b3168677837465575746977556641335a4d3269777a433651757144356a59454465426a2f77696b6970656469612d6f6e2d697066732e706e67" width="40%" />
+</p>
+
+<h1 align="center">Distributed Wikipedia Mirror Project</h1>
+<p align="center">
 Putting Wikipedia Snapshots on IPFS and working towards making it fully read-write.
+<br />
+<br />
+</p>
 
 ## Purpose
 
