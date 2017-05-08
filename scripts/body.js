@@ -59,11 +59,14 @@ const documentToPrint = `
   <div>
     Created on: {{SNAPSHOT_DATE}} from the <a href="http://wiki.kiwix.org/wiki/Content_in_all_languages">kiwix ZIM file </a>
   </div>
-  <div>
-    IPFS Link: <a class="external text ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
+  <div class="ipns-hide">
+    IPFS Link (this snaphost): <a class="external text dweb ipfs" href=""></a>
   </div>
   <div>
-    HTTP Link: <a class="external text http-ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
+    IPNS Link (most recent): <a class="external text dweb ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
+  </div>
+  <div>
+    HTTP Link: <a class="external text ipfs http-ipfs" href=""></a>
   </div>
   <div>
     <a class="external text" href="https://ipfs.io/ipns/dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
@@ -107,18 +110,30 @@ const documentToPrint = `
 document.write(documentToPrint);
 document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
 	link.href = link.href.replace('{ARTICLE_URL}', window.location.href)
-  link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
-});
-document.querySelectorAll('a.ipns').forEach((link) => {
-	var loc = window.location.pathname.split("/").slice(3).join("/");
-	link.href = link.href + '/' + window.location.pathname.split("/").slice(3).join("/");
-  link.textContent = decodeURIComponent(link.textContent + '/' + loc);
+	link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
 });
 
-document.querySelectorAll('a.http-ipns').forEach((link) => {
-	var loc = window.location.pathname.split("/").slice(3).join("/");
-	link.href = link.href + '/' + window.location.pathname.split("/").slice(3).join("/");
-  link.textContent = decodeURIComponent(link.href)
+document.querySelectorAll('a.ipfs').forEach((link) => {
+	var p = window.location.pathname
+	link.textContent = decodeURIComponent(p);
+	link.href = p;
+});
+
+document.querySelectorAll('div.ipns-hide').forEach((link) => {
+	var p = window.location.pathname
+	if (!p.startsWith('/ipfs/')) {
+		link.style.display = 'none';
+	}
+});
+
+document.querySelectorAll('a.ipns').forEach((link) => {
+	var loc = '/' + window.location.pathname.split("/").slice(3).join("/");
+	link.href = link.href + loc;
+  link.textContent = link.textContent + decodeURIComponent(loc)
+});
+
+document.querySelectorAll('a.http-ipfs').forEach((link) => {
+  link.textContent = decodeURIComponent(link.href);
 });
 
 // following section adds search functions
