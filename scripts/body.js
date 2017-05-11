@@ -125,8 +125,16 @@ document.querySelectorAll('div.ipns-hide').forEach((link) => {
 		link.style.display = 'none';
 	}
 });
+// fix Kurdish wiki style
+document.querySelectorAll('th.wîkîlogo').forEach((a) => {
+	a.style['background-image'] = 'none'
+})
 
 document.querySelectorAll('a.ipns').forEach((link) => {
+	if link.hraf.indexOf('{{IPNS_HASH}}') != -1 {
+		link.parentNode.style.display = 'none'
+		return
+	}
 	var loc = '/' + window.location.pathname.split("/").slice(3).join("/");
 	link.href = link.href + loc;
   link.textContent = link.textContent + decodeURIComponent(loc)
