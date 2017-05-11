@@ -64,7 +64,11 @@ const searchInject = `
 </div>
 `
 var script = document.createElement('script');
+var wikiSearch = null;
 script.src = "../-/j/search.js";
+script.onload = () => {
+	wikiSearch = new WikiSearch('{{SEARCH_CID}}');
+}
 
 document.head.appendChild(script);
 
@@ -87,10 +91,9 @@ var delResults = function() {
 		while(resultsElem.firstChild) resultsElem.removeChild(resultsElem.firstChild);
 }
 
-var wikiSearch = new WikiSearch('{{SEARCH_CID}}');
 
 document.querySelector('.search-form').onsubmit = function() {
-	if (search == null) {
+	if (wikiSearch == null) {
 		return false;
 	}
 	var val = document.querySelector('.search-text').value;
