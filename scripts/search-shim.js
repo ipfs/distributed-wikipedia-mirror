@@ -1,7 +1,7 @@
 const searchInject = `
 <div class="search-root">
 	<form class="search-form">
-		<input class="search-text" placeholder="Vikipedi üzerinde ara" type="text" />
+		<input class="search-text" placeholder="Search Wikipedia" type="text" />
 		<input type="submit" class="search-btn" />
 	</form>
 
