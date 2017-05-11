@@ -76,6 +76,8 @@ NEW_BODYJS=$(
 	-e 's/{{IPNS_HASH}}/'"$IPNS_HASH"'/g' scripts/body.js |\
 	if [ -n "$SEARCH" ]; then
 		cat - <(sed -e 's/{{SEARCH_CID}}/'"$SEARCH"'/' scripts/search-shim.js)
+	else
+		cat -
 	fi | ipfs add -Q
 )
 
