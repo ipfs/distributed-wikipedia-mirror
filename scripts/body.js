@@ -131,7 +131,7 @@ document.querySelectorAll('th.wîkîlogo').forEach((a) => {
 })
 
 document.querySelectorAll('a.ipns').forEach((link) => {
-	if link.hraf.indexOf('{{IPNS_HASH}}') != -1 {
+	if (link.href.indexOf('{{IPNS_HASH}}') != -1) {
 		link.parentNode.style.display = 'none'
 		return
 	}
