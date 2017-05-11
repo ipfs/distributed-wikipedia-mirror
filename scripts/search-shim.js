@@ -102,7 +102,7 @@ document.querySelector('.search-form').onsubmit = function() {
 		var resultsElem = document.querySelector('.search-results');
 		delResults()
 
-		results.forEach(function(art, idx) {
+		results.slice(0, 19).forEach(function(art, idx) {
 			var entry = proto.cloneNode(true);
 			entry.getElementsByClassName('entry-id')[0].appendChild(document.createTextNode(idx));
 			var link = entry.getElementsByClassName('entry-link')[0];
