@@ -69,7 +69,7 @@ ROOT="$1"
 
 ipfs-replace() {
 	ipfs files rm "$ROOT/$1" >/dev/null 2>&1 || true
-	ipfs files cp "$2" "$ROOT/$1"
+	ipfs files --flush=false cp "$2" "$ROOT/$1"
 }
 
 if ipfs files stat "$ROOT/A" >/dev/null 2>&1; then
@@ -105,6 +105,7 @@ ipfs-replace "-/j/head.js" "/ipfs/$HEAD_JS_HASH"
 ipfs-replace "/wiki/index.html" "$ROOT/wiki/$MAIN"
 ipfs-replace "/index.html" "/ipfs/$(ipfs add -Q redirect-page/index_root.html)"
 
+ipfs files flush "$ROOT"
 echo "We are done !!!"
 ipfs files stat "$ROOT"
 
