@@ -12,12 +12,13 @@ error() {
 usage() {
 	echo "USAGE:"
 	echo "	$0 [-h|--help] [--ipns=<ipns hash>] [--date=<date of snapshot>]";
-	echo "		[--search] <ipfs files root>"
+	echo "		[--search=<cid of searchset>] [--main=<article>] <ipfs files root>"
 	echo ""
 	echo "	-h|--help		- displays help"
 	echo "	--ipns			- ipns hash of the archive"
 	echo "	--date			- date of snapshot (defaults to this month)"
 	echo "  --search		- hash of search IPLD structure"
+	echo "  --main 			- full name of article containing intro page (e.g. Main_Page.html)"
 	exit 2
 }
 
@@ -26,7 +27,7 @@ if [ "$(getopt --test >/dev/null 2>&1; echo $?)" -ne "4" ]; then
 fi
 
 
-LONG_OPT="help,search:,ipns:,date:"
+LONG_OPT="help,search:,ipns:,date:,main:"
 SHORT_OPT="h"
 PARSED_OPTS=$(getopt -n "$0" -o "$SHORT_OPT" -l "$LONG_OPT" -- "$@") || usage
 
@@ -36,6 +37,7 @@ eval set -- "$PARSED_OPTS"
 SNAP_DATE=$(date +"%Y-%m-%d")
 IPNS_HASH=""
 SEARCH=""
+MAIN=index.htm
 
 while true; do
 	case "$1" in
@@ -49,6 +51,9 @@ while true; do
 			shift 2;;
 		--search)
 			SEARCH="$2"
+			shift 2;;
+		--main)
+			MAIN="$2"
 			shift 2;;
 		--)
 			shift;
@@ -97,7 +102,7 @@ HEAD_JS_HASH="$(ipfs cat "$HEAD_JS_LOCATION" | sed -e "s|^\tdocument.getElements
 
 ipfs-replace "-/j/head.js" "/ipfs/$HEAD_JS_HASH"
 
-ipfs-replace "/wiki/index.html" "/ipfs/$(ipfs add -Q redirect-page/index.html)"
+ipfs-replace "/wiki/index.html" "$ROOT/wiki/$MAIN"
 ipfs-replace "/index.html" "/ipfs/$(ipfs add -Q redirect-page/index_root.html)"
 
 echo "We are done !!!"
