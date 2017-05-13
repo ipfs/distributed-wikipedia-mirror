@@ -14,9 +14,9 @@ usage() {
 	echo "	$0 [-h|--help] [--ipns=<ipns hash>] [--date=<date of snapshot>]";
 	echo "		[--search=<cid of searchset>] [--main=<article>] <ipfs files root>"
 	echo ""
-	echo "	-h|--help		- displays help"
-	echo "	--ipns			- ipns hash of the archive"
-	echo "	--date			- date of snapshot (defaults to this month)"
+	echo "  -h|--help		- displays help"
+	echo "  --ipns			- ipns hash of the archive"
+	echo "  --date			- date of snapshot (defaults to this month)"
 	echo "  --search		- hash of search IPLD structure"
 	echo "  --main 			- full name of article containing intro page (e.g. Main_Page.html)"
 	exit 2
