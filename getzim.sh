@@ -28,10 +28,10 @@ textmenu() { #allows the user to choose an id or item from a list
   echo "< $res" #show the choice to the user
 }
 
-#Select Source
-srcs=$(echo "$urls" | grep "zim/.*_.*_all.zim" -o | grep "/[a-z]*_" -o | grep "[a-z]*" -o | uniq)
-textmenu "$srcs" "Select which source to mirror" "$1"
-src="$res"
+#Select Wiki
+wikis=$(echo "$urls" | grep "zim/.*_.*_all.zim" -o | grep "/[a-z]*_" -o | grep "[a-z]*" -o | uniq)
+textmenu "$wikis" "Select which wiki to mirror" "$1"
+wiki="$res"
 
 #Select Language
 langs=$(echo "$urls" | grep "/${res}_.*" -o | grep -o "_.*_" | sed "s|^_||g" | sed "s|_$||g")
@@ -39,12 +39,12 @@ textmenu "$langs" "Select which language to mirror" "$2"
 lang="$res"
 
 #Get URL
-url="http://download.kiwix.org/zim/${src}_${lang}_all.zim"
+url="http://download.kiwix.org/zim/${wiki}_${lang}_all.zim"
 urlverify=$(echo "$urls" | grep "$url")
 [ -z "$urlverify" ] && echo "INTERNAL ERROR: $url was not found in list but seems to be valid - Please report!" && exit 2
 
 echo
-echo "Source: $src, Language: $lang, Url: $url"
+echo "Wiki: $wiki, Language: $lang, Url: $url"
 
 [ -z "$*" ] && read -p "Press return to start downloading (this may take a long time)...
 " _foo
