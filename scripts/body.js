@@ -113,6 +113,8 @@ document.querySelectorAll('.footer-sharing-icon').forEach((link) => {
 	link.href = link.href.replace('{ARTICLE_TITLE}', document.title)
 });
 
+document.title = document.title + " - The InterPlanetary Wiki";
+
 document.querySelectorAll('a.ipfs').forEach((link) => {
 	var p = window.location.pathname
 	link.textContent = decodeURIComponent(p);
