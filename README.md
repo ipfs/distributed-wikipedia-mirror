@@ -8,9 +8,13 @@
 Putting Wikipedia Snapshots on IPFS and working towards making it fully read-write.
 <br />
 <br />
+ Existing Mirrors: https://en.wikipedia-on-ipfs.org, https://tr.wikipedia-on-ipfs.org
 </p>
 
 ## Purpose
+
+“We believe that information—knowledge—makes the world better. That when we ask questions, get the facts, and are able to understand all perspectives on an issue, it allows us to build the foundation for a more just and tolerant society” 
+-- Katherine Maher, Executive Director of the Wikimedia Foundation
 
 ## Wikipedia on IPFS -- Background
 
@@ -28,7 +32,7 @@ So far, we have achieved part of this goal: we have static snapshots of all of W
 
 ### (Goal 2) Fully Read-Write Wikipedia on IPFS
 
-The long term goal is to get the full-fledged read-write Wikipedia to work on top of IPFS. This is much more difficult because for a read-write application like Wikipedia to leverage the distributed nature of IPFS, we need to change the how the applications write data. A read-write wikipedia on IPFS would allow it to be completely decentralized and an extremely difficult to censor operation. In addition to all the benefits of the static version above, the users of a read-write Wikipedia on IPFS could write content from anywhere and publish it, even without being directly connected to any wikipedia.org servers. There would be automatic version control and version history archiving. We could allow people to view, edit, and publish in completely encrypted contexts, which is important to people in highly repressive regions of the world.
+The long term goal is to get the full-fledged read-write Wikipedia to work on top of IPFS. This is much more difficult because for a read-write application like Wikipedia to leverage the distributed nature of IPFS, we need to change how the applications write data. A read-write wikipedia on IPFS would allow it to be completely decentralized, and create an extremely difficult to censor operation. In addition to all the benefits of the static version above, the users of a read-write Wikipedia on IPFS could write content from anywhere and publish it, even without being directly connected to any wikipedia.org servers. There would be automatic version control and version history archiving. We could allow people to view, edit, and publish in completely encrypted contexts, which is important to people in highly repressive regions of the world.
 
 A full read-write version (2) would require a strong collaboration with Wikipedia.org itself, and finishing work on important dynamic content challenges -- we are working on all the technology (2) needs, but it's not ready for prime-time yet. We will update when it is.
 
@@ -51,7 +55,7 @@ $ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
 ### Step 4: Add the data to IPFS
-Add all the data the node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2. **Don't share the hash yet.**
+Add all the data to your node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2. **Don't share the hash yet.**
 
 ```sh
 $ ipfs add -w -r --raw-leaves $upacked_wiki
@@ -60,7 +64,7 @@ $ ipfs add -w -r --raw-leaves $upacked_wiki
 Save the last hash of the output from that process. You will use that in the next step.
 
 ### Step 5: Add mirror info and search bar to the snapshot
-**IMPORTANT: The snapshots must say who disseminated them.** This effort to mirror Wikipedia snapshots is not affiliated with Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. _The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia._
+**IMPORTANT: The snapshots must say who disseminated them.** This effort to mirror Wikipedia snapshots is not affiliated with the Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. _The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia._
 
 We have provided a script that adds the necessary information. It also adds a decentralized, serverless search utility to the page.
 
@@ -97,4 +101,4 @@ Share the hash of your new snapshot so people can access it and replicate it ont
 
 # How to Help
 
-If you would like to contribute to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted)
+If you would like to contribute to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted).
