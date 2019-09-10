@@ -52,7 +52,7 @@ fetch_with_cache() {
 }
 
 get_urls() {
-  grep href | sed -r 's|.*href="(.*)".*|\1|g' | sed "s|/||g"
+  grep href | grep -v "<pre>" | sed -r 's|.*href="(.*)".*|\1|g' | sed "s|/||g"
 }
 
 # main funcs
@@ -68,48 +68,117 @@ cmd_cache_update() {
   done
 }
 
-filter_group() {
-  # wikipedia_ru_molcell_nopic_2019-05.zim
-  # base:
-  sed -r "s|([a-z0-9-]+)_([a-z0-9-]+)_([a-z0-9-]+)_([a-z0-9-]+)_([a-z0-9-]+)\\.zim|\\$1|g"
+urlp() {
+  # usage: get var
+  # usage: filter type lang edition tags... date/"any"
+
+  case "$1" in
+    get)
+      get_var="$2"
+      ;;
+    filter)
+      filter_type="$1"
+      shift
+      filter_lang="$1"
+      shift
+      filter_edition="$1"
+      shift
+
+      filter_tags=()
+      while [ ! -z "$2" ]; do
+        filter_tags+=("$1")
+        shift
+      done
+      filter_tags="${filter_tags[*]}"
+
+      if [ "$1" != "any" ]; then
+        filter_date="$1"
+      fi
+      shift
+      ;;
+  esac
+
+  while read url; do
+    type=""
+    lang=""
+    edition=""
+
+    tags=()
+    date=""
+
+    for group in $(echo "$url" | sed "s|.zim||g" | tr "_" "\n"); do
+      if [ -z "$type" ]; then
+        type="$group"
+      elif [ -z "$lang" ]; then
+        lang="$group"
+      elif [ -z "$edition" ]; then
+        edition="$group"
+      elif [[ "$group" == "20"* ]]; then
+        date="$group"
+      else
+        tags+=("$group")
+      fi
+    done
+
+    tags="${tags[*]}"
+
+    if [ ! -z "$get_var" ]; then
+      echo "${!get_var}"
+    else
+      if [ -z "$filter_type" ] || [[ "$filter_type" == "$type" ]]; then
+        if [ -z "$filter_lang" ] || [[ "$filter_lang" == "$lang" ]]; then
+          if [ -z "$filter_edition" ] || [[ "$filter_edition" == "$edition" ]]; then
+            if [ -z "$filter_tags" ] || [[ "$filter_tags" == "$tags" ]]; then
+              if [ -z "$filter_date" ] || [[ "$filter_date" == "$date" ]]; then
+                echo "$url"
+              fi
+            fi
+          fi
+        fi
+      fi
+    fi
+
+    # echo "type=$type, lang=$lang, edition=$edition, date=$date, tags=${tags[*]}"
+  done
 }
 
 cmd_choose() {
   # Select wiki
-  # TODO: there is a special case, "other", where multiple wikis are available
+  log "Getting wiki list..."
   wikis=$(fetch_with_cache | get_urls)
   textmenu "$wikis" "Select which wiki to mirror (choose 'other' for more)" "$1"
   wiki="$res"
 
-  # https://download.kiwix.org/zim/wikipedia/wikipedia_ar_medicine_nopic_2019-08.zim
-  #                               TYPE      TYPE      LANG CAT     EDITION DATE
-
-  fetch_with_cache "$wiki" | get_urls | filter_group 1 | uniq
-  fetch_with_cache "$wiki" | get_urls | filter_group 1 | uniq | wc -l
-
-  reallist=$(fetch_with_cache "$wiki" | get_urls | filter_group 1 | uniq | wc -l)
+  log "Getting sub-wiki list..."
+  # there is a special case, "other", where multiple wikis are available
+  reallist=$(fetch_with_cache "$wiki" | get_urls | urlp get type | uniq | wc -l)
 
   if [ "$reallist" != "1" ]; then
-    wikireals=$(fetch_with_cache "$wiki" | get_urls | filter_group 1 | sort | uniq)
+    wikireals=$(fetch_with_cache "$wiki" | get_urls | urlp get type | sort | uniq)
     textmenu "$wikireals" "Select which wiki to mirror" "$1"
     wikireal="$res"
   else
     wikireal="$wiki"
   fi
 
-  langs=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_" | filter_group 2 | sort | uniq)
+  log "Getting language list..."
+  langs=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_" | urlp get lang | sort | uniq)
   textmenu "$langs" "Select which language to mirror" "$2"
   lang="$res"
 
-  cats=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}" | filter_group 3 | sort | uniq)
-  textmenu "$cats" "Select which category to mirror" "$3"
-  cat="$res"
-
-  editions=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${cat}" | filter_group 4 | sort | uniq)
-  textmenu "$editions" "Select which edition to mirror" "$4"
+  log "Getting edition list..."
+  editions=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}" | urlp get edition | sort | uniq)
+  textmenu "$editions" "Select which edition to mirror" "$3"
   edition="$res"
 
-  dates=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${cat}_${edition}" | filter_group 5 | sort | uniq)
+  log "Getting tag list.."
+  tags=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}" | urlp get tags | sort | uniq)
+  textmenu "$tags" "Select which tags to use" "$4"
+  tag=$(echo "$res" | sed "s| |_|g")
+
+  log "Getting date list..."
+  dates=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}_${tag}" | urlp get date | sort | uniq)
+  dates="any $dates"
   textmenu "$dates" "Select which date to mirror" "$5"
   date="$res"
 
@@ -117,7 +186,8 @@ cmd_choose() {
     wiki="$wiki $wikireal"
   fi
 
-  echo "Download command: $0 download $wiki $lang $cat $edition $date"
+  echo "Download command:"
+  echo "  \$ $0 download $wiki $lang $edition $tag $date"
 }
 
 cmd_download() {
