@@ -2,33 +2,21 @@
 ---
 # This is a stopgap measure for keeping track of hashes until we set up a better system.
 
-ar:
-  name: Arabic
-  original: ar.wikipedia.org
-  date: no snapshot yet
-  ipns: https://ipfs.io/ipns/QmNayrUbrwPYQ9hKk9YevbebUDrrfgQboi2BfsuKmuZEjC
-  ipfs: no snapshot yet
 en:
   name: English
   original: en.wikipedia.org
   date: 2017-05-11
-  ipns:  https://ipfs.io/ipns/QmdJiuMWp2FxyaerfLrtdLF6Nr1EWpL7dPAxA9oKSPYYgV
+  ipns:
   ipfs: https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco
-simple:
-  name: Simple English
-  original: simple.wikipedia.org
-  date:
-  ipns:  https://ipfs.io/ipfs/QmU2TE8ym8rBAMwzaanZ3SbVtBJY4R7oX2uN1fca4JAnrD
-  ipfs:
 ku:
   name: Kurdish
   original: ku.wikipedia.org
   date: 2017-05-10
-  ipns:  https://ipfs.io/ipns/QmakP2ZAzEEUpfK6ng2tKHCM56cdEDXDBX2aV5EtPvqpHm
+  ipns:
   ipfs: https://ipfs.io/ipfs/QmWY4KZXKTuspGSwYVDNbNLLZcmSiQ63Mdmz7eRd4KzBbb
 tr:
   name: Turkish
   original: tr.wikipedia.org
   date: 2017-04-30
-  ipns:  https://ipfs.io/ipns/QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W
+  ipns:
   ipfs: https://ipfs.io/ipfs/QmT5NvUtoM5nWFfrQdVrFtvGfKFmG7AHE8P34isapyhCxX
