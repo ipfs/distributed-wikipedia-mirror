@@ -77,6 +77,7 @@ urlp() {
       get_var="$2"
       ;;
     filter)
+      shift
       filter_type="$1"
       shift
       filter_lang="$1"
@@ -90,6 +91,10 @@ urlp() {
         shift
       done
       filter_tags="${filter_tags[*]}"
+
+      if [ -z "$filter_tags" ]; then
+        filter_tags="notag"
+      fi
 
       if [ "$1" != "any" ]; then
         filter_date="$1"
@@ -121,6 +126,10 @@ urlp() {
     done
 
     tags="${tags[*]}"
+
+    if [ -z "$tags" ]; then
+      tags="notag"
+    fi
 
     if [ ! -z "$get_var" ]; then
       echo "${!get_var}"
@@ -171,27 +180,109 @@ cmd_choose() {
   textmenu "$editions" "Select which edition to mirror" "$3"
   edition="$res"
 
-  log "Getting tag list.."
-  tags=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}" | urlp get tags | sort | uniq)
+  log "Getting tag list..."
+  tags=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}" | urlp get tags | sed "s| |_|g" | sort | uniq)
   textmenu "$tags" "Select which tags to use" "$4"
-  tag=$(echo "$res" | sed "s| |_|g")
+  tag="$res"
+
+  if [ "$tag" != "notag" ]; then
+    tagu="_$tag"
+  fi
 
   log "Getting date list..."
-  dates=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}_${tag}" | urlp get date | sort | uniq)
+  dates=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}${tagu}" | urlp get date | sort | uniq)
   dates="any $dates"
   textmenu "$dates" "Select which date to mirror" "$5"
   date="$res"
 
-  if [ "$wikireal" != "$wiki" ]; then
-    wiki="$wiki $wikireal"
+  echo
+  echo "  Download command:"
+  echo "    \$ $0 download $wiki $wikireal $lang $edition $tag $date"
+  echo
+
+  while true; do
+    read -p "Download [y/N]: " doit
+    case "$doit" in
+      y)
+        cmd_download "$wiki" "$wikireal" "$lang" "$edition" "$tag" "$date"
+        exit $?
+        ;;
+      n)
+        exit 0
+        ;;
+    esac
+  done
+}
+
+cmd_download_url() {
+  wiki="$1"
+  wikireal="$2"
+  lang="$3"
+  edition="$4"
+  tag="$5"
+  date="$6"
+
+  tag=$(echo "$tag" | sed "s|_| |g")
+  tag=($tag)
+
+  log "Getting download URL..."
+  URL=$(fetch_with_cache "$1" | get_urls | urlp filter "$wikireal" "$lang" "$edition" "${tag[@]}" "$date" | sort -s -r | head -n 1)
+
+  if [ -z "$URL" ]; then
+    echo "ERROR: Download URL not found. Possibly removed?" >&2
+    exit 2
   fi
 
-  echo "Download command:"
-  echo "  \$ $0 download $wiki $lang $edition $tag $date"
+  URL="$BASEURL$wiki/$URL"
+
+  log "URL: $URL"
+
+  # below is a mixture of https://stackoverflow.com/a/19841872/3990041, my knowledge and guesswork :P
+  SHA256=$(curl -sI "$URL" | grep digest | grep "SHA-256" | sed "s|digest: SHA-256=||g" | base64 -i -w 0 -d | od -t x8 -An | tr "\n" " " | sed "s| ||g")
+
+  log "SHA256: $SHA256"
 }
 
 cmd_download() {
-  :
+  cmd_download_url "$@"
+
+  # real=$(curl -sLI $url | grep "^Location:"  | sed "s|Location: ||g" | grep "[a-zA-Z0-9\/:\._-]*" -o) #all the redirects
+  OUTNAME=$(basename "$URL")
+
+  dl_cycle() {
+    log "Downloading $OUTNAME..."
+    wget --continue "$URL"
+    return $?
+  }
+
+  check_cycle() {
+    log "Verifiying $OUTNAME..."
+    sha256="$SHA256  $OUTNAME"
+    echo "$sha256" | sha256sum -c -
+    return $?
+  }
+
+  if [ -e "$OUTNAME" ]; then
+    if ! check_cycle; then
+      if ! dl_cycle; then
+        echo "Download failed! Check your network!"
+      fi
+      if ! check_cycle; then
+        echo "It seems like your file is corrupted"
+        echo "Please remove it:" # we won't do that because the user might not want this
+        echo " \$ rm $OUTNAME"
+      fi
+    fi
+  else
+    if ! dl_cycle; then
+      echo "Download failed! Check your network!"
+    fi
+    if ! check_cycle; then
+      echo "It seems like your file is corrupted"
+      echo "Please remove it:" # we won't do that because the user might not want this
+      echo " \$ rm $OUTNAME"
+    fi
+  fi
 }
 
 if [ -n "$(LC_ALL=C type -t cmd_$1)" ] && [ "$(LC_ALL=C type -t cmd_$1)" = function ]; then
@@ -202,76 +293,6 @@ if [ -n "$(LC_ALL=C type -t cmd_$1)" ] && [ "$(LC_ALL=C type -t cmd_$1)" = funct
 else
   echo "Usage: $0 cache_update"
   echo "       $0 choose"
-  echo "       $0 download <wiki-type> <wiki-lang> <wiki-category> <wiki-edition> [<wiki-date>]"
+  echo "       $0 download <wiki> <wiki-real> <wiki-lang> <wiki-edition> <wiki-tag> <wiki-date>"
   exit 2
 fi
-
-
-
-
-old() {
-  #urls=$(echo "$html" | grep "Download" | grep "https://download.kiwix.org/zim/.*_all.zim\"" -o | grep "https://download.kiwix.org/zim/.*_all.zim" -o | uniq) #filter all urls
-
-  #Select Wiki
-  # wikis=$(echo "$urls" | grep "zim/.*_.*_all.zim" -o | grep "/[a-z]*_" -o | grep "[a-z]*" -o | uniq)
-
-  fetch_with_cache "$wiki"
-
-  #Select Language
-  langs=$(echo "$urls" | grep "/${res}_.*" -o | grep -o "_.*_" | sed "s|^_||g" | sed "s|_$||g")
-  textmenu "$langs" "Select which language to mirror" "$2"
-  lang="$res"
-
-  #Get URL
-  url="https://download.kiwix.org/zim/${wiki}_${lang}_all.zim"
-  urlverify=$(echo "$urls" | grep "$url")
-  [ -z "$urlverify" ] && echo "INTERNAL ERROR: $url was not found in list but seems to be valid - Please report!" && exit 2
-
-  echo
-  echo "Wiki: $wiki, Language: $lang, Url: $url"
-
-  [ -z "$*" ] && read -p "Press return to start downloading (this may take a long time)...
-  " _foo
-
-  md5=$(curl -sL $url.md5) #get the md5
-  real=$(curl -sLI $url | grep "^Location:"  | sed "s|Location: ||g" | grep "[a-zA-Z0-9\/:\._-]*" -o) #all the redirects
-  dest=$(basename $(echo "$real" | head -n 1)) #the real filename (includes date in filename, different from the one in the wiki)
-
-  md5check() {
-    echo
-    echo "Verify md5 checksum..."
-    md5sum -c > /dev/null 2> /dev/null << q
-  $md5
-  q
-    e=$?
-    if [ $e -ne 0 ]; then
-      echo "md5sum FAILED!"
-      if [ -z "$1" ]; then
-        echo "Trying to continue the download..."
-        echo
-        wget --continue "$url" -O $dest
-        echo
-        md5check "r"
-      else
-        echo
-        echo "It seems like your file is corrupted"
-        echo "Please remove it:" #we won't do that because the user might not want this
-        echo " $ rm $dest"
-        exit 2
-      fi
-    else
-      echo
-      echo "Success! File saved as $dest"
-    fi
-  }
-
-  if [ -e "$dest" ]; then
-    echo "Skipping download, file already exists..."
-    md5check
-  else
-    echo
-    wget $url -O $dest
-    echo
-    md5check
-  fi
-}
