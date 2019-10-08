@@ -70,7 +70,7 @@ cmd_cache_update() {
 
 urlp() {
   # usage: get var
-  # usage: filter type lang edition tags... date/"any"
+  # usage: filter type lang edition tags... date/"latest"
 
   case "$1" in
     get)
@@ -96,7 +96,7 @@ urlp() {
         filter_tags="notag"
       fi
 
-      if [ "$1" != "any" ]; then
+      if [ "$1" != "latest" ]; then
         filter_date="$1"
       fi
       shift
@@ -191,7 +191,7 @@ cmd_choose() {
 
   log "Getting date list..."
   dates=$(fetch_with_cache "$wiki" | get_urls | grep "^${wikireal}_${lang}_${edition}${tagu}" | urlp get date | sort | uniq)
-  dates="any $dates"
+  dates="latest $dates"
   textmenu "$dates" "Select which date to mirror" "$5"
   date="$res"
 
@@ -241,6 +241,10 @@ cmd_download_url() {
   SHA256=$(curl -sI "$URL" | grep digest | grep "SHA-256" | sed "s|digest: SHA-256=||g" | base64 -i -w 0 -d | od -t x1 -An | tr "\n" " " | sed "s| ||g")
 
   log "SHA256: $SHA256"
+}
+
+cmd_url() {
+  cmd_download_url "$@"
 }
 
 cmd_download() {
@@ -293,6 +297,6 @@ if [ -n "$(LC_ALL=C type -t cmd_$1)" ] && [ "$(LC_ALL=C type -t cmd_$1)" = funct
 else
   echo "Usage: $0 cache_update"
   echo "       $0 choose"
-  echo "       $0 download <wiki> <wiki-real> <wiki-lang> <wiki-edition> <wiki-tag> <wiki-date>"
+  echo "       $0 download/url <wiki> <wiki-real> <wiki-lang> <wiki-edition> <wiki-tag> <wiki-date>"
   exit 2
 fi
