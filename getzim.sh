@@ -244,7 +244,8 @@ cmd_download_url() {
 }
 
 cmd_url() {
-  cmd_download_url "$@"
+  cmd_download_url "$@" >&2
+  echo '{"url":"'"$URL"'","sha256":"'"$SHA256"'"}'
 }
 
 cmd_download() {
