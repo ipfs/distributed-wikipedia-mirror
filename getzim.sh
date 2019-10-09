@@ -46,6 +46,7 @@ fetch_with_cache() {
     cat "$OUTFILE"
   else
     OUT=$(curl -sL "$BASEURL$1")
+    mkdir -p "$CACHE"
     echo "$OUT" > "$OUTFILE"
     echo "$OUT"
   fi
