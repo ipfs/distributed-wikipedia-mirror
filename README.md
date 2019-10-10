@@ -42,8 +42,27 @@ If you would like to create an updated Wikipedia snapshot on IPFS, you can follo
 
 **Note: This is a work in progress.**. We intend to make it easy for anyone to create their own wikipedia snapshots and add them to IPFS, but our first emphasis has been to get the initial snapshots onto the network. This means some of the steps aren't as easy as we want them to be. If you run into trouble, seek help through a github issue, commenting in the #ipfs channel in IRC, or by posting a thread on https://discuss.ipfs.io.
 
+### Step 0: Clone this repository
+All commands assume to be run inside a cloned version of this repository
+
+Clone the distributed-wikipedia-mirror git repository
+
+```sh
+$ git clone git@github.com:ipfs/distributed-wikipedia-mirror.git
+```
+
+then `cd` into that directory
+
+```sh
+$ cd distributed-wikipedia-mirror
+```
+
 ### Step 1: Download the latest snapshot from kiwix.org
-Download the latest snapshot of Wikipedia (in ZIM format) from http://wiki.kiwix.org/wiki/Content_in_all_languages
+For that you can use the getzim.sh script
+
+First, download the latest wiki lists using `bash getzim.sh cache_update`
+
+After that create a download command using `bash getzim.sh choose`
 
 ### Step 2: Unpack the ZIM snapshot
 Unpack the ZIM snapshot using https://github.com/dignifiedquire/zim/commit/a283151105ab4c1905d7f5cb56fb8eb2a854ad67
@@ -67,18 +86,6 @@ Save the last hash of the output from that process. You will use that in the nex
 **IMPORTANT: The snapshots must say who disseminated them.** This effort to mirror Wikipedia snapshots is not affiliated with the Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. _The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia._
 
 We have provided a script that adds the necessary information. It also adds a decentralized, serverless search utility to the page.
-
-Clone the distributed-wikipedia-mirror git repository
-
-```sh
-$ git clone git@github.com:ipfs/distributed-wikipedia-mirror.git
-```
-
-then `cd` into that directory
-
-```sh
-$ cd distributed-wikipedia-mirror
-```
 
 Write a copy of the snapshot from IPFS to `/root` on your machine
 
