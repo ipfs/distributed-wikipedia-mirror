@@ -83,27 +83,27 @@ NEW_BODYJS=$(
 		cat - <(sed -e 's/{{SEARCH_CID}}/'"$SEARCH"'/' scripts/search-shim.js)
 	else
 		cat -
-	fi | ipfs add -Q
+	fi | ipfs add --cid-version 1 -Q
 )
 
 ipfs-replace "-/j/body.js" "/ipfs/$NEW_BODYJS"
 ipfs-replace "I/s/Wikipedia-logo-v2-200px-transparent.png" \
-	"/ipfs/$(ipfs add -q assets/wikipedia-on-ipfs-small-flat-cropped-offset-min.png)"
+	"/ipfs/$(ipfs add --cid-version 1 -q assets/wikipedia-on-ipfs-small-flat-cropped-offset-min.png)"
 ipfs-replace "I/s/wikipedia-on-ipfs.png" \
-	"/ipfs/$(ipfs add -Q assets/wikipedia-on-ipfs-100px.png)"
+	"/ipfs/$(ipfs add --cid-version 1 -Q assets/wikipedia-on-ipfs-100px.png)"
 
 if [ -n "$SEARCH" ]; then
-	ipfs-replace "-/j/search.js" "/ipfs/$(ipfs add -Q scripts/search.js)"
+	ipfs-replace "-/j/search.js" "/ipfs/$(ipfs add --cid-version 1 -Q scripts/search.js)"
 fi
 
 # comment out some debug stuff in head.js
 HEAD_JS_LOCATION="$(ipfs files stat --hash "$ROOT")/-/j/head.js"
-HEAD_JS_HASH="$(ipfs cat "$HEAD_JS_LOCATION" | sed -e "s|^\tdocument.getElementsByTagName( 'head' )|//\0|" | ipfs add -Q)"
+HEAD_JS_HASH="$(ipfs cat "$HEAD_JS_LOCATION" | sed -e "s|^\tdocument.getElementsByTagName( 'head' )|//\0|" | ipfs add --cid-version 1 -Q)"
 
 ipfs-replace "-/j/head.js" "/ipfs/$HEAD_JS_HASH"
 
 ipfs-replace "/wiki/index.html" "$ROOT/wiki/$MAIN"
-ipfs-replace "/index.html" "/ipfs/$(ipfs add -Q redirect-page/index_root.html)"
+ipfs-replace "/index.html" "/ipfs/$(ipfs add --cid-version 1 -Q redirect-page/index_root.html)"
 
 ipfs files flush "$ROOT"
 echo "We are done !!!"

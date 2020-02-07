@@ -65,40 +65,94 @@ First, download the latest wiki lists using `bash getzim.sh cache_update`
 After that create a download command using `bash getzim.sh choose`
 
 ### Step 2: Unpack the ZIM snapshot
-Unpack the ZIM snapshot using https://github.com/dignifiedquire/zim/commit/a283151105ab4c1905d7f5cb56fb8eb2a854ad67
 
-### Step 3: Enable Directory Sharding on your IPFS Node
+Unpack the ZIM snapshot using `extract_zim` from https://github.com/dignifiedquire/zim:
+
+```sh
+$ extract_zim --skip-link ./wikipedia_en_all_maxi_2018-10.zim --out ./out
+Extracting file: ./wikipedia_en_all_maxi_2018-10.zim to ./out
+  Creating map
+  Extracting entries: 126688
+  Spawning 126687 tasks across 64 threads
+  Extraction done in 315434ms
+  Main page is User:Stephane_(Kiwix)_Landing.html
+```
+
+> ### ℹ️ Main page
+> The string after `Main page is` as it is the name
+of the landing page set for the ZIM archive.  
+> You may also decide to use the original landing page instead (eg. `Main_Page` in `en`, `Anasayfa` in `tr` etc)  
+> Main page needs to be passed as `--main` when calling `execute-changes.sh` later.
+
+### Step 3: Configure your IPFS Node
+
+#### Enable Directory Sharding
+
 Configure your IPFS node to enable directory sharding
 ```sh
 $ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
-### Step 4: Add the data to IPFS
-Add all the data to your node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2. **Don't share the hash yet.**
+#### Optional: Switch to  `badgerds`
+
+Consider using a [datastore backed by BadgerDB](https://github.com/ipfs/go-ds-badger) for improved performance.  
+Existing repository can be converted to badgerds with [ipfs-ds-convert](https://github.com/ipfs/ipfs-ds-convert):
 
 ```sh
-$ ipfs add -w -r --raw-leaves $upacked_wiki
+$ ipfs config profile apply badgerds
+$ ipfs-ds-convert convert
 ```
 
-Save the last hash of the output from that process. You will use that in the next step.
+### Step 4: Import unpacked data to IPFS
+
+### Add immutable copy
+
+Add all the data to your node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the unpacked ZIM snapshot that you created in Step 2 (`./out`). **Don't share the hash yet.**
+
+```sh
+$ ipfs add -r --cid-version 1 $unpacked_wiki
+```
+
+If you find it takes too long, and your IPFS node is located on the same machine,
+consider running this step in offline mode:
+
+```sh
+$ ipfs add -r --cid-version 1 --offline $unpacked_wiki
+```
+
+Save the last hash of the output from the above process.
+It is the CID representing data in the original `$unpacked_wiki`.
+
+### Create mutable copy
+
+Now, copy immutable snapshot to `/root` on [MFS](https://docs-beta.ipfs.io/concepts/file-systems/#mutable-file-system-mfs):
+
+```sh
+$ ipfs files cp /ipfs/$ROOT_CID /root
+```
+
+**Tip:** if anything goes wrong later, remove `/root` from MFS and create it again with the above command.
+
 
 ### Step 5: Add mirror info and search bar to the snapshot
 **IMPORTANT: The snapshots must say who disseminated them.** This effort to mirror Wikipedia snapshots is not affiliated with the Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. _The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia._
 
 We have provided a script that adds the necessary information. It also adds a decentralized, serverless search utility to the page.
+We intend to make this part easier. See [the issue](https://github.com/ipfs/distributed-wikipedia-mirror/issues/21).
 
-Write a copy of the snapshot from IPFS to `/root` on your machine
+Within `execute-changes.sh` update `IPNS_HASH` and `SNAP_DATE`. `IPNS_HASH` value should be the IPNS hash for the language-verison of Wikipedia you're adding. `SNAP_DATE` should be today's date.
+
+----
+### 🚧 **Warning:** The `execute-changes.sh` script does not work correctly with file structures present in latest ZIM files. 
+
+Fixing this step is tracked in [here](https://github.com/ipfs/distributed-wikipedia-mirror/issues/64). Comment there if you have spare time and want to help.
+
+----
+
+Now run the script. It will process the content you copied into `/root`:
 
 ```sh
-$ ipfs files cp /ipfs/$YOUR_WIKI_HASH /root
-```
-
-_[We intend to make this part easier. See [the issue](https://github.com/ipfs/distributed-wikipedia-mirror/issues/21)]_ Within `execute-changes.sh` update `IPNS_HASH` and `SNAP_DATE`. `IPNS_HASH` value should be the IPNS hash for the language-verison of Wikipedia you're adding. `SNAP_DATE` should be today's date.
-
-Now run the script. It will process the content you copied into `/root`
-
-```sh
-$ ./execute-changes.sh
+$ ./execute-changes.sh /root
 ```
 
 This will apply the modifications to your snapshot, add the modified version of the snapshot to IPFS, and return the hash of your new, modified version. That is the hash you want to share.
