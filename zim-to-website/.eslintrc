@@ -1,0 +1,18 @@
+{
+  "extends": ["oclif", "oclif-typescript"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none"
+        },
+        "singleline": {
+          "delimiter": "semi"
+        }
+      }
+    ]
+  }
+}

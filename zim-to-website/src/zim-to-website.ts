@@ -1,4 +1,4 @@
-const {
+import {
   readdirSync,
   readFileSync,
   writeFileSync,
@@ -6,40 +6,52 @@ const {
   copyFileSync,
   renameSync,
   existsSync
-} = require('fs')
-const path = require('path')
-const cheerio = require('cheerio')
-const Handlebars = require('handlebars')
-const { format } = require('date-fns')
-
-const zimRootDir = './out'
+} from 'fs'
+import { join } from 'path'
+import cheerio from 'cheerio'
+import Handlebars from 'handlebars'
+import { format } from 'date-fns'
+import { cli } from 'cli-ux'
 
 const footerFragment = readFileSync('./src/footer_fragment.handlebars')
 const indexRedirectFragment = readFileSync(
   './src/index_redirect_fragment.handlebars'
 )
 
-const articleFolder = path.join(zimRootDir, 'A')
-const imagesFolder = path.join(zimRootDir, 'I', 'm')
-const wikiFolder = path.join(zimRootDir, 'wiki')
+export interface Options {
+  unpackedZimDir: string
+  host: string
+  ipnsHash: string
+  mainPage: string
+  zimFile: string
+}
 
-const copyImageAssetsIntoWiki = async assetsDir => {
+export interface EnhancedOpts extends Options {
+  snapshotDate: Date
+  canonicalUrl: string
+  file: string
+}
+
+const copyImageAssetsIntoWiki = async (
+  assetsDir: string,
+  imagesFolder: string
+) => {
   const imagesFiles = readdirSync(assetsDir)
 
   for (const imageFile of imagesFiles) {
-    const filepath = path.join(assetsDir, imageFile)
+    const filepath = join(assetsDir, imageFile)
     const info = lstatSync(filepath)
 
     if (!info.isFile()) {
       return
     }
 
-    imagesFolderPath = path.join(imagesFolder, imageFile)
+    const imagesFolderPath = join(imagesFolder, imageFile)
     copyFileSync(filepath, imagesFolderPath)
   }
 }
 
-const moveArticleFolderToWiki = () => {
+const moveArticleFolderToWiki = (articleFolder: string, wikiFolder: string) => {
   if (existsSync(wikiFolder)) {
     return
   }
@@ -47,10 +59,10 @@ const moveArticleFolderToWiki = () => {
   renameSync(articleFolder, wikiFolder)
 }
 
-const insertIndexRedirect = options => {
+const insertIndexRedirect = (options: Options) => {
   const template = Handlebars.compile(indexRedirectFragment.toString())
 
-  const indexPath = path.join(zimRootDir, 'index.html')
+  const indexPath = join(options.unpackedZimDir, 'index.html')
   writeFileSync(
     indexPath,
     template({
@@ -59,10 +71,10 @@ const insertIndexRedirect = options => {
   )
 }
 
-const reworkInternalLinks = $html => {
+const reworkInternalLinks = ($html: any) => {
   const links = $html('a:not(.external)')
 
-  for (const link of Object.values(links)) {
+  for (const link of Object.values<any>(links)) {
     const attribs = link.attribs
 
     if (!attribs || !attribs.href) {
@@ -77,7 +89,7 @@ const reworkInternalLinks = $html => {
   }
 }
 
-const appendFooter = ($html, options) => {
+const appendFooter = ($html: any, options: EnhancedOpts) => {
   const title = $html('title').text()
 
   const context = {
@@ -106,21 +118,23 @@ const appendFooter = ($html, options) => {
   )
 }
 
-const main = async () => {
-  const options = Object.assign(JSON.parse(readFileSync('./options.json')), {
-    snapshotDate: new Date()
-  })
+export const zimToWebsite = async (options: Options) => {
+  const articleFolder = join(options.unpackedZimDir, 'A')
+  const imagesFolder = join(options.unpackedZimDir, 'I', 'm')
+  const wikiFolder = join(options.unpackedZimDir, 'wiki')
 
-  copyImageAssetsIntoWiki('./assets')
-  moveArticleFolderToWiki()
+  copyImageAssetsIntoWiki('./assets', imagesFolder)
+  moveArticleFolderToWiki(articleFolder, wikiFolder)
   insertIndexRedirect(options)
 
   const articles = readdirSync(wikiFolder)
 
-  console.log(`Processing ${articles.length} articles`)
+  const progressBar = cli.progress()
+
   let count = 0
-  articles.forEach(file => {
-    const filepath = path.join(wikiFolder, file)
+  progressBar.start(articles.length, count)
+  articles.forEach((file: string) => {
+    const filepath = join(wikiFolder, file)
     const info = lstatSync(filepath)
 
     if (!info.isFile()) {
@@ -132,16 +146,24 @@ const main = async () => {
 
     const canonicalUrl = $html('link[rel="canonical"]').attr('href')
 
+    if (!canonicalUrl) {
+      throw new Error(`Could not parse out canonical url for ${canonicalUrl}`)
+    }
+
     reworkInternalLinks($html)
-    appendFooter($html, Object.assign({}, options, { file, canonicalUrl }))
+
+    const enhancedOpts = Object.assign(options, {
+      snapshotDate: new Date(),
+      file,
+      canonicalUrl
+    })
+    appendFooter($html, enhancedOpts)
 
     writeFileSync(filepath, $html.html())
+
     count++
-
-    if (count % 1000 === 0) {
-      console.log('Processed ' + count)
-    }
+    progressBar.update(count)
   })
-}
 
-main()
+  progressBar.stop()
+}
