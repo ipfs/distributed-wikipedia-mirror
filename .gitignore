@@ -3,3 +3,5 @@
 *.zim
 out
 IPFS_PATH
+
+node_modules/

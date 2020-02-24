@@ -1,0 +1,18 @@
+{
+  "name": "zim-to-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install:extract_zim": "cd ./extract_zim && make",
+    "prepare": "node ./src/zim-to-website.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "date-fns": "^2.9.0",
+    "handlebars": "^4.7.3"
+  }
+}
