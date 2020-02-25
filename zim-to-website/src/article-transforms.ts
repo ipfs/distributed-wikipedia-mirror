@@ -18,6 +18,7 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
     IPNS_HASH: options.ipnsHash,
     CANONICAL_URL: options.canonicalUrl,
     CANONICAL_URL_DISPLAY: decodeURIComponent(options.canonicalUrl),
+    IMAGES_DIR: options.relativeImagePath,
     ZIM_URL: options.zimFile
       ? `http://download.kiwix.org/zim/${options.zimFile}`
       : 'https://wiki.kiwix.org/wiki/Content_in_all_languages'
@@ -32,7 +33,29 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
   )
 }
 
-export const reworkInternalLinks = ($html: any) => {
+export const appendHtmlPostfix = (href: string) => {
+  if (href.endsWith('.html')) {
+    return href
+  }
+
+  return `${href}.html`
+}
+
+export const moveRelativeLinksUpOneLevel = (href: string) => {
+  return href.replace('../', '')
+}
+
+export const replaceANamespaceWithWiki = (href: string) => {
+  return href.replace('/A/', '/wiki/')
+}
+
+export const reworkInternalLinks = (
+  $html: any,
+  fns: ((href: string) => string)[] = [
+    replaceANamespaceWithWiki,
+    appendHtmlPostfix
+  ]
+) => {
   const links = $html('a:not(.external)')
 
   for (const link of Object.values<any>(links)) {
@@ -42,10 +65,12 @@ export const reworkInternalLinks = ($html: any) => {
       continue
     }
 
-    if (attribs.href.endsWith('.html')) {
-      continue
+    let href = attribs.href
+
+    for (const fn of fns) {
+      href = fn(href)
     }
 
-    attribs.href = `${attribs.href}.html`
+    attribs.href = href
   }
 }

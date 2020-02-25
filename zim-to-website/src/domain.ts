@@ -11,6 +11,7 @@ export interface EnhancedOpts extends Options {
   snapshotDate: Date
   canonicalUrl: string
   relativeFilepath: string
+  relativeImagePath: string
 }
 
 export interface Directories {

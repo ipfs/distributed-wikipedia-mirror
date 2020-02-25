@@ -1,6 +1,7 @@
 {
   "extends": ["oclif", "oclif-typescript", "plugin:prettier/recommended"],
   "rules": {
+    "unicorn/no-abusive-eslint-disable": ["off"],
     "@typescript-eslint/member-delimiter-style": [
       "error",
       {

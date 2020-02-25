@@ -1,4 +1,4 @@
-import { Directories, Options } from './domain'
+import { Directories, Options, EnhancedOpts } from './domain'
 import { readFileSync, writeFileSync } from 'fs'
 import { relative } from 'path'
 import cheerio from 'cheerio'
@@ -6,7 +6,7 @@ import { reworkInternalLinks, appendFooter } from './article-transforms'
 
 export const processArticle = async (
   filepath: string,
-  { wikiFolder }: Directories,
+  { wikiFolder, imagesFolder }: Directories,
   options: Options
 ) => {
   const htmlBuffer = readFileSync(filepath)
@@ -24,9 +24,10 @@ export const processArticle = async (
     throw new Error(`Could not parse out canonical url for ${canonicalUrl}`)
   }
 
-  const enhancedOpts = Object.assign(options, {
+  const enhancedOpts: EnhancedOpts = Object.assign(options, {
     snapshotDate: new Date(),
     relativeFilepath: relative(wikiFolder, filepath),
+    relativeImagePath: relative(filepath, imagesFolder),
     canonicalUrl
   })
 

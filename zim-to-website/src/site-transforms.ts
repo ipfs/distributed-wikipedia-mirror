@@ -7,11 +7,19 @@ import {
   renameSync,
   existsSync
 } from 'fs'
-import { join } from 'path'
+import { join, relative } from 'path'
 import Handlebars from 'handlebars'
-import { Options, Directories } from './domain'
+import { Options, Directories, EnhancedOpts } from './domain'
 import walkFiles from './utils/walk-files'
 import { processArticle } from './process-article'
+import cheerio from 'cheerio'
+import {
+  reworkInternalLinks,
+  moveRelativeLinksUpOneLevel,
+  appendHtmlPostfix,
+  replaceANamespaceWithWiki,
+  appendFooter
+} from './article-transforms'
 
 const indexRedirectFragment = readFileSync(
   './src/index_redirect_fragment.handlebars'
@@ -80,18 +88,65 @@ export const processArticles = async (
   cli: any
 ) => {
   const { wikiFolder } = directories
-  const articles = readdirSync(wikiFolder)
+  const rootArticleDir = join(wikiFolder, '12')
+
+  let totalArticleCount = 0
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  for await (const _filepath of walkFiles(rootArticleDir)) {
+    totalArticleCount++
+  }
 
   const progressBar = cli.progress()
 
-  let count = 0
-  progressBar.start(articles.length, count)
+  let processingCount = 0
+  progressBar.start(totalArticleCount, processingCount)
 
-  for await (const filepath of walkFiles(wikiFolder)) {
+  for await (const filepath of walkFiles(rootArticleDir)) {
     await processArticle(filepath, directories, options)
-    count++
-    progressBar.update(count)
+    processingCount++
+    progressBar.update(processingCount)
   }
 
   progressBar.stop()
+}
+
+export const generateMainPage = (
+  options: Options,
+  { wikiFolder, imagesFolder }: Directories
+) => {
+  const kiwixMainpage = readFileSync(
+    join(wikiFolder, `${options.kiwixMainPage}.html`)
+  )
+
+  const mainPagePath = join(wikiFolder, options.mainPage)
+
+  const $html = cheerio.load(kiwixMainpage.toString())
+
+  const canonicalUrlString = $html('link[rel="canonical"]').attr('href')
+
+  if (!canonicalUrlString) {
+    throw new Error(
+      `Could not parse out canonical url for ${canonicalUrlString}`
+    )
+  }
+
+  const canonicalUrl = new URL(canonicalUrlString)
+  canonicalUrl.pathname = `wiki/${options.mainPage.replace('.html', '')}`
+
+  const enhancedOpts: EnhancedOpts = Object.assign(options, {
+    snapshotDate: new Date(),
+    relativeFilepath: relative(wikiFolder, mainPagePath),
+    relativeImagePath: relative(mainPagePath, imagesFolder),
+    canonicalUrl: canonicalUrl.href
+  })
+
+  reworkInternalLinks($html, [
+    moveRelativeLinksUpOneLevel,
+    replaceANamespaceWithWiki,
+    appendHtmlPostfix
+  ])
+
+  appendFooter($html, enhancedOpts)
+
+  writeFileSync(mainPagePath, $html.html())
 }
