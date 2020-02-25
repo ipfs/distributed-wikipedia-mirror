@@ -15,11 +15,10 @@ import { processArticle } from './process-article'
 import cheerio from 'cheerio'
 import fetch from 'node-fetch'
 import {
-  reworkInternalLinks,
-  moveRelativeLinksUpOneLevel,
+  reworkLinks,
   appendHtmlPostfix,
-  replaceANamespaceWithWiki,
-  appendFooter
+  appendFooter,
+  prefixRelativeRoot
 } from './article-transforms'
 
 const indexRedirectFragment = readFileSync(
@@ -172,15 +171,15 @@ export const generateMainPage = async (
     const enhancedOpts: EnhancedOpts = Object.assign(options, {
       snapshotDate: new Date(),
       relativeFilepath: relative(wikiFolder, mainPagePath),
-      relativeImagePath: relative(mainPagePath, imagesFolder),
+      relativeImagePath: relative(wikiFolder, imagesFolder),
       canonicalUrl: canonicalUrl.href
     })
 
-    reworkInternalLinks($kiwixMainPageHtml, [
-      moveRelativeLinksUpOneLevel,
-      replaceANamespaceWithWiki,
-      appendHtmlPostfix
-    ])
+    reworkLinks(
+      $kiwixMainPageHtml,
+      'a[href^="/wiki/"]:not(a[href$=".svg"]):not(a[href$=".png"]):not(a[href$=".jpg"])',
+      [appendHtmlPostfix, prefixRelativeRoot]
+    )
 
     appendFooter($kiwixMainPageHtml, enhancedOpts)
     writeFileSync(mainPagePath, $kiwixMainPageHtml.html())

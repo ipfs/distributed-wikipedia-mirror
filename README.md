@@ -64,6 +64,7 @@ Node, rust and make are required.
 Install the node dependencies:
 
 ```sh
+$ cd ./zim-to-website
 $ yarn
 ```
 

@@ -51,6 +51,14 @@ export const appendHtmlPostfix = (href: string) => {
   return href.replace(parts[0], `${parts[0]}.html`)
 }
 
+export const prefixRelativeRoot = (href: string) => {
+  if (!href.startsWith('/wiki/')) {
+    return href
+  }
+
+  return href.replace('/wiki/', './')
+}
+
 export const moveRelativeLinksUpOneLevel = (href: string) => {
   return href.replace('../', '')
 }
@@ -59,14 +67,15 @@ export const replaceANamespaceWithWiki = (href: string) => {
   return href.replace('/A/', '/wiki/')
 }
 
-export const reworkInternalLinks = (
+export const reworkLinks = (
   $html: any,
+  selector = 'a:not(.external)',
   fns: ((href: string) => string)[] = [
     replaceANamespaceWithWiki,
     appendHtmlPostfix
   ]
 ) => {
-  const links = $html('a:not(.external)')
+  const links = $html(selector)
 
   for (const link of Object.values<any>(links)) {
     const attribs = link.attribs

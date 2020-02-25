@@ -2,7 +2,12 @@ import { Directories, Options, EnhancedOpts } from './domain'
 import { readFileSync, writeFileSync } from 'fs'
 import { relative } from 'path'
 import cheerio from 'cheerio'
-import { reworkInternalLinks, appendFooter } from './article-transforms'
+import {
+  reworkLinks,
+  appendFooter,
+  replaceANamespaceWithWiki,
+  appendHtmlPostfix
+} from './article-transforms'
 
 export const processArticle = async (
   filepath: string,
@@ -27,11 +32,14 @@ export const processArticle = async (
   const enhancedOpts: EnhancedOpts = Object.assign(options, {
     snapshotDate: new Date(),
     relativeFilepath: relative(wikiFolder, filepath),
-    relativeImagePath: relative(filepath, imagesFolder),
+    relativeImagePath: relative(filepath, imagesFolder).replace('../', ''),
     canonicalUrl
   })
 
-  reworkInternalLinks($html)
+  reworkLinks($html, 'a:not(.external)', [
+    replaceANamespaceWithWiki,
+    appendHtmlPostfix
+  ])
   appendFooter($html, enhancedOpts)
 
   writeFileSync(filepath, $html.html())

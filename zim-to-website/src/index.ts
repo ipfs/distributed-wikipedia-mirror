@@ -17,7 +17,7 @@ class ZimToWebsite extends Command {
 
     const options: Options = {
       unpackedZimDir: args.unpackedZimDir,
-      host: 'en.wikiquote-on-ipfs.org',
+      host: 'en.wikiquote-on-i[pfs.org',
       ipnsHash: 'QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W',
       zimFile: 'wikiquote_en_all_maxi_2020-02.zim',
       kiwixMainPage: 'Main_Page',
