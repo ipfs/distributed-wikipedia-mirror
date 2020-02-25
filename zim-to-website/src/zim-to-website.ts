@@ -32,6 +32,8 @@ export interface Directories {
 }
 
 export const zimToWebsite = async (options: Options) => {
+  cli.log(`Reading unpacked zim directory ${options.unpackedZimDir}`)
+
   const directories = resolveDirectories(options)
   const { articleFolder, imagesFolder, wikiFolder } = directories
 

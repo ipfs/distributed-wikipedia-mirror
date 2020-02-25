@@ -14,8 +14,6 @@ class ZimToWebsite extends Command {
   async run() {
     const { args } = this.parse(ZimToWebsite)
 
-    this.log(`Reading unpacked zim directory ${args.unpackedZimDir}`)
-
     const options = {
       unpackedZimDir: args.unpackedZimDir,
       host: 'tr.wikipedia-on-ipfs.org',
@@ -24,7 +22,7 @@ class ZimToWebsite extends Command {
       mainPage: 'Kullanıcı:The_other_Kiwix_guy/Landing'
     }
 
-    zimToWebsite(options)
+    await zimToWebsite(options)
   }
 }
 
