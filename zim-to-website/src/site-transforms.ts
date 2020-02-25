@@ -13,6 +13,7 @@ import { Options, Directories, EnhancedOpts } from './domain'
 import walkFiles from './utils/walk-files'
 import { processArticle } from './process-article'
 import cheerio from 'cheerio'
+import fetch from 'node-fetch'
 import {
   reworkInternalLinks,
   moveRelativeLinksUpOneLevel,
@@ -88,7 +89,7 @@ export const processArticles = async (
   cli: any
 ) => {
   const { wikiFolder } = directories
-  const rootArticleDir = join(wikiFolder, '12')
+  const rootArticleDir = join(wikiFolder)
 
   let totalArticleCount = 0
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -110,9 +111,10 @@ export const processArticles = async (
   progressBar.stop()
 }
 
-export const generateMainPage = (
+export const generateMainPage = async (
   options: Options,
-  { wikiFolder, imagesFolder }: Directories
+  { wikiFolder, imagesFolder }: Directories,
+  cli: any
 ) => {
   const kiwixMainpage = readFileSync(
     join(wikiFolder, `${options.kiwixMainPage}.html`)
@@ -120,9 +122,11 @@ export const generateMainPage = (
 
   const mainPagePath = join(wikiFolder, options.mainPage)
 
-  const $html = cheerio.load(kiwixMainpage.toString())
+  const $kiwixMainPageHtml = cheerio.load(kiwixMainpage.toString())
 
-  const canonicalUrlString = $html('link[rel="canonical"]').attr('href')
+  const canonicalUrlString = $kiwixMainPageHtml('link[rel="canonical"]').attr(
+    'href'
+  )
 
   if (!canonicalUrlString) {
     throw new Error(
@@ -130,23 +134,57 @@ export const generateMainPage = (
     )
   }
 
+  const canonicalPageVersionid = $kiwixMainPageHtml
+    .html()
+    .match(/(?<=oldid=)\d+/g)
+
+  if (!canonicalPageVersionid) {
+    throw new Error('Could not parse out the canoncial urls version id')
+  }
+
   const canonicalUrl = new URL(canonicalUrlString)
   canonicalUrl.pathname = `wiki/${options.mainPage.replace('.html', '')}`
 
-  const enhancedOpts: EnhancedOpts = Object.assign(options, {
-    snapshotDate: new Date(),
-    relativeFilepath: relative(wikiFolder, mainPagePath),
-    relativeImagePath: relative(mainPagePath, imagesFolder),
-    canonicalUrl: canonicalUrl.href
-  })
+  canonicalUrl.searchParams.append('oldid', canonicalPageVersionid[0])
 
-  reworkInternalLinks($html, [
-    moveRelativeLinksUpOneLevel,
-    replaceANamespaceWithWiki,
-    appendHtmlPostfix
-  ])
+  try {
+    const response = await fetch(canonicalUrl)
+    const pageBody = await response.text()
+    const $remoteMainPageHtml = cheerio.load(pageBody)
 
-  appendFooter($html, enhancedOpts)
+    const $remoteContent = $remoteMainPageHtml('#content')
 
-  writeFileSync(mainPagePath, $html.html())
+    $remoteContent.addClass('content')
+    $remoteContent.find('#siteNotice').remove()
+    $remoteContent.find('#firstHeading').remove()
+    $remoteContent.find('#siteSub').remove()
+    $remoteContent.find('#contentSub').remove()
+    $remoteContent.find('#catlinks').remove()
+    $remoteContent.find('a.mw-jump-link').remove()
+
+    const $kiwixNote = $kiwixMainPageHtml('#mw-content-text > div:last-child')
+
+    $remoteContent.find('#mw-content-text').append($kiwixNote)
+
+    $kiwixMainPageHtml('#content').remove()
+    $kiwixMainPageHtml('#mw-mf-page-center').prepend($remoteContent)
+
+    const enhancedOpts: EnhancedOpts = Object.assign(options, {
+      snapshotDate: new Date(),
+      relativeFilepath: relative(wikiFolder, mainPagePath),
+      relativeImagePath: relative(mainPagePath, imagesFolder),
+      canonicalUrl: canonicalUrl.href
+    })
+
+    reworkInternalLinks($kiwixMainPageHtml, [
+      moveRelativeLinksUpOneLevel,
+      replaceANamespaceWithWiki,
+      appendHtmlPostfix
+    ])
+
+    appendFooter($kiwixMainPageHtml, enhancedOpts)
+    writeFileSync(mainPagePath, $kiwixMainPageHtml.html())
+  } catch (error) {
+    cli.error(error)
+  }
 }
