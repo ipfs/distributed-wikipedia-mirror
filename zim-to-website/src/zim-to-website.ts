@@ -7,11 +7,12 @@ import {
   renameSync,
   existsSync
 } from 'fs'
-import { join } from 'path'
+import { join, relative } from 'path'
 import cheerio from 'cheerio'
 import Handlebars from 'handlebars'
 import { format } from 'date-fns'
 import { cli } from 'cli-ux'
+import walkFiles from './utils/walkFiles'
 
 const footerFragment = readFileSync('./src/footer_fragment.handlebars')
 const indexRedirectFragment = readFileSync(
@@ -29,7 +30,7 @@ export interface Options {
 export interface EnhancedOpts extends Options {
   snapshotDate: Date
   canonicalUrl: string
-  file: string
+  relativeFilepath: string
 }
 
 const copyImageAssetsIntoWiki = async (
@@ -94,16 +95,14 @@ const appendFooter = ($html: any, options: EnhancedOpts) => {
 
   const context = {
     SNAPSHOT_DATE: format(options.snapshotDate, 'yyyy-MM'),
-    ARTICLE_URL: `https://${options.host}/wiki/${encodeURIComponent(
-      options.file
-    )}`,
-    IPNS_HASH: options.ipnsHash,
-    ARTICLE_URL_DISPLAY: `https://${options.host}/wiki/${options.file}`,
     ARTICLE_TITLE: encodeURIComponent(title),
-
+    ARTICLE_URL: `https://${options.host}/wiki/${encodeURIComponent(
+      options.relativeFilepath
+    )}`,
+    ARTICLE_URL_DISPLAY: `https://${options.host}/wiki/${options.relativeFilepath}`,
+    IPNS_HASH: options.ipnsHash,
     CANONICAL_URL: options.canonicalUrl,
     CANONICAL_URL_DISPLAY: decodeURIComponent(options.canonicalUrl),
-
     ZIM_URL: options.zimFile
       ? `http://download.kiwix.org/zim/${options.zimFile}`
       : 'https://wiki.kiwix.org/wiki/Content_in_all_languages'
@@ -133,15 +132,15 @@ export const zimToWebsite = async (options: Options) => {
 
   let count = 0
   progressBar.start(articles.length, count)
-  articles.forEach((file: string) => {
-    const filepath = join(wikiFolder, file)
-    const info = lstatSync(filepath)
 
-    if (!info.isFile()) {
-      return
+  for await (const filepath of walkFiles(wikiFolder)) {
+    const htmlBuffer = readFileSync(filepath)
+    const html = htmlBuffer.toString()
+
+    if (html.trim() === '') {
+      continue
     }
 
-    const html = readFileSync(filepath)
     const $html = cheerio.load(html)
 
     const canonicalUrl = $html('link[rel="canonical"]').attr('href')
@@ -150,20 +149,20 @@ export const zimToWebsite = async (options: Options) => {
       throw new Error(`Could not parse out canonical url for ${canonicalUrl}`)
     }
 
-    reworkInternalLinks($html)
-
     const enhancedOpts = Object.assign(options, {
       snapshotDate: new Date(),
-      file,
+      relativeFilepath: relative(wikiFolder, filepath),
       canonicalUrl
     })
+
+    reworkInternalLinks($html)
     appendFooter($html, enhancedOpts)
 
     writeFileSync(filepath, $html.html())
 
     count++
     progressBar.update(count)
-  })
+  }
 
   progressBar.stop()
 }
