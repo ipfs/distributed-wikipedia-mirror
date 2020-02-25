@@ -1,4 +1,4 @@
-import { Directories, Options } from './zim-to-website'
+import { Directories, Options } from './domain'
 import { readFileSync, writeFileSync } from 'fs'
 import { relative } from 'path'
 import cheerio from 'cheerio'

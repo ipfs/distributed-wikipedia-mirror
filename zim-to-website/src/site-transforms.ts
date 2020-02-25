@@ -9,7 +9,9 @@ import {
 } from 'fs'
 import { join } from 'path'
 import Handlebars from 'handlebars'
-import { Options, Directories } from './zim-to-website'
+import { Options, Directories } from './domain'
+import walkFiles from './utils/walk-files'
+import { processArticle } from './process-article'
 
 const indexRedirectFragment = readFileSync(
   './src/index_redirect_fragment.handlebars'
@@ -17,7 +19,7 @@ const indexRedirectFragment = readFileSync(
 
 export const copyImageAssetsIntoWiki = async (
   assetsDir: string,
-  imagesFolder: string
+  { imagesFolder }: Directories
 ) => {
   const imagesFiles = readdirSync(assetsDir)
 
@@ -34,10 +36,10 @@ export const copyImageAssetsIntoWiki = async (
   }
 }
 
-export const moveArticleFolderToWiki = (
-  articleFolder: string,
-  wikiFolder: string
-) => {
+export const moveArticleFolderToWiki = ({
+  articleFolder,
+  wikiFolder
+}: Directories) => {
   if (existsSync(wikiFolder)) {
     return
   }
@@ -70,4 +72,26 @@ export const resolveDirectories = (options: Options) => {
   }
 
   return directories
+}
+
+export const processArticles = async (
+  options: Options,
+  directories: Directories,
+  cli: any
+) => {
+  const { wikiFolder } = directories
+  const articles = readdirSync(wikiFolder)
+
+  const progressBar = cli.progress()
+
+  let count = 0
+  progressBar.start(articles.length, count)
+
+  for await (const filepath of walkFiles(wikiFolder)) {
+    await processArticle(filepath, directories, options)
+    count++
+    progressBar.update(count)
+  }
+
+  progressBar.stop()
 }
