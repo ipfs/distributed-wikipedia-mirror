@@ -5,8 +5,8 @@ import {
   copyImageAssetsIntoWiki,
   moveArticleFolderToWiki,
   insertIndexRedirect,
-  generateMainPage
-  // processArticles
+  generateMainPage,
+  processArticles
 } from './site-transforms'
 import { Options } from './domain'
 
@@ -20,5 +20,5 @@ export const zimToWebsite = async (options: Options) => {
   insertIndexRedirect(options)
   await generateMainPage(options, directories, cli)
 
-  // await processArticles(options, directories, cli)
+  await processArticles(options, directories, cli)
 }

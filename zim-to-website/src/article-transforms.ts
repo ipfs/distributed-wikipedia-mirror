@@ -34,11 +34,21 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
 }
 
 export const appendHtmlPostfix = (href: string) => {
-  if (href.endsWith('.html')) {
-    return href
+  const parts = href.split(/[#?]+/)
+
+  if (parts.length === 0) {
+    throw new Error('Unexpected parsing of links')
   }
 
-  return `${href}.html`
+  if (parts.length === 1) {
+    if (href.endsWith('.html')) {
+      return href
+    }
+
+    return `${href}.html`
+  }
+
+  return href.replace(parts[0], `${parts[0]}.html`)
 }
 
 export const moveRelativeLinksUpOneLevel = (href: string) => {
