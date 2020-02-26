@@ -18,4 +18,4 @@ if [ -z "${1-}" ]; then
 fi
 
 MAIN_PAGE=$(curl -Ls -o /dev/null -w %{url_effective} https://${1}.wikipedia.org | cut -d"/" -f5)
-echo -n "${MAIN_PAGE}.html"
+printf "${MAIN_PAGE}.html\n"

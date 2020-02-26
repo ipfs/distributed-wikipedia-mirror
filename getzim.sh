@@ -257,13 +257,13 @@ cmd_download() {
 
   dl_cycle() {
     log "Downloading $OUTNAME..."
-    wget --continue "$URL"
+    wget --continue -P ./snapshots "$URL"
     return $?
   }
 
   check_cycle() {
     log "Verifiying $OUTNAME..."
-    sha256="$SHA256  $OUTNAME"
+    sha256="$SHA256  ./snapshots/$OUTNAME"
     echo "$sha256" | sha256sum -c -
     return $?
   }

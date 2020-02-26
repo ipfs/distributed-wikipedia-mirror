@@ -1,18 +1,14 @@
 {
-  "name": "zim-to-website",
-  "version": "1.0.0",
+  "name": "distributed-wikipedia-mirror",
+  "version": "0.2.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "install:extract_zim": "cd ./extract_zim && make",
-    "prepare": "node ./src/zim-to-website.js"
+    "install:zim-to-website": "cd ./zim-to-website && yarn",
+    "install": "yarn install:extract_zim && yarn install:zim-to-website"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
-    "date-fns": "^2.9.0",
-    "handlebars": "^4.7.3"
-  }
+  "dependencies": {}
 }
