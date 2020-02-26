@@ -114,18 +114,24 @@ export const generateMainPage = async (
     )
   }
 
-  const canonicalPageVersionid = $kiwixMainPageHtml
-    .html()
-    .match(/(?<=oldid=)\d+/g)
+  let canonicalPageVersionid: string
 
-  if (!canonicalPageVersionid) {
-    throw new Error('Could not parse out the canoncial urls version id')
+  if (options.mainPageVersion) {
+    canonicalPageVersionid = options.mainPageVersion.toString()
+  } else {
+    const matches = $kiwixMainPageHtml.html().match(/(?<=oldid=)\d+/g)
+
+    if (!matches) {
+      throw new Error('Could not parse out the canoncial urls version id')
+    }
+
+    canonicalPageVersionid = matches[0]
   }
 
   const canonicalUrl = new URL(canonicalUrlString)
   canonicalUrl.pathname = `wiki/${options.mainPage.replace('.html', '')}`
 
-  canonicalUrl.searchParams.append('oldid', canonicalPageVersionid[0])
+  canonicalUrl.searchParams.append('oldid', canonicalPageVersionid)
 
   try {
     const response = await fetch(canonicalUrl)
@@ -140,7 +146,20 @@ export const generateMainPage = async (
     $remoteContent.find('#siteSub').remove()
     $remoteContent.find('#contentSub').remove()
     $remoteContent.find('#catlinks').remove()
+    $remoteContent.find('#mw-fr-revisiontag-old').remove()
     $remoteContent.find('a.mw-jump-link').remove()
+
+    // Some styling on the top banner - I know, this has got ... hacky
+
+    // Set the width to 100%
+    $remoteContent
+      .find('#mp-topbanner')
+      .attr('style', 'width:100% !important; margin-bottom:2px;')
+
+    // Slightly reduce the size of the text
+    $remoteContent
+      .find('#mp-topbanner tbody tbody tr td:last-of-type')
+      .attr('style', 'width:16%; font-size:95%;')
 
     const $kiwixNote = $kiwixMainPageHtml('#mw-content-text > div:last-child')
 

@@ -4,6 +4,7 @@ export interface Options {
   hostingIPNSHash: string
   kiwixMainPage: string
   mainPage: string
+  mainPageVersion?: number
   zimFileDownloadUrl: string
 }
 

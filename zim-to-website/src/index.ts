@@ -33,6 +33,10 @@ class ZimToWebsite extends Command {
       required: true,
       description:
         "the main page as it is on the approptiate wikimedia site, e.g. 'Anasayfa' for tr.wikipedia.org"
+    }),
+    mainpageversion: flags.integer({
+      required: false,
+      description: 'overrides the version of the homepage used'
     })
   }
 
@@ -47,7 +51,8 @@ class ZimToWebsite extends Command {
       hostingIPNSHash: flags.hostingipnshash,
       zimFileDownloadUrl: flags.zimfiledownloadurl,
       kiwixMainPage: flags.kiwixmainpage,
-      mainPage: flags.mainpage
+      mainPage: flags.mainpage,
+      mainPageVersion: flags.mainpageversion
     }
 
     await zimToWebsite(options)
