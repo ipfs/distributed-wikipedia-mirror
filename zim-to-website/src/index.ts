@@ -6,7 +6,7 @@ class ZimToWebsite extends Command {
   static description = 'Convert unpacked zim files to usable websites'
 
   static examples = [
-    '$ zim-to-website ./tmp \\\n  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \\\n  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \\\n  --zimfiledownloadurl=wikipedia_tr_all_maxi_2019-12.zim \\\n  --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \\\n  --mainpage=Anasayfa.html'
+    '$ zim-to-website ./tmp \\\n  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \\\n  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \\\n  --zimfiledownloadurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \\\n  --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \\\n  --mainpage=Anasayfa.html'
   ]
 
   static flags = {

@@ -90,37 +90,6 @@ export const resolveDirectories = (options: Options) => {
   return directories
 }
 
-export const processArticles = async (
-  options: Options,
-  directories: Directories,
-  cli: any
-) => {
-  cli.log(' Processing articles:')
-  const { wikiFolder } = directories
-  const rootArticleDir = join(wikiFolder)
-
-  let totalArticleCount = 0
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  for await (const _filepath of walkFiles(rootArticleDir)) {
-    totalArticleCount++
-  }
-
-  const progressBar = cli.progress({
-    format: '  Articles | {bar} | {percentage}% | {value}/{total} Files'
-  })
-
-  let processingCount = 0
-  progressBar.start(totalArticleCount, processingCount)
-
-  for await (const filepath of walkFiles(rootArticleDir)) {
-    await processArticle(filepath, directories, options)
-    processingCount++
-    progressBar.update(processingCount)
-  }
-
-  progressBar.stop()
-}
-
 export const generateMainPage = async (
   options: Options,
   { wikiFolder, imagesFolder }: Directories
@@ -200,4 +169,35 @@ export const generateMainPage = async (
   } catch (error) {
     cli.error(error)
   }
+}
+
+export const processArticles = async (
+  options: Options,
+  directories: Directories,
+  cli: any
+) => {
+  cli.log(' Processing articles:')
+  const { wikiFolder } = directories
+  const rootArticleDir = join(wikiFolder)
+
+  let totalArticleCount = 0
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  for await (const _filepath of walkFiles(rootArticleDir)) {
+    totalArticleCount++
+  }
+
+  const progressBar = cli.progress({
+    format: '  Articles | {bar} | {percentage}% | {value}/{total} Files'
+  })
+
+  let processingCount = 0
+  progressBar.start(totalArticleCount, processingCount)
+
+  for await (const filepath of walkFiles(rootArticleDir)) {
+    await processArticle(filepath, directories, options)
+    processingCount++
+    progressBar.update(processingCount)
+  }
+
+  progressBar.stop()
 }

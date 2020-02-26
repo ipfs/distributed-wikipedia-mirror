@@ -19,9 +19,9 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
     CANONICAL_URL: options.canonicalUrl,
     CANONICAL_URL_DISPLAY: decodeURIComponent(options.canonicalUrl),
     IMAGES_DIR: options.relativeImagePath,
-    ZIM_URL: options.zimFileDownloadUrl
-      ? `http://download.kiwix.org/zim/${options.zimFileDownloadUrl}`
-      : 'https://wiki.kiwix.org/wiki/Content_in_all_languages'
+    ZIM_URL:
+      options.zimFileDownloadUrl ??
+      'https://wiki.kiwix.org/wiki/Content_in_all_languages'
   }
 
   const footerTemplate = Handlebars.compile(footerFragment.toString())

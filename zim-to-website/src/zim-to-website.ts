@@ -1,6 +1,4 @@
 import { cli } from 'cli-ux'
-import { existsSync, lstatSync } from 'fs'
-
 import {
   resolveDirectories,
   copyImageAssetsIntoWiki,
@@ -10,19 +8,12 @@ import {
   processArticles
 } from './site-transforms'
 import { Options } from './domain'
+import { checkUnpackedZimDir } from './utils/check-unpacked-zim-dir'
 
 export const zimToWebsite = async (options: Options) => {
   const directories = resolveDirectories(options)
 
-  if (!existsSync(options.unpackedZimDir)) {
-    throw new Error(
-      `Unpacked Zim Directory does not exist: ${options.unpackedZimDir}`
-    )
-  }
-
-  if (!lstatSync(options.unpackedZimDir).isDirectory()) {
-    throw new Error(`Unpacked Zim Directory must be a directory`)
-  }
+  checkUnpackedZimDir(options.unpackedZimDir)
 
   cli.log('-------------------------')
   cli.log('Zim to Website Conversion')
@@ -43,7 +34,6 @@ export const zimToWebsite = async (options: Options) => {
   insertIndexRedirect(options)
   await generateMainPage(options, directories)
 
-  return
   await processArticles(options, directories, cli)
 
   cli.log('done')
