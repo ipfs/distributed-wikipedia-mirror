@@ -20,6 +20,7 @@ import {
   appendFooter,
   prefixRelativeRoot
 } from './article-transforms'
+import { cli } from 'cli-ux'
 
 const indexRedirectFragment = readFileSync(
   './src/index_redirect_fragment.handlebars'
@@ -29,6 +30,7 @@ export const copyImageAssetsIntoWiki = async (
   assetsDir: string,
   { imagesFolder }: Directories
 ) => {
+  cli.action.start('  Copying image assets into unpacked zim directory ')
   const imagesFiles = readdirSync(assetsDir)
 
   for (const imageFile of imagesFiles) {
@@ -42,6 +44,7 @@ export const copyImageAssetsIntoWiki = async (
     const imagesFolderPath = join(imagesFolder, imageFile)
     copyFileSync(filepath, imagesFolderPath)
   }
+  cli.action.stop()
 }
 
 export const moveArticleFolderToWiki = ({
@@ -52,10 +55,13 @@ export const moveArticleFolderToWiki = ({
     return
   }
 
+  cli.action.start('  Renaming A namespace to wiki ')
   renameSync(articleFolder, wikiFolder)
+  cli.action.stop()
 }
 
 export const insertIndexRedirect = (options: Options) => {
+  cli.action.start("  Inserting root 'index.html' as redirect to main page")
   const template = Handlebars.compile(indexRedirectFragment.toString())
 
   const indexPath = join(options.unpackedZimDir, 'index.html')
@@ -65,6 +71,8 @@ export const insertIndexRedirect = (options: Options) => {
       MAIN_PAGE: options.mainPage
     })
   )
+
+  cli.action.stop()
 }
 
 export const resolveDirectories = (options: Options) => {
@@ -87,6 +95,7 @@ export const processArticles = async (
   directories: Directories,
   cli: any
 ) => {
+  cli.log(' Processing articles:')
   const { wikiFolder } = directories
   const rootArticleDir = join(wikiFolder)
 
@@ -96,7 +105,9 @@ export const processArticles = async (
     totalArticleCount++
   }
 
-  const progressBar = cli.progress()
+  const progressBar = cli.progress({
+    format: '  Articles | {bar} | {percentage}% | {value}/{total} Files'
+  })
 
   let processingCount = 0
   progressBar.start(totalArticleCount, processingCount)
@@ -112,14 +123,15 @@ export const processArticles = async (
 
 export const generateMainPage = async (
   options: Options,
-  { wikiFolder, imagesFolder }: Directories,
-  cli: any
+  { wikiFolder, imagesFolder }: Directories
 ) => {
   const kiwixMainpage = readFileSync(
     join(wikiFolder, `${options.kiwixMainPage}.html`)
   )
 
   const mainPagePath = join(wikiFolder, options.mainPage)
+
+  cli.action.start(`  Generating main page into ${mainPagePath} `)
 
   const $kiwixMainPageHtml = cheerio.load(kiwixMainpage.toString())
 
@@ -183,6 +195,8 @@ export const generateMainPage = async (
 
     appendFooter($kiwixMainPageHtml, enhancedOpts)
     writeFileSync(mainPagePath, $kiwixMainPageHtml.html())
+
+    cli.action.stop()
   } catch (error) {
     cli.error(error)
   }

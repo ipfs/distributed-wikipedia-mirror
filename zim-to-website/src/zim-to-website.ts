@@ -1,4 +1,5 @@
 import { cli } from 'cli-ux'
+import { existsSync, lstatSync } from 'fs'
 
 import {
   resolveDirectories,
@@ -13,12 +14,36 @@ import { Options } from './domain'
 export const zimToWebsite = async (options: Options) => {
   const directories = resolveDirectories(options)
 
-  cli.log(`Reading unpacked zim directory ${options.unpackedZimDir}`)
+  if (!existsSync(options.unpackedZimDir)) {
+    throw new Error(
+      `Unpacked Zim Directory does not exist: ${options.unpackedZimDir}`
+    )
+  }
+
+  if (!lstatSync(options.unpackedZimDir).isDirectory()) {
+    throw new Error(`Unpacked Zim Directory must be a directory`)
+  }
+
+  cli.log('-------------------------')
+  cli.log('Zim to Website Conversion')
+  cli.log('-------------------------')
+  cli.log(`  Unpacked Zim Directory: ${options.unpackedZimDir}`)
+  cli.log(`   Zim File Download Url: ${options.zimFile}`)
+  cli.log(`      Hosting DNS Domain: ${options.host}`)
+  cli.log(`       Hosting IPNS Hash: ${options.ipnsHash}`)
+  cli.log(`               Main Page: ${options.mainPage}`)
+  cli.log(`         Kiwix Main Page: ${options.kiwixMainPage}`)
+  cli.log('-------------------------')
+  cli.log('')
+
+  cli.log(`Starting zim to website conversion ...`)
 
   copyImageAssetsIntoWiki('./assets', directories)
   moveArticleFolderToWiki(directories)
   insertIndexRedirect(options)
-  await generateMainPage(options, directories, cli)
+  await generateMainPage(options, directories)
 
   await processArticles(options, directories, cli)
+
+  cli.log('done')
 }
