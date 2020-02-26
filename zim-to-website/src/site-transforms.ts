@@ -161,6 +161,14 @@ export const generateMainPage = async (
       .find('#mp-topbanner tbody tbody tr td:last-of-type')
       .attr('style', 'width:16%; font-size:95%;')
 
+    // Change the globe icon to the wikipedia-on-IPFS version
+    $remoteContent
+      .find('.globegris')
+      .attr(
+        'style',
+        'background-image: url("../I/m/wikipedia-on-ipfs.png"); background-repeat:no-repeat; background-position:-20px -40px; background-size: 200px; width:100%; border:1px solid #a7d7f9; vertical-align:top;'
+      )
+
     const $kiwixNote = $kiwixMainPageHtml('#mw-content-text > div:last-child')
 
     $remoteContent.find('#mw-content-text').append($kiwixNote)
