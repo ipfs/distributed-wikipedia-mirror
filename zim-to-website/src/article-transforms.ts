@@ -11,16 +11,16 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
   const context = {
     SNAPSHOT_DATE: format(options.snapshotDate, 'yyyy-MM'),
     ARTICLE_TITLE: encodeURIComponent(title),
-    ARTICLE_URL: `https://${options.host}/wiki/${encodeURIComponent(
+    ARTICLE_URL: `https://${options.hostingDNSDomain}/wiki/${encodeURIComponent(
       options.relativeFilepath
     )}`,
-    ARTICLE_URL_DISPLAY: `https://${options.host}/wiki/${options.relativeFilepath}`,
-    IPNS_HASH: options.ipnsHash,
+    ARTICLE_URL_DISPLAY: `https://${options.hostingDNSDomain}/wiki/${options.relativeFilepath}`,
+    IPNS_HASH: options.hostingIPNSHash,
     CANONICAL_URL: options.canonicalUrl,
     CANONICAL_URL_DISPLAY: decodeURIComponent(options.canonicalUrl),
     IMAGES_DIR: options.relativeImagePath,
-    ZIM_URL: options.zimFile
-      ? `http://download.kiwix.org/zim/${options.zimFile}`
+    ZIM_URL: options.zimFileDownloadUrl
+      ? `http://download.kiwix.org/zim/${options.zimFileDownloadUrl}`
       : 'https://wiki.kiwix.org/wiki/Content_in_all_languages'
   }
 

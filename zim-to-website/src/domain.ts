@@ -1,10 +1,10 @@
 export interface Options {
   unpackedZimDir: string
-  host: string
-  ipnsHash: string
+  hostingDNSDomain: string
+  hostingIPNSHash: string
   kiwixMainPage: string
   mainPage: string
-  zimFile: string
+  zimFileDownloadUrl: string
 }
 
 export interface EnhancedOpts extends Options {

@@ -28,9 +28,9 @@ export const zimToWebsite = async (options: Options) => {
   cli.log('Zim to Website Conversion')
   cli.log('-------------------------')
   cli.log(`  Unpacked Zim Directory: ${options.unpackedZimDir}`)
-  cli.log(`   Zim File Download Url: ${options.zimFile}`)
-  cli.log(`      Hosting DNS Domain: ${options.host}`)
-  cli.log(`       Hosting IPNS Hash: ${options.ipnsHash}`)
+  cli.log(`   Zim File Download Url: ${options.zimFileDownloadUrl}`)
+  cli.log(`      Hosting DNS Domain: ${options.hostingDNSDomain}`)
+  cli.log(`       Hosting IPNS Hash: ${options.hostingIPNSHash}`)
   cli.log(`               Main Page: ${options.mainPage}`)
   cli.log(`         Kiwix Main Page: ${options.kiwixMainPage}`)
   cli.log('-------------------------')
@@ -43,6 +43,7 @@ export const zimToWebsite = async (options: Options) => {
   insertIndexRedirect(options)
   await generateMainPage(options, directories)
 
+  return
   await processArticles(options, directories, cli)
 
   cli.log('done')
