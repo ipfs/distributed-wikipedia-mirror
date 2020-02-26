@@ -6,3 +6,5 @@ IPFS_PATH
 
 node_modules/
 notes.md
+snapshots/
+tmp/
