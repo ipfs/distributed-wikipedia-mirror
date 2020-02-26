@@ -4,7 +4,14 @@
 out
 IPFS_PATH
 
-node_modules/
 notes.md
-snapshots/
-tmp/
+
+*-debug.log
+*-error.log
+/.nyc_output
+/dist
+/lib
+/package-lock.json
+/tmp
+/snapshots
+node_modules

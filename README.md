@@ -105,11 +105,15 @@ Extraction done in 25.91s
 
 IMPORTANT: The snapshots must say who disseminated them. This effort to mirror Wikipedia snapshots is not affiliated with the Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia.
 
-The conversion to a working website and the appending of necessary information is is done by the node program under `./zim-to-website`.
+The conversion to a working website and the appending of necessary information is is done by the node program under `./bin/run`.
 
-First though the main page as the archive appears on the appropriate wikimedia website must be determined. For instance the zim file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa.html` as the main page. Both must be passed to `zim-to-website`.
+```sh
+$ node ./bin/run --help
+```
 
-To determine the website main page use `./tools/find_main_page_name.sh`:
+First though the main page, as the archive appears on the appropriate wikimedia website, must be determined. For instance, the zim file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa.html` as the main page. Both must be passed to the node script.
+
+To determine the website main page use `./tools/find_main_page_name.sh` with a language code:
 
 ```sh
 $ ./tools/find_main_page_name.sh tr
@@ -119,14 +123,13 @@ Anasayfa.html
 The conversion is done on the unpacked zim directory:
 
 ```sh
-cd ./zim-to-website
-node ./bin/run ../tmp \
-     --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
-     --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
-     --zimfiledownloadurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \
-     --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \
-     --mainpage=Anasayfa.html \
-     --mainpageversion=19869765
+node ./bin/run ./tmp \
+  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
+  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
+  --zimfiledownloadurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \
+  --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \
+  --mainpage=Anasayfa.html \
+  --mainpageversion=19869765
 ```
 
 ### Step 5: Configure your IPFS Node
@@ -171,6 +174,22 @@ Save the last hash of the output from the above process. It is the CID of the we
 ### Step 6: Share the hash
 
 Share the CID of your new snapshot so people can access it and replicate it onto their machines.
+
+# Docker
+
+A dockerfile with the software requirements is provided.
+
+To build the docker image:
+
+```sh
+docker build . -t distributed-wikipedia-mirror-build
+```
+
+To use it as a development environment:
+
+```sh
+docker run -it -v $(pwd):/root/distributed-wikipedia-mirror -p 8080:8080 --entrypoint bash distributed-wikipedia-mirror-build
+```
 
 # How to Help
 
