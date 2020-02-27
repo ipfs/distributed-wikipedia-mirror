@@ -6,6 +6,7 @@ export interface Options {
   mainPage: string
   mainPageVersion?: number
   zimFileDownloadUrl: string
+  noOfWorkerThreads: number
 }
 
 export interface EnhancedOpts extends Options {
@@ -20,4 +21,19 @@ export interface Directories {
   articleFolder: string
   imagesFolder: string
   wikiFolder: string
+}
+
+export type ArticleWorkerData = {
+  options: Options
+  directories: Directories
+}
+
+export enum MessageRequestTypes {
+  EXIT = 'EXIT',
+  PROCESS_ARTICLES = 'PROCESS_ARTICLES'
+}
+
+export enum MessageResponseTypes {
+  PROCESSED_ARTICLES = 'PROCESSED_ARTICLES',
+  READY = 'READY'
 }

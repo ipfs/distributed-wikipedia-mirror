@@ -9,7 +9,7 @@ import {
   appendHtmlPostfix
 } from './article-transforms'
 
-export const processArticle = async (
+export const processArticle = (
   filepath: string,
   { wikiFolder, imagesFolder }: Directories,
   options: Options
@@ -40,6 +40,7 @@ export const processArticle = async (
     replaceANamespaceWithWiki,
     appendHtmlPostfix
   ])
+
   appendFooter($html, enhancedOpts)
 
   writeFileSync(filepath, $html.html())

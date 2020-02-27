@@ -37,6 +37,11 @@ class ZimToWebsite extends Command {
     mainpageversion: flags.integer({
       required: false,
       description: 'overrides the version of the homepage used'
+    }),
+    numberofworkerthreads: flags.integer({
+      required: false,
+      default: 6,
+      description: 'overrides the number of worker threads'
     })
   }
 
@@ -52,7 +57,8 @@ class ZimToWebsite extends Command {
       zimFileDownloadUrl: flags.zimfiledownloadurl,
       kiwixMainPage: flags.kiwixmainpage,
       mainPage: flags.mainpage,
-      mainPageVersion: flags.mainpageversion
+      mainPageVersion: flags.mainpageversion,
+      noOfWorkerThreads: flags.numberofworkerthreads
     }
 
     await zimToWebsite(options)
