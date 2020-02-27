@@ -93,3 +93,30 @@ export const reworkLinks = (
     attribs.href = href
   }
 }
+
+export const reworkScriptSrcs = (
+  $html: any,
+  selector = 'a:not(.external)',
+  fns: ((href: string) => string)[] = [
+    replaceANamespaceWithWiki,
+    appendHtmlPostfix
+  ]
+) => {
+  const scripts = $html(selector)
+
+  for (const script of Object.values<any>(scripts)) {
+    const attribs = script.attribs
+
+    if (!attribs || !attribs.src) {
+      continue
+    }
+
+    let src = attribs.src
+
+    for (const fn of fns) {
+      src = fn(src)
+    }
+
+    attribs.src = src
+  }
+}

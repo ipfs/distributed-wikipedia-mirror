@@ -18,7 +18,9 @@ import {
   reworkLinks,
   appendHtmlPostfix,
   appendFooter,
-  prefixRelativeRoot
+  prefixRelativeRoot,
+  moveRelativeLinksUpOneLevel,
+  reworkScriptSrcs
 } from './article-transforms'
 import { cli } from 'cli-ux'
 
@@ -188,6 +190,15 @@ export const generateMainPage = async (
       'a[href^="/wiki/"]:not(a[href$=".svg"]):not(a[href$=".png"]):not(a[href$=".jpg"])',
       [appendHtmlPostfix, prefixRelativeRoot]
     )
+
+    // update css links
+    reworkLinks($kiwixMainPageHtml, 'link[href^="../../"]', [
+      moveRelativeLinksUpOneLevel
+    ])
+
+    reworkScriptSrcs($kiwixMainPageHtml, 'script', [
+      moveRelativeLinksUpOneLevel
+    ])
 
     appendFooter($kiwixMainPageHtml, enhancedOpts)
     writeFileSync(mainPagePath, $kiwixMainPageHtml.html())
