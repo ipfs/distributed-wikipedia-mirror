@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
-RUN apt-get -y install --no-install-recommends ca-certificates make build-essential curl wget apt-utils golang-go
+RUN apt-get -y install --no-install-recommends git ca-certificates make build-essential curl wget apt-utils golang-go
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile default \
     && cat $HOME/.cargo/env >> ~/.bashrc
