@@ -31,6 +31,7 @@
     "eslint-config-oclif-typescript": "^0.1",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-simple-import-sort": "^5.0.1",
     "mocha": "^5",
     "nyc": "^14",
     "prettier": "^1.19.1",

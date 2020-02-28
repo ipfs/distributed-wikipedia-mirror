@@ -1,5 +1,5 @@
-import { resolve } from 'path'
 import { readdir } from 'fs'
+import { resolve } from 'path'
 import { promisify } from 'util'
 
 const readdirAsync = promisify(readdir)

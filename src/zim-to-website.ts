@@ -1,13 +1,14 @@
 import { cli } from 'cli-ux'
-import {
-  resolveDirectories,
-  copyImageAssetsIntoWiki,
-  moveArticleFolderToWiki,
-  insertIndexRedirect,
-  generateMainPage,
-  processArticles
-} from './site-transforms'
+
 import { Options } from './domain'
+import {
+  copyImageAssetsIntoWiki,
+  generateMainPage,
+  insertIndexRedirect,
+  moveArticleFolderToWiki,
+  processArticles,
+  resolveDirectories
+} from './site-transforms'
 import { checkUnpackedZimDir } from './utils/check-unpacked-zim-dir'
 
 export const zimToWebsite = async (options: Options) => {

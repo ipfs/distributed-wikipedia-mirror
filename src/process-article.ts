@@ -1,13 +1,14 @@
-import { Directories, Options, EnhancedOpts } from './domain'
+import cheerio from 'cheerio'
 import { readFileSync, writeFileSync } from 'fs'
 import { relative } from 'path'
-import cheerio from 'cheerio'
+
 import {
-  reworkLinks,
   appendFooter,
+  appendHtmlPostfix,
   replaceANamespaceWithWiki,
-  appendHtmlPostfix
+  reworkLinks
 } from './article-transforms'
+import { Directories, EnhancedOpts, Options } from './domain'
 
 export const processArticle = (
   filepath: string,

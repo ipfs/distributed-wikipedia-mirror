@@ -1,6 +1,7 @@
 import { Command, flags } from '@oclif/command'
-import { zimToWebsite } from './zim-to-website'
+
 import { Options } from './domain'
+import { zimToWebsite } from './zim-to-website'
 
 class ZimToWebsite extends Command {
   static description = 'Convert unpacked zim files to usable websites'

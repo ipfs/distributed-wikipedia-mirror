@@ -1,11 +1,12 @@
-import { workerData, parentPort } from 'worker_threads'
+import { parentPort, workerData } from 'worker_threads'
+
 import {
+  ArticleWorkerData,
   MessageRequestTypes,
-  MessageResponseTypes,
-  ArticleWorkerData
+  MessageResponseTypes
 } from './domain'
-import { assertNever } from './utils/assert-never'
 import { processArticle } from './process-article'
+import { assertNever } from './utils/assert-never'
 
 if (!parentPort) {
   throw new Error('Error loading worker - no parent port')

@@ -1,35 +1,36 @@
+import cheerio from 'cheerio'
+import { cli } from 'cli-ux'
 import {
+  copyFileSync,
+  existsSync,
+  lstatSync,
   readdirSync,
   readFileSync,
-  writeFileSync,
-  lstatSync,
-  copyFileSync,
   renameSync,
-  existsSync
+  writeFileSync
 } from 'fs'
-import { join, relative } from 'path'
 import Handlebars from 'handlebars'
-import {
-  Options,
-  Directories,
-  EnhancedOpts,
-  MessageResponseTypes as MessageResponseType,
-  MessageRequestTypes as MessageRequestType
-} from './domain'
-import walkFiles from './utils/walk-files'
-import cheerio from 'cheerio'
 import fetch from 'node-fetch'
+import { join, relative } from 'path'
+import { Worker } from 'worker_threads'
+
 import {
-  reworkLinks,
-  appendHtmlPostfix,
   appendFooter,
-  prefixRelativeRoot,
+  appendHtmlPostfix,
   moveRelativeLinksUpOneLevel,
+  prefixRelativeRoot,
+  reworkLinks,
   reworkScriptSrcs
 } from './article-transforms'
-import { cli } from 'cli-ux'
-import { Worker } from 'worker_threads'
+import {
+  Directories,
+  EnhancedOpts,
+  MessageRequestTypes as MessageRequestType,
+  MessageResponseTypes as MessageResponseType,
+  Options
+} from './domain'
 import { assertNever } from './utils/assert-never'
+import walkFiles from './utils/walk-files'
 
 const ARTICLE_BATCH_SIZE = 100
 

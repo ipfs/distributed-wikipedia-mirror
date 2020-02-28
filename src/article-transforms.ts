@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
-import Handlebars from 'handlebars'
 import { readFileSync } from 'fs'
+import Handlebars from 'handlebars'
+
 import { EnhancedOpts } from './domain'
 
 const footerFragment = readFileSync('./src/footer_fragment.handlebars')
