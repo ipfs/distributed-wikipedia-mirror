@@ -49,6 +49,10 @@ export const appendHtmlPostfix = (href: string) => {
     return `${href}.html`
   }
 
+  if (parts[0].endsWith('.html')) {
+    return href
+  }
+
   return href.replace(parts[0], `${parts[0]}.html`)
 }
 

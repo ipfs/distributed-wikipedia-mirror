@@ -106,6 +106,9 @@
       Original Link:
       <a class="external text ipfs http-ipfs" href="{{CANONICAL_URL}}">{{CANONICAL_URL_DISPLAY}}</a>
     </div>
+    <div id="copyright-infringement-link">
+      <!-- Placeholder -->
+    </div>
     <div>
       <a class="external text" href="https://ipfs.io/ipns/dist.ipfs.io/#go-ipfs">Download IPFS Here</a>
     </div>
@@ -122,11 +125,14 @@
     </div>
     <div style="clear: both"></div>
   </div>
-  <div class="post-footer-wrapper">
-    <p>PLACEHOLDER FOR TAKEDOWN POLICY / CONTACT INFORMATION (eg. if latest snapshot includes information removed in
-      upstream wikipedia))</p>
-  </div>
   <script>
+    const copyrightInfringementLinkDiv = document.querySelector('copyright-infringement-link')
 
+    if (window.location.hostname === 'ipfs.io' || window.location.hostname.indexOf('dweb.link') !== -1) {
+      document.querySelector('#copyright-infringement-link').innerHTML = 'To report copyright infringement please follow the instructions at <a class="external text" href="https://ipfs.io/legal">https://ipfs.io/legal</a>'
+    } else {
+      const domainToolsLink = `https://whois.domaintools.com/${window.location.hostname}`
+      document.querySelector('#copyright-infringement-link').innerHTML = 'This content is being made available by <a class="external text" href="' + `https://whois.domaintools.com/${window.location.hostname}` + '">' + window.location.hostname + '</a>'
+    }
   </script>
 </div>
