@@ -5,11 +5,11 @@ import {
   copyFileSync,
   existsSync,
   lstatSync,
+  mkdirSync,
   readdirSync,
   readFileSync,
   renameSync,
-  writeFileSync,
-  mkdirSync
+  writeFileSync
 } from 'fs'
 import Handlebars from 'handlebars'
 import fetch from 'node-fetch'

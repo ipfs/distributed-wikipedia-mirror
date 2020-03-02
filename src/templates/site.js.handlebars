@@ -44,8 +44,9 @@
 
     // Fix links
 
-    var reworkLinks = (
+    var reworkAttr = (
         selector,
+        attr,
         fns
     ) => {
         var $links = $(selector)
@@ -53,17 +54,17 @@
         $links.each(function (_index, link) {
             var $link = $(link)
 
-            var href = $link.attr('href')
+            var attrValue = $link.attr(attr)
 
-            if (!href) {
+            if (!attrValue) {
                 return
             }
 
             for (const fn of fns) {
-                href = fn(href)
+                attrValue = fn(attrValue)
             }
 
-            $link.attr('href', href)
+            $link.attr(attr, attrValue)
         })
     }
 
@@ -97,6 +98,13 @@
         return href.replace(parts[0], `${parts[0]}.html`)
     }
 
-    reworkLinks('a:not(.external)', [replaceANamespaceWithWiki, appendHtmlPostfix])
+    var lowercaseJpgExtension = function (src) {
+        return src.replace('.JPG', '.jpg')
+    }
+
+    // Fix internal links
+    reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki, appendHtmlPostfix])
+    // Fix broken image links
+    reworkAttr('img[src$=".JPG"]', 'src', [lowercaseJpgExtension])
 
 </script>
