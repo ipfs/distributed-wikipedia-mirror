@@ -20,7 +20,7 @@ export const zimToWebsite = async (options: Options) => {
   cli.log('Zim to Website Conversion')
   cli.log('-------------------------')
   cli.log(`  Unpacked Zim Directory: ${options.unpackedZimDir}`)
-  cli.log(`   Zim File Download Url: ${options.zimFileDownloadUrl}`)
+  cli.log(`   Zim File Download Url: ${options.zimFileSourceUrl}`)
   cli.log(`      Hosting DNS Domain: ${options.hostingDNSDomain}`)
   cli.log(`       Hosting IPNS Hash: ${options.hostingIPNSHash}`)
   cli.log(`               Main Page: ${options.mainPage}`)

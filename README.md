@@ -126,7 +126,7 @@ The conversion is done on the unpacked zim directory:
 node ./bin/run ./tmp \
   --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
   --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
-  --zimfiledownloadurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \
+  --zimfilesourceurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \
   --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \
   --mainpage=Anasayfa.html \
   --mainpageversion=19869765

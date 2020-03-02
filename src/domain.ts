@@ -5,7 +5,7 @@ export interface Options {
   kiwixMainPage: string
   mainPage: string
   mainPageVersion?: number
-  zimFileDownloadUrl: string
+  zimFileSourceUrl: string
   noOfWorkerThreads: number
 }
 

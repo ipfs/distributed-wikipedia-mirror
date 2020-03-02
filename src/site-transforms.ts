@@ -242,7 +242,7 @@ export const appendJavscript = (
     IPNS_HASH: options.hostingIPNSHash,
     HOSTING_DNS_DOMAIN: options.hostingDNSDomain,
     ZIM_URL:
-      options.zimFileDownloadUrl ??
+      options.zimFileSourceUrl ??
       'https://wiki.kiwix.org/wiki/Content_in_all_languages'
   }
 
