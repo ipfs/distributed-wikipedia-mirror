@@ -8,7 +8,8 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
-  writeFileSync
+  writeFileSync,
+  mkdirSync
 } from 'fs'
 import Handlebars from 'handlebars'
 import fetch from 'node-fetch'
@@ -225,7 +226,7 @@ export const generateMainPage = async (
 
 export const appendJavscript = (
   options: Options,
-  { jsmodulesFolder }: Directories
+  { unpackedZimDir, jsmodulesFolder }: Directories
 ) => {
   cli.action.start('  Appending custom javascript to site.js ')
 
@@ -275,11 +276,25 @@ export const appendJavscript = (
   // hack replace the unexpected var in startup.js
   const startupJsFile = join(jsmodulesFolder, 'startup.js')
   let startJs = readFileSync(startupJsFile).toString()
-  startJs = startJs.replace(
-    'function domEval(code){var',
-    'function domEval(code){'
-  )
+  startJs = startJs
+    .replace('function domEval(code){var', 'function domEval(code){')
+    .replace('"/w/load.php"', '"../w/load.php"')
   writeFileSync(startupJsFile, startJs)
+
+  // Create a stub load.php
+  const loadPhpPath = join(unpackedZimDir, 'w', 'load.php')
+  if (!existsSync(loadPhpPath)) {
+    mkdirSync(join(unpackedZimDir, 'w'))
+    writeFileSync(loadPhpPath, '/* Stubbed by Distributed Wikipedia Mirror */')
+  }
+
+  // hack: overwrite erroring js files see https://github.com/openzim/mwoffliner/issues/894
+  for (const file of []) {
+    const filepath = join(jsmodulesFolder, file)
+    const overwriteText =
+      '/* Overwritten by Distributed Wikipedia Mirror to prevent js errors, see https://github.com/openzim/mwoffliner/issues/894 */'
+    writeFileSync(filepath, overwriteText)
+  }
 
   cli.action.stop()
 }
