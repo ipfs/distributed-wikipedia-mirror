@@ -2,11 +2,11 @@ import { cli } from 'cli-ux'
 
 import { Options } from './domain'
 import {
+  appendJavscript as appendJavascript,
   copyImageAssetsIntoWiki,
   generateMainPage,
   insertIndexRedirect,
   moveArticleFolderToWiki,
-  processArticles,
   resolveDirectories
 } from './site-transforms'
 import { checkUnpackedZimDir } from './utils/check-unpacked-zim-dir'
@@ -33,9 +33,10 @@ export const zimToWebsite = async (options: Options) => {
   copyImageAssetsIntoWiki('./assets', directories)
   moveArticleFolderToWiki(directories)
   insertIndexRedirect(options)
+  appendJavascript(options, directories)
   await generateMainPage(options, directories)
 
-  await processArticles(options, directories, cli)
+  // await processArticles(options, directories, cli)
 
   cli.log('done')
 }

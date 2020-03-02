@@ -1,5 +1,6 @@
 import cheerio from 'cheerio'
 import { cli } from 'cli-ux'
+import { format } from 'date-fns'
 import {
   copyFileSync,
   existsSync,
@@ -11,12 +12,12 @@ import {
 } from 'fs'
 import Handlebars from 'handlebars'
 import fetch from 'node-fetch'
-import { join, relative } from 'path'
+import { join } from 'path'
 import { Worker } from 'worker_threads'
 
 import {
-  appendFooter,
   appendHtmlPostfix,
+  makeScriptLinksRelativeToWiki,
   moveRelativeLinksUpOneLevel,
   prefixRelativeRoot,
   reworkLinks,
@@ -24,7 +25,6 @@ import {
 } from './article-transforms'
 import {
   Directories,
-  EnhancedOpts,
   MessageRequestTypes as MessageRequestType,
   MessageResponseTypes as MessageResponseType,
   Options
@@ -35,7 +35,11 @@ import walkFiles from './utils/walk-files'
 const ARTICLE_BATCH_SIZE = 100
 
 const indexRedirectFragment = readFileSync(
-  './src/index_redirect_fragment.handlebars'
+  './src/templates/index_redirect_fragment.handlebars'
+)
+
+const footerFragment = readFileSync(
+  './src/templates/footer_fragment.handlebars'
 )
 
 export const copyImageAssetsIntoWiki = async (
@@ -91,12 +95,14 @@ export const resolveDirectories = (options: Options) => {
   const articleFolder = join(options.unpackedZimDir, 'A')
   const imagesFolder = join(options.unpackedZimDir, 'I', 'm')
   const wikiFolder = join(options.unpackedZimDir, 'wiki')
+  const jsmodulesFolder = join(options.unpackedZimDir, '-', 'j', 'js_modules')
 
   const directories: Directories = {
     unpackedZimDir: options.unpackedZimDir,
     articleFolder,
     imagesFolder,
-    wikiFolder
+    wikiFolder,
+    jsmodulesFolder
   }
 
   return directories
@@ -104,7 +110,7 @@ export const resolveDirectories = (options: Options) => {
 
 export const generateMainPage = async (
   options: Options,
-  { wikiFolder, imagesFolder }: Directories
+  { wikiFolder }: Directories
 ) => {
   const kiwixMainpage = readFileSync(
     join(wikiFolder, `${options.kiwixMainPage}.html`)
@@ -188,13 +194,6 @@ export const generateMainPage = async (
     $kiwixMainPageHtml('#content').remove()
     $kiwixMainPageHtml('#mw-mf-page-center').prepend($remoteContent)
 
-    const enhancedOpts: EnhancedOpts = Object.assign(options, {
-      snapshotDate: new Date(),
-      relativeFilepath: relative(wikiFolder, mainPagePath),
-      relativeImagePath: relative(wikiFolder, imagesFolder),
-      canonicalUrl: canonicalUrl.href
-    })
-
     reworkLinks(
       $kiwixMainPageHtml,
       'a[href^="/wiki/"]:not(a[href$=".svg"]):not(a[href$=".png"]):not(a[href$=".jpg"])',
@@ -206,17 +205,83 @@ export const generateMainPage = async (
       moveRelativeLinksUpOneLevel
     ])
 
-    reworkScriptSrcs($kiwixMainPageHtml, 'script', [
-      moveRelativeLinksUpOneLevel
-    ])
+    if (options.mainPage.includes('/')) {
+      reworkScriptSrcs($kiwixMainPageHtml, 'script', [
+        moveRelativeLinksUpOneLevel
+      ])
+    } else {
+      reworkScriptSrcs($kiwixMainPageHtml, 'script', [
+        makeScriptLinksRelativeToWiki
+      ])
+    }
 
-    appendFooter($kiwixMainPageHtml, enhancedOpts)
     writeFileSync(mainPagePath, $kiwixMainPageHtml.html())
 
     cli.action.stop()
   } catch (error) {
     cli.error(error)
   }
+}
+
+export const appendJavscript = (
+  options: Options,
+  { jsmodulesFolder }: Directories
+) => {
+  cli.action.start('  Appending custom javascript to site.js ')
+
+  const delimiter = '/* Appended by Distributed Wikipedia Mirror */'
+  const targetSiteJsFile = join(jsmodulesFolder, 'site.js')
+
+  const dwmSitejsTemplate = readFileSync('./src/templates/site.js.handlebars')
+    .toString()
+    .replace('<script>', '')
+    .replace('</script>', '')
+
+  const context = {
+    SNAPSHOT_DATE: format(new Date(), 'yyyy-MM'),
+    IPNS_HASH: options.hostingIPNSHash,
+    HOSTING_DNS_DOMAIN: options.hostingDNSDomain,
+    ZIM_URL:
+      options.zimFileDownloadUrl ??
+      'https://wiki.kiwix.org/wiki/Content_in_all_languages'
+  }
+
+  const dwmSitejs = Handlebars.compile(dwmSitejsTemplate.toString())({
+    FOOTER_TEMPLATE: footerFragment,
+    DWM_OPTIONS: JSON.stringify(context, null, 2)
+  })
+
+  let originalSiteJs = readFileSync(targetSiteJsFile).toString()
+
+  // hack out erroring site.js code
+  originalSiteJs = originalSiteJs.replace(
+    'if(wgCanonicalSpecialPageName=="Watchlist")importScript(\'MediaWiki:Common.js/WatchlistNotice.js\');',
+    ''
+  )
+
+  if (originalSiteJs.includes(delimiter)) {
+    originalSiteJs = originalSiteJs.split(delimiter)[0]
+  }
+
+  // const updatedSiteJs = `${originalSiteJs}\n${delimiter}\n${dwmSitejs}`
+  const updatedSiteJs = `\n${delimiter}\n${dwmSitejs}`
+
+  writeFileSync(targetSiteJsFile, updatedSiteJs)
+
+  // hack to stop console error
+  const targetJsConfigVarFile = join(jsmodulesFolder, 'jsConfigVars.js')
+  writeFileSync(targetJsConfigVarFile, '{}')
+
+  // hack replace the unexpected var in startup.js
+  const startupJsFile = join(jsmodulesFolder, 'startup.js')
+  let startJs = readFileSync(startupJsFile).toString()
+  startJs = startJs.replace(
+    'function domEval(code){var',
+    'function domEval(code){'
+  )
+  writeFileSync(startupJsFile, startJs)
+
+  cli.action.stop()
 }
 
 async function* iteratorTake<T>(

@@ -89,15 +89,10 @@
       <a href="{{ZIM_URL}}">kiwix ZIM file
       </a>
     </div>
-    {{!-- <div class="ipns-hide">
-      IPFS Link (this snaphost): <a class="external text dweb ipfs" href=""></a>
-    </div> --}}
-    {{#if IPNS_HASH}}
     <div>
       IPNS Link (most recent):
       <a class="external text dweb ipns" href="/ipns/{{IPNS_HASH}}">/ipns/{{IPNS_HASH}}</a>
     </div>
-    {{/if}}
     <div>
       HTTP Link:
       <a class="external text ipfs http-ipfs" href="{{ARTICLE_URL}}">{{ARTICLE_URL_DISPLAY}}</a>
@@ -131,8 +126,8 @@
     if (window.location.hostname === 'ipfs.io' || window.location.hostname.indexOf('dweb.link') !== -1) {
       document.querySelector('#copyright-infringement-link').innerHTML = 'To report copyright infringement please follow the instructions at <a class="external text" href="https://ipfs.io/legal">https://ipfs.io/legal</a>'
     } else {
-      const domainToolsLink = `https://whois.domaintools.com/${window.location.hostname}`
-      document.querySelector('#copyright-infringement-link').innerHTML = 'This content is being made available by <a class="external text" href="' + `https://whois.domaintools.com/${window.location.hostname}` + '">' + window.location.hostname + '</a>'
+      const domainToolsLink = 'https://whois.domaintools.com/' + window.location.hostname
+      document.querySelector('#copyright-infringement-link').innerHTML = 'This content is being made available by <a class="external text" href="https://whois.domaintools.com/' + window.location.hostname + '">' + window.location.hostname + '</a>'
     }
   </script>
 </div>

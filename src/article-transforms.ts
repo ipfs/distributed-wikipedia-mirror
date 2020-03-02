@@ -4,14 +4,16 @@ import Handlebars from 'handlebars'
 
 import { EnhancedOpts } from './domain'
 
-const footerFragment = readFileSync('./src/footer_fragment.handlebars')
+const footerFragment = readFileSync(
+  './src/templates/footer_fragment.handlebars'
+)
 
-export const appendFooter = ($html: any, options: EnhancedOpts) => {
-  const title = $html('title').text()
+const generateFooterFrom = (options: EnhancedOpts) => {
+  // const title = $html('title').text()
 
   const context = {
     SNAPSHOT_DATE: format(options.snapshotDate, 'yyyy-MM'),
-    ARTICLE_TITLE: encodeURIComponent(title),
+    // ARTICLE_TITLE: encodeURIComponent(title),
     ARTICLE_URL: `https://${options.hostingDNSDomain}/wiki/${encodeURIComponent(
       options.relativeFilepath
     )}`,
@@ -28,6 +30,12 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
   const footerTemplate = Handlebars.compile(footerFragment.toString())
 
   const footer = footerTemplate(context)
+
+  return footer
+}
+
+export const appendFooter = ($html: any, options: EnhancedOpts) => {
+  const footer = generateFooterFrom(options)
   $html('#distribution-footer').remove()
   $html('#mw-mf-page-center').append(
     `<div id='distribution-footer'>${footer}</div>`
@@ -66,6 +74,14 @@ export const prefixRelativeRoot = (href: string) => {
 
 export const moveRelativeLinksUpOneLevel = (href: string) => {
   return href.replace('../', '')
+}
+
+export const makeScriptLinksRelativeToWiki = (href: string) => {
+  if (!href.startsWith('-/')) {
+    return href
+  }
+
+  return `../${href}`
 }
 
 export const replaceANamespaceWithWiki = (href: string) => {

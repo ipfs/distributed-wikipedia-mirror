@@ -1,0 +1,98 @@
+<script>
+    // Distributed Wikipedia Mirror Modifications
+    // Append Distribution Footer
+
+    var footerTemplate = `{{{FOOTER_TEMPLATE}}}`
+
+    var dwmOptions = {{{ DWM_OPTIONS }}}
+
+    const canonicalUrl = $('link[rel="canonical"]').attr('href')
+
+    var resolveRelativeFilePath = function () {
+        var prefix = window.location.pathname.split('/wiki')[0]
+        var relativeFilePath = window.location.pathname.replace(prefix, '')
+
+        return {
+            relativeFilePath: relativeFilePath,
+            basePath: prefix
+        }
+    }
+
+    var resolution = resolveRelativeFilePath()
+    var relativeFilePath = resolution.relativeFilePath
+    var basePath = resolution.basePath
+
+    dwmOptions.ARTICLE_URL = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + relativeFilePath
+    dwmOptions.ARTICLE_URL_DISPLAY = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + decodeURIComponent(relativeFilePath)
+
+    const footer = footerTemplate
+        .replace(/\{{IPNS_HASH}}/g, dwmOptions.IPNS_HASH)
+        .replace(/\{{ZIM_URL}}/g, dwmOptions.ZIM_URL)
+        .replace(/\{{SNAPSHOT_DATE}}/g, dwmOptions.SNAPSHOT_DATE)
+        .replace(/\{{IMAGES_DIR}}/g, basePath + '/I/m')
+        .replace(/\{{ARTICLE_URL}}/g, dwmOptions.ARTICLE_URL)
+        .replace(/\{{ARTICLE_URL_DISPLAY}}/g, dwmOptions.ARTICLE_URL_DISPLAY)
+        .replace(/\{{CANONICAL_URL}}/g, canonicalUrl)
+        .replace(/\{{CANONICAL_URL_DISPLAY}}/g, decodeURIComponent(canonicalUrl))
+
+    if ($("#distribution-footer").length === 0) {
+        $('#mw-mf-page-center').append(
+            "<div id='distribution-footer'>" + footer + "</div>"
+        )
+    }
+
+
+    // Fix links
+
+    var reworkLinks = (
+        selector,
+        fns
+    ) => {
+        var $links = $(selector)
+
+        $links.each(function (_index, link) {
+            var $link = $(link)
+
+            var href = $link.attr('href')
+
+            if (!href) {
+                return
+            }
+
+            for (const fn of fns) {
+                href = fn(href)
+            }
+
+            $link.attr('href', href)
+        })
+    }
+
+    var replaceANamespaceWithWiki = function (href) {
+        return href.replace('/A/', '/wiki/')
+    }
+
+    var appendHtmlPostfix = function (href) {
+        var parts = href.split(/[#?]+/)
+
+        if (parts.length === 0) {
+            throw new Error('Unexpected parsing of links')
+        }
+
+        if (parts.length === 1) {
+            if (href.endsWith('.html')) {
+                return href
+            }
+
+            return `${href}.html`
+        }
+
+        if (parts[0].endsWith('.html')) {
+            return href
+        }
+
+        return href.replace(parts[0], `${parts[0]}.html`)
+    }
+
+    reworkLinks('a:not(.external)', [replaceANamespaceWithWiki, appendHtmlPostfix])
+
+</script>

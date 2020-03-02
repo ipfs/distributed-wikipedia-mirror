@@ -21,6 +21,7 @@ export interface Directories {
   articleFolder: string
   imagesFolder: string
   wikiFolder: string
+  jsmodulesFolder: string
 }
 
 export type ArticleWorkerData = {
