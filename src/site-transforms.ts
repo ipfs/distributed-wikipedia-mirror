@@ -206,7 +206,7 @@ export const generateMainPage = async (
       moveRelativeLinksUpOneLevel
     ])
 
-    if (options.mainPage.includes('/')) {
+    if (options.kiwixMainPage.includes('/')) {
       reworkScriptSrcs($kiwixMainPageHtml, 'script', [
         moveRelativeLinksUpOneLevel
       ])

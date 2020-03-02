@@ -98,13 +98,13 @@
         return href.replace(parts[0], `${parts[0]}.html`)
     }
 
-    var lowercaseJpgExtension = function (src) {
-        return src.replace('.JPG', '.jpg')
+    var fixJpgExtension = function (src) {
+        return src.replace('.JPG', '.jpg').replace('.jpeg', '.jpg')
     }
 
     // Fix internal links
     reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki, appendHtmlPostfix])
     // Fix broken image links
-    reworkAttr('img[src$=".JPG"]', 'src', [lowercaseJpgExtension])
+    reworkAttr('img[src$=".JPG"]', 'src', [fixJpgExtension])
 
 </script>
