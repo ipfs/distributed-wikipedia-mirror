@@ -90,6 +90,10 @@
             return href
         }
 
+        if (parts[0] === '') {
+            return href
+        }
+
         return href.replace(parts[0], `${parts[0]}.html`)
     }
 
