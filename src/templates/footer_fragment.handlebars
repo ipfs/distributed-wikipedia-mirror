@@ -125,9 +125,9 @@
 
     if (window.location.hostname === 'ipfs.io' || window.location.hostname.indexOf('dweb.link') !== -1) {
       document.querySelector('#copyright-infringement-link').innerHTML = 'To report copyright infringement please follow the instructions at <a class="external text" href="https://ipfs.io/legal">https://ipfs.io/legal</a>'
-    } else {
+    } else if (['localhost', '127.0.0.1', '[::1]'].indexOf(window.location.hostname) === -1 && window.location.protocol.indexOf('http:') === -1) {
       const domainToolsLink = 'https://whois.domaintools.com/' + window.location.hostname
-      document.querySelector('#copyright-infringement-link').innerHTML = 'This content is being made available by <a class="external text" href="https://whois.domaintools.com/' + window.location.hostname + '">' + window.location.hostname + '</a>'
+      document.querySelector('#copyright-infringement-link').innerHTML = 'This content is provided by a third party IPFS gateway. To report copyright infringement please contact the owner of <a class="external text" href="https://whois.domaintools.com/' + window.location.hostname + '">' + window.location.hostname + '</a>'
     }
   </script>
 </div>
