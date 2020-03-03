@@ -317,7 +317,7 @@ export const appendJavscript = (
   }
 
   // hack: overwrite erroring js files see https://github.com/openzim/mwoffliner/issues/894
-  for (const file of []) {
+  for (const file of ['ext.cite.ux-enhancements.js']) {
     const filepath = join(jsmodulesFolder, file)
     const overwriteText =
       '/* Overwritten by Distributed Wikipedia Mirror to prevent js errors, see https://github.com/openzim/mwoffliner/issues/894 */'
