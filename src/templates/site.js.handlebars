@@ -2,11 +2,20 @@
     // Distributed Wikipedia Mirror Modifications
     // Append Distribution Footer
 
-    var footerTemplate = `{{{FOOTER_TEMPLATE}}}`
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function (search, this_len) {
+            if (this_len === undefined || this_len > this.length) {
+                this_len = this.length;
+            }
+            return this.substring(this_len - search.length, this_len) === search;
+        };
+    }
+
+    var footerTemplate = "{{{FOOTER_TEMPLATE}}}"
 
     var dwmOptions = {{{ DWM_OPTIONS }}}
 
-    const canonicalUrl = $('link[rel="canonical"]').attr('href')
+    var canonicalUrl = $('link[rel="canonical"]').attr('href')
 
     var resolveRelativeFilePath = function () {
         var prefix = window.location.pathname.split('/wiki')[0]
@@ -25,7 +34,7 @@
     dwmOptions.ARTICLE_URL = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + relativeFilePath
     dwmOptions.ARTICLE_URL_DISPLAY = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + decodeURIComponent(relativeFilePath)
 
-    const footer = footerTemplate
+    var footer = footerTemplate
         .replace(/\{{IPNS_HASH}}/g, dwmOptions.IPNS_HASH)
         .replace(/\{{ZIM_URL}}/g, dwmOptions.ZIM_URL)
         .replace(/\{{SNAPSHOT_DATE}}/g, dwmOptions.SNAPSHOT_DATE)
@@ -44,11 +53,11 @@
 
     // Fix links
 
-    var reworkAttr = (
+    var reworkAttr = function (
         selector,
         attr,
         fns
-    ) => {
+    ) {
         var $links = $(selector)
 
         $links.each(function (_index, link) {
@@ -60,9 +69,9 @@
                 return
             }
 
-            for (const fn of fns) {
+            fns.forEach(function (fn) {
                 attrValue = fn(attrValue)
-            }
+            })
 
             $link.attr(attr, attrValue)
         })
@@ -84,7 +93,7 @@
                 return href
             }
 
-            return `${href}.html`
+            return href + '.html'
         }
 
         if (parts[0].endsWith('.html')) {
@@ -95,7 +104,7 @@
             return href
         }
 
-        return href.replace(parts[0], `${parts[0]}.html`)
+        return href.replace(parts[0], parts[0] + '.html')
     }
 
     var fixJpgExtension = function (src) {
@@ -106,5 +115,15 @@
     reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki, appendHtmlPostfix])
     // Fix broken image links
     reworkAttr('img[src$=".JPG"]', 'src', [fixJpgExtension])
+
+    // Append copyright notice
+    var copyrightInfringementLinkDiv = document.querySelector('copyright-infringement-link')
+
+    if (window.location.hostname === 'ipfs.io' || window.location.hostname.indexOf('dweb.link') !== -1) {
+        document.querySelector('#copyright-infringement-link').innerHTML = 'To report copyright infringement please follow the instructions at <a class="external text" href="https://ipfs.io/legal">https://ipfs.io/legal</a>'
+    } else if (['localhost', '127.0.0.1', '[::1]'].indexOf(window.location.hostname) === -1 && window.location.protocol.indexOf('http:') === -1) {
+        var domainToolsLink = 'https://whois.domaintools.com/' + window.location.hostname
+        document.querySelector('#copyright-infringement-link').innerHTML = 'This content is provided by a third party IPFS gateway. To report copyright infringement please contact the owner of <a class="external text" href="https://whois.domaintools.com/' + window.location.hostname + '">' + window.location.hostname + '</a>'
+    }
 
 </script>

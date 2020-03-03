@@ -152,7 +152,7 @@ export const generateMainPage = async (
   const canonicalUrl = new URL(canonicalUrlString)
   canonicalUrl.pathname = `wiki/${options.mainPage.replace('.html', '')}`
 
-  canonicalUrl.searchParams.append('oldid', canonicalPageVersionid)
+  canonicalUrl.searchParams.set('oldid', canonicalPageVersionid)
 
   try {
     const response = await fetch(canonicalUrl)
@@ -273,7 +273,10 @@ export const appendJavscript = (
   }
 
   const dwmSitejs = Handlebars.compile(dwmSitejsTemplate.toString())({
-    FOOTER_TEMPLATE: footerFragment,
+    FOOTER_TEMPLATE: footerFragment
+      .toString()
+      .replace(/\n/g, '\\\n')
+      .replace(/"/g, '\\"'),
     DWM_OPTIONS: JSON.stringify(context, null, 2)
   })
 
