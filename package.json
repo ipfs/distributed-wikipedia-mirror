@@ -2,6 +2,7 @@
   "name": "distributed-wikipedia-mirror",
   "description": "Mirror wikipedia on IPFS",
   "version": "0.1.0",
+  "private": true,  
   "bin": {
     "zim-to-website": "./bin/run"
   },

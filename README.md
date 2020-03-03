@@ -94,7 +94,7 @@ Main page is Kullanıcı:The_other_Kiwix_guy/Landing
 Extraction done in 25.91s
 ```
 
-> ### ℹ️ Kiwix Zim file Main page
+> ### ℹ️ ZIM's main page
 >
 > The string after `Main page is` as it is the name
 > of the landing page set for the ZIM archive.  
