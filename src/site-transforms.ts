@@ -13,6 +13,7 @@ import {
 } from 'fs'
 import Handlebars from 'handlebars'
 import fetch from 'node-fetch'
+import path from 'path'
 import { join } from 'path'
 import { Worker } from 'worker_threads'
 
@@ -31,6 +32,7 @@ import {
   Options
 } from './domain'
 import { assertNever } from './utils/assert-never'
+import { downloadFile } from './utils/download-file'
 import walkFiles from './utils/walk-files'
 
 const ARTICLE_BATCH_SIZE = 100
@@ -111,7 +113,7 @@ export const resolveDirectories = (options: Options) => {
 
 export const generateMainPage = async (
   options: Options,
-  { wikiFolder }: Directories
+  { wikiFolder, imagesFolder }: Directories
 ) => {
   const kiwixMainpage = readFileSync(
     join(wikiFolder, `${options.kiwixMainPage}.html`)
@@ -158,7 +160,6 @@ export const generateMainPage = async (
     const $remoteMainPageHtml = cheerio.load(pageBody)
 
     const $remoteContent = $remoteMainPageHtml('#content')
-
     const remotePageTitle = $remoteMainPageHtml('title').text()
 
     $remoteContent.addClass('content')
@@ -171,7 +172,6 @@ export const generateMainPage = async (
     $remoteContent.find('a.mw-jump-link').remove()
 
     // Some styling on the top banner - I know, this has got ... hacky
-
     // Set the width to 100%
     $remoteContent
       .find('#mp-topbanner')
@@ -189,6 +189,23 @@ export const generateMainPage = async (
         'style',
         'background-image: url("../I/m/wikipedia-on-ipfs.png"); background-repeat:no-repeat; background-position:-20px -40px; background-size: 200px; width:100%; border:1px solid #a7d7f9; vertical-align:top;'
       )
+
+    // Copy image downloads
+    const $externalImages = $remoteContent.find(
+      'img[src*="upload.wikimedia.org"]'
+    )
+
+    for (const $externalImage of $externalImages.toArray()) {
+      const src = $externalImage.attribs.src
+      const filename = path.basename(src)
+
+      // eslint-disable-next-line no-await-in-loop
+      await downloadFile(
+        new URL(`http:${src}`),
+        join(imagesFolder, decodeURIComponent(filename))
+      )
+      $externalImage.attribs.src = `../I/m/${filename}`
+    }
 
     const $kiwixNote = $kiwixMainPageHtml('#mw-content-text > div:last-child')
 
