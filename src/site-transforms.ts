@@ -159,6 +159,8 @@ export const generateMainPage = async (
 
     const $remoteContent = $remoteMainPageHtml('#content')
 
+    const mainPageTitle = $remoteMainPageHtml('title').text()
+
     $remoteContent.addClass('content')
     $remoteContent.find('#siteNotice').remove()
     $remoteContent.find('#firstHeading').remove()
@@ -191,6 +193,9 @@ export const generateMainPage = async (
     const $kiwixNote = $kiwixMainPageHtml('#mw-content-text > div:last-child')
 
     $remoteContent.find('#mw-content-text').append($kiwixNote)
+
+    // Add title from remote main page
+    $kiwixMainPageHtml('title').text(mainPageTitle)
 
     $kiwixMainPageHtml('#content').remove()
     $kiwixMainPageHtml('#mw-mf-page-center').prepend($remoteContent)
