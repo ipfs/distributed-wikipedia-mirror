@@ -159,7 +159,7 @@ export const generateMainPage = async (
 
     const $remoteContent = $remoteMainPageHtml('#content')
 
-    const mainPageTitle = $remoteMainPageHtml('title').text()
+    const remotePageTitle = $remoteMainPageHtml('title').text()
 
     $remoteContent.addClass('content')
     $remoteContent.find('#siteNotice').remove()
@@ -195,7 +195,10 @@ export const generateMainPage = async (
     $remoteContent.find('#mw-content-text').append($kiwixNote)
 
     // Add title from remote main page
-    $kiwixMainPageHtml('title').text(mainPageTitle)
+    $kiwixMainPageHtml('title').text(remotePageTitle)
+
+    // Update the canoncial url from the remote main page
+    $kiwixMainPageHtml('link[rel="canonical"]').attr('href', canonicalUrl.href)
 
     $kiwixMainPageHtml('#content').remove()
     $kiwixMainPageHtml('#mw-mf-page-center').prepend($remoteContent)
