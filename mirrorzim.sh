@@ -66,8 +66,7 @@ node ./bin/run $TMP_DIRECTORY \
   --mainpage=$MAIN_PAGE \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
 
-# Add the processed tmp directory to IPFS
-ipfs add -r --cid-version 1 --offline $TMP_DIRECTORY
-CID=$(ipfs add -r --cid-version 1 --offline $TMP_DIRECTORY | tail -n -1 | cut -d' ' -f2)
+printf "\nAdd the processed tmp directory to IPFS\n"
+CID=$(ipfs add -r --cid-version 1 --offline $TMP_DIRECTORY | tail -n -1 | cut -d' ' -f2 )
 
-echo -e "\nThe CID of $ZIM_FILE is:\n$CID"
+printf "\nThe CID of $ZIM_FILE is:\n$CID\n"
