@@ -2,7 +2,7 @@
 
 # internal
 
-BASE=$(readlink -f $(dirname "$0"))
+BASE=$(pwd -P)
 CACHE="$BASE/.cache"
 
 # conf
@@ -53,7 +53,7 @@ fetch_with_cache() {
 }
 
 get_urls() {
-  grep href | grep -v "<pre>" | sed -r 's|.*href="(.*)".*|\1|g' | sed "s|/||g"
+  grep href | grep -v "<pre>" | sed -E 's|.*href="(.*)".*|\1|g' | sed "s|/||g"
 }
 
 # main funcs
