@@ -7,7 +7,7 @@ set -euo pipefail
 
 usage() {
 	echo "USAGE:"
-	echo "	$0 <LANGUAGE_CODE> <WIKI_TYPE> <HOSTING_DNS_DOMAIN> <HOSTING_IPNS_HASH> <MAIN_PAGE_VERSION>";
+	echo "	$0 <LANGUAGE_CODE> <WIKI_TYPE> [HOSTING_DNS_DOMAIN] [HOSTING_IPNS_HASH] [MAIN_PAGE_VERSION]";
 	echo ""
 	exit 2
 }
@@ -25,7 +25,7 @@ fi
 if [ -z "${3-}" ]; then
 	HOSTING_DNS_DOMAIN=""
 else 
-    HOSTING_DNS_DOMAIN="$4"
+    HOSTING_DNS_DOMAIN="$3"
 fi
 
 if [ -z "${4-}" ]; then
