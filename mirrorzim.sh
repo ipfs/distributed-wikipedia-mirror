@@ -23,25 +23,25 @@ if [ -z "${2-}" ]; then
 fi
 
 if [ -z "${3-}" ]; then
-	echo "Missing hosting dns domain e.g. tr.wikipedia-on-ipfs.org"
-	usage
+	HOSTING_DNS_DOMAIN=""
+else 
+    HOSTING_DNS_DOMAIN="$4"
 fi
 
 if [ -z "${4-}" ]; then
-	echo "Missing hosting IPNS hash e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W"
-	usage
+	HOSTING_IPNS_HASH=""
+else 
+    HOSTING_IPNS_HASH="$4"
 fi
 
 if [ -z "${5-}" ]; then
-	echo "Missing Main Page Version e.g. 19869765"
-	usage
+	MAIN_PAGE_VERSION=""
+else
+    MAIN_PAGE_VERSION="$5"
 fi
 
 LANGUAGE_CODE="$1"
 WIKI="$2"
-HOSTING_DNS_DOMAIN="$3"
-HOSTING_IPNS_HASH="$4"
-MAIN_PAGE_VERSION="$5"
 
 printf "\nDownload the zim file...\n"
 ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI $WIKI $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
@@ -59,11 +59,11 @@ MAIN_PAGE=$(./tools/find_main_page_name.sh "$LANGUAGE_CODE.$WIKI.org")
 
 printf "\nConvert the unpacked zim directory to a website\n"
 node ./bin/run $TMP_DIRECTORY \
-  --hostingdnsdomain=$HOSTING_DNS_DOMAIN \
-  --hostingipnshash=$HOSTING_IPNS_HASH \
   --zimfilesourceurl=$ZIM_FILE_SOURCE_URL \
   --kiwixmainpage=$ZIM_FILE_MAIN_PAGE \
   --mainpage=$MAIN_PAGE \
+  ${HOSTING_DNS_DOMAIN:+--hostingdnsdomain=$HOSTING_DNS_DOMAIN} \
+  ${HOSTING_IPNS_HASH:+--hostingipnshash=$HOSTING_IPNS_HASH} \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
 
 printf "\nAdd the processed tmp directory to IPFS\n"

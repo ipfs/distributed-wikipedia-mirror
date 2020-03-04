@@ -13,14 +13,6 @@ class ZimToWebsite extends Command {
   static flags = {
     version: flags.version({ char: 'v' }),
     help: flags.help({ char: 'h' }),
-    hostingdnsdomain: flags.string({
-      required: true,
-      description: 'the DNS domain the website will be hosted at'
-    }),
-    hostingipnshash: flags.string({
-      required: true,
-      description: 'the IPNS address the website will be hosted at on IPFS'
-    }),
     zimfilesourceurl: flags.string({
       required: true,
       description: 'the url of the original (before unpacking) source zim file'
@@ -34,6 +26,14 @@ class ZimToWebsite extends Command {
       required: true,
       description:
         "the main page as it is on the approptiate wikimedia site, e.g. 'Anasayfa' for tr.wikipedia.org"
+    }),
+    hostingdnsdomain: flags.string({
+      required: false,
+      description: 'the DNS domain the website will be hosted at'
+    }),
+    hostingipnshash: flags.string({
+      required: false,
+      description: 'the IPNS address the website will be hosted at on IPFS'
     }),
     mainpageversion: flags.integer({
       required: false,

@@ -31,16 +31,13 @@
     var relativeFilePath = resolution.relativeFilePath
     var basePath = resolution.basePath
 
-    dwmOptions.ARTICLE_URL = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + relativeFilePath
-    dwmOptions.ARTICLE_URL_DISPLAY = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + decodeURIComponent(relativeFilePath)
-
     var footer = footerTemplate
-        .replace(/\{{IPNS_HASH}}/g, dwmOptions.IPNS_HASH)
+        // .replace(/\{{HOSTING_IPNS_HASH}}/g, dwmOptions.HOSTING_IPNS_HASH)
         .replace(/\{{ZIM_URL}}/g, dwmOptions.ZIM_URL)
         .replace(/\{{SNAPSHOT_DATE}}/g, dwmOptions.SNAPSHOT_DATE)
         .replace(/\{{IMAGES_DIR}}/g, basePath + '/I/m')
-        .replace(/\{{ARTICLE_URL}}/g, dwmOptions.ARTICLE_URL)
-        .replace(/\{{ARTICLE_URL_DISPLAY}}/g, dwmOptions.ARTICLE_URL_DISPLAY)
+        //.replace(/\{{ARTICLE_URL}}/g, dwmOptions.ARTICLE_URL)
+        //.replace(/\{{ARTICLE_URL_DISPLAY}}/g, dwmOptions.ARTICLE_URL_DISPLAY)
         .replace(/\{{CANONICAL_URL}}/g, canonicalUrl)
         .replace(/\{{CANONICAL_URL_DISPLAY}}/g, decodeURIComponent(canonicalUrl))
 
@@ -126,4 +123,29 @@
         document.querySelector('#copyright-infringement-link').innerHTML = 'This content is provided by a third party IPFS gateway. To report copyright infringement please contact the owner of <a class="external text" href="https://whois.domaintools.com/' + window.location.hostname + '">' + window.location.hostname + '</a>'
     }
 
+    if (dwmOptions.HOSTING_IPNS_HASH) {
+        // Append IPNS hash link
+        var ipnsHashLinkDiv = " \
+        <div> \
+            IPNS Link (most recent): \
+            <a class=\"external text dweb ipns\" href=\"/ipns/" + dwmOptions.HOSTING_IPNS_HASH + "\">/ipns/" + dwmOptions.HOSTING_IPNS_HASH + "</a> \
+        </div> \
+        "
+
+        document.querySelector("#footer-ipns-link").innerHTML = ipnsHashLinkDiv
+    }
+
+    if (dwmOptions.HOSTING_DNS_DOMAIN) {
+        var articleUrl = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + relativeFilePath
+        var articleUrlDisplay = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + decodeURIComponent(relativeFilePath)
+
+        var httpLinkDiv = " \
+            <div> \
+                HTTP Link: \
+                <a class=\"external text ipfs http - ipfs\" href=\"" + articleUrl + "\">" + articleUrlDisplay + "</a> \
+            </div> \
+        "
+
+        document.querySelector("#footer-http-link").innerHTML = httpLinkDiv
+    }
 </script>

@@ -21,10 +21,21 @@ export const zimToWebsite = async (options: Options) => {
   cli.log('-------------------------')
   cli.log(`  Unpacked Zim Directory: ${options.unpackedZimDir}`)
   cli.log(`   Zim File Download Url: ${options.zimFileSourceUrl}`)
-  cli.log(`      Hosting DNS Domain: ${options.hostingDNSDomain}`)
-  cli.log(`       Hosting IPNS Hash: ${options.hostingIPNSHash}`)
   cli.log(`               Main Page: ${options.mainPage}`)
   cli.log(`         Kiwix Main Page: ${options.kiwixMainPage}`)
+
+  if (options.hostingDNSDomain) {
+    cli.log(`      Hosting DNS Domain: ${options.hostingDNSDomain}`)
+  }
+
+  if (options.hostingIPNSHash) {
+    cli.log(`       Hosting IPNS Hash: ${options.hostingIPNSHash}`)
+  }
+
+  if (options.mainPageVersion) {
+    cli.log(`       Main Page version: ${options.mainPageVersion}`)
+  }
+
   cli.log('-------------------------')
   cli.log('')
 

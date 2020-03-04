@@ -265,7 +265,7 @@ export const appendJavscript = (
 
   const context = {
     SNAPSHOT_DATE: format(new Date(), 'yyyy-MM'),
-    IPNS_HASH: options.hostingIPNSHash,
+    HOSTING_IPNS_HASH: options.hostingIPNSHash,
     HOSTING_DNS_DOMAIN: options.hostingDNSDomain,
     ZIM_URL:
       options.zimFileSourceUrl ??

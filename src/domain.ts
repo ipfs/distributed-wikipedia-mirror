@@ -1,10 +1,10 @@
 export interface Options {
   unpackedZimDir: string
-  hostingDNSDomain: string
-  hostingIPNSHash: string
   kiwixMainPage: string
   mainPage: string
   mainPageVersion?: number
+  hostingDNSDomain?: string
+  hostingIPNSHash?: string
   zimFileSourceUrl: string
   noOfWorkerThreads: number
 }
