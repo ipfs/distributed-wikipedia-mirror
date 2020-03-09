@@ -44,7 +44,6 @@
         )
     }
 
-
     // Fix links
 
     var reworkAttr = function (
@@ -146,4 +145,20 @@
 
         document.querySelector("#footer-http-link").innerHTML = httpLinkDiv
     }
+
+    const $snapshotSourceRevisionLink = $('a.external[href*="oldid"]')
+
+    if ($snapshotSourceRevisionLink.length) {
+        var snapshotSourceRevisionUrl = $snapshotSourceRevisionLink.attr('href')
+
+        var snapshotSourceRevisionDiv = " \
+                <div> \
+                    Snapshot source revision: \
+                    <a class=\"external text\" href=\"" + snapshotSourceRevisionUrl + "\">" + decodeURIComponent(snapshotSourceRevisionUrl) + "</a> \
+                </div> \
+            "
+
+        document.querySelector("#snapshot-source-revision-link").innerHTML = snapshotSourceRevisionDiv
+    }
+
 </script>
