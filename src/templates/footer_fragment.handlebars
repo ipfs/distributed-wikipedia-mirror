@@ -4,10 +4,13 @@
       padding-bottom: 0;
     }
 
-    .footer-wrapper,
-    .post-footer-wrapper {
-      width: 55.8em;
+    #distribution-footer {
+      max-width: 55.8em;
       margin: 0px auto;
+    }
+
+    .footer-wrapper {
+      margin: 5px;
       font-family: 'Linux Libertine', Georgia, Times, serif;
     }
 
@@ -38,13 +41,10 @@
       margin-bottom: 12px;
     }
 
-    .footer-logo,
-    .footer-titles,
-    .footer-sharing {
-      position: relative;
-      float: left;
-      width: 200px;
-      text-align: center;
+    .footer-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
     }
 
     .footer-logo {
@@ -52,13 +52,21 @@
       padding-left: 10px;
     }
 
-    .footer-titles,
-    .footer-sharing {
-      padding-top: 20px;
+    .footer-header-blank-slot {
+      width: 100px;
+      padding-right: 10px;
+    }
+
+    @media screen and (min-width: 0px) and (max-width: 600px) {
+      .footer-header-blank-slot {
+        display: none;
+      }
     }
 
     .footer-titles {
-      width: 570px;
+      padding-top: 20px;
+      min-width: 250px;
+      text-align: center;
     }
 
     .footer-titles-title {
@@ -80,16 +88,20 @@
     }
   </style>
   <div class="footer-wrapper">
-    <div class="footer-logo">
-      <img src="{{IMAGES_DIR}}/wikipedia-on-ipfs.png" width="100" />
-    </div>
-    <div class="footer-titles">
-      <div class="footer-titles-title">Distributed Wikipedia Mirror Project</div>
-      <div class="footer-titles-subtitle">
-        Powered by <a href="https://ipfs.io">IPFS</a>
+    <div class="footer-header">
+      <div class="footer-logo">
+        <img src="{{IMAGES_DIR}}/wikipedia-on-ipfs.png" width="100" />
+      </div>
+      <div class="footer-titles">
+        <div class="footer-titles-title">Distributed Wikipedia Mirror Project</div>
+        <div class="footer-titles-subtitle">
+          Powered by <a href="https://ipfs.io">IPFS</a>
+        </div>
+      </div>
+      <div class="footer-header-blank-slot">
+        <!-- blank slot -->
       </div>
     </div>
-    <div style="clear: both"></div>
     <div class="footer-main">
       <div>
         This snapshot was generated and distributed by the
