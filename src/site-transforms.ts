@@ -214,11 +214,21 @@ export const generateMainPage = async (
     // Add title from remote main page
     $kiwixMainPageHtml('title').text(remotePageTitle)
 
-    // Update the canoncial url from the remote main page
-    $kiwixMainPageHtml('link[rel="canonical"]').attr('href', canonicalUrl.href)
-
     $kiwixMainPageHtml('#content').remove()
     $kiwixMainPageHtml('#mw-mf-page-center').prepend($remoteContent)
+
+    // Updage the article issuing link at the bottom
+    $kiwixMainPageHtml('a')
+      .filter((_, elem) => {
+        // console.log(elem.attribs?.href)
+        return elem.attribs?.href?.includes('oldid')
+      })
+      .first()
+      .attr('href', canonicalUrl.href)
+
+    // Update the canoncial url from the remote main page (without oldid)
+    canonicalUrl.searchParams.delete('oldid')
+    $kiwixMainPageHtml('link[rel="canonical"]').attr('href', canonicalUrl.href)
 
     reworkLinks(
       $kiwixMainPageHtml,
