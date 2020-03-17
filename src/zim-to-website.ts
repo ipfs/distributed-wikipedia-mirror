@@ -47,7 +47,5 @@ export const zimToWebsite = async (options: Options) => {
   appendJavascript(options, directories)
   await generateMainPage(options, directories)
 
-  // await processArticles(options, directories, cli)
-
   cli.log('done')
 }

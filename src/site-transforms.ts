@@ -15,7 +15,6 @@ import Handlebars from 'handlebars'
 import fetch from 'node-fetch'
 import path from 'path'
 import { join } from 'path'
-import { Worker } from 'worker_threads'
 
 import {
   appendHtmlPostfix,
@@ -25,17 +24,8 @@ import {
   reworkLinks,
   reworkScriptSrcs
 } from './article-transforms'
-import {
-  Directories,
-  MessageRequestTypes as MessageRequestType,
-  MessageResponseTypes as MessageResponseType,
-  Options
-} from './domain'
-import { assertNever } from './utils/assert-never'
+import { Directories, Options } from './domain'
 import { downloadFile } from './utils/download-file'
-import walkFiles from './utils/walk-files'
-
-const ARTICLE_BATCH_SIZE = 100
 
 const indexRedirectFragment = readFileSync(
   './src/templates/index_redirect_fragment.handlebars'
@@ -335,132 +325,4 @@ export const appendJavscript = (
   }
 
   cli.action.stop()
-}
-
-async function* iteratorTake<T>(
-  generator: AsyncGenerator<T, any, any>,
-  batchSize: number
-) {
-  let batch: T[] = []
-
-  for await (const element of generator) {
-    batch.push(element)
-
-    if (batch.length === batchSize) {
-      yield batch
-      batch = []
-    }
-  }
-
-  if (batch.length === 0) {
-    return
-  }
-
-  yield batch
-}
-
-const sendNextProcessArticlesMessage = async (
-  worker: Worker,
-  articleBatches: AsyncGenerator<string[], any, any>
-) => {
-  const nextFileResult = await articleBatches.next()
-
-  if (nextFileResult.done) {
-    worker.postMessage({ type: MessageRequestType.EXIT })
-    return
-  }
-
-  const articles = nextFileResult.value
-
-  worker.postMessage({
-    type: MessageRequestType.PROCESS_ARTICLES,
-    articles: articles
-  })
-}
-
-const runArticleWorker = (
-  options: Options,
-  directories: Directories,
-  articleBatches: AsyncGenerator<string[], any, any>,
-  batchCompleteFn: (numberProcessed: number) => void
-) => {
-  const worker = new Worker('./src/article-worker.import.js', {
-    workerData: { options, directories }
-  })
-
-  worker.on('message', message => {
-    const messageType: MessageResponseType = message.type
-
-    switch (messageType) {
-      case MessageResponseType.READY:
-        sendNextProcessArticlesMessage(worker, articleBatches)
-        break
-      case MessageResponseType.PROCESSED_ARTICLES:
-        batchCompleteFn(message.processed)
-        sendNextProcessArticlesMessage(worker, articleBatches)
-        break
-      default:
-        assertNever(messageType)
-    }
-  })
-
-  const exitPromise = new Promise<void>((resolve, reject) => {
-    worker.once('exit', err => {
-      if (err) {
-        reject(err)
-      }
-
-      resolve()
-    })
-  })
-
-  return exitPromise
-}
-
-export const processArticles = async (
-  options: Options,
-  directories: Directories,
-  cli: any
-) => {
-  cli.log(' Processing articles:')
-  const { wikiFolder } = directories
-  const rootArticleDir = join(wikiFolder)
-
-  let totalArticleCount = 0
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  for await (const _filepath of walkFiles(rootArticleDir)) {
-    totalArticleCount++
-  }
-
-  const progressBar = cli.progress({
-    format: '  Articles | {bar} | {percentage}% | {value}/{total} Files'
-  })
-
-  let processingCount = 0
-  progressBar.start(totalArticleCount, processingCount)
-
-  const articleBatches = iteratorTake(
-    walkFiles(rootArticleDir),
-    ARTICLE_BATCH_SIZE
-  )
-
-  const workthreadExitPromises: Promise<void>[] = []
-
-  for (let index = 0; index < options.noOfWorkerThreads; index++) {
-    const workerExitPromise = runArticleWorker(
-      options,
-      directories,
-      articleBatches,
-      (numberProcessed: number) => {
-        processingCount += numberProcessed
-        progressBar.update(processingCount)
-      }
-    )
-
-    workthreadExitPromises.push(workerExitPromise)
-  }
-
-  await Promise.all(workthreadExitPromises)
-
-  progressBar.stop()
 }
