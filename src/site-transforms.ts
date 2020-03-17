@@ -195,6 +195,7 @@ export const generateMainPage = async (
         join(imagesFolder, decodeURIComponent(filename))
       )
       $externalImage.attribs.src = `../I/m/${filename}`
+      delete $externalImage.attribs.srcset
     }
 
     const $kiwixNote = $kiwixMainPageHtml('#mw-content-text > div:last-child')
