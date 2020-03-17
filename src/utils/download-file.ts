@@ -3,7 +3,7 @@ import { Url } from 'url'
 
 export const downloadFile = (url: Url, dest: string) => {
   return new Promise((resolve, reject) => {
-    const wget = `wget -O "${dest}" "${url.href}"`
+    const wget = `wget --continue -O "${dest}" "${url.href}"`
 
     exec(wget, err => {
       if (err) {
