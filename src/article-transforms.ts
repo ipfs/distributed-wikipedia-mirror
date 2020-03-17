@@ -43,6 +43,10 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
 }
 
 export const appendHtmlPostfix = (href: string) => {
+  if (href.includes('/w/index.php')) {
+    return href
+  }
+
   const parts = href.split(/[#?]+/)
 
   if (parts.length === 0) {

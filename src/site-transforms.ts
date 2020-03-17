@@ -160,6 +160,7 @@ export const generateMainPage = async (
     $remoteContent.find('#catlinks').remove()
     $remoteContent.find('#mw-fr-revisiontag-old').remove()
     $remoteContent.find('a.mw-jump-link').remove()
+    $remoteContent.find('#mc0').remove()
 
     // Some styling on the top banner - I know, this has got ... hacky
     // Set the width to 100%
