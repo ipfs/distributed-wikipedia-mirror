@@ -9,6 +9,7 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
+  unlinkSync,
   writeFileSync
 } from 'fs'
 import Handlebars from 'handlebars'
@@ -74,10 +75,23 @@ export const insertIndexRedirect = (options: Options) => {
   const template = Handlebars.compile(indexRedirectFragment.toString())
 
   const indexPath = join(options.unpackedZimDir, 'index.html')
+  const wikiIndexPath = join(options.unpackedZimDir, 'wiki', 'index.html')
+
   writeFileSync(
     indexPath,
     template({
-      MAIN_PAGE: options.mainPage
+      MAIN_PAGE: `wiki/${options.mainPage}`
+    })
+  )
+
+  if (existsSync(wikiIndexPath)) {
+    unlinkSync(wikiIndexPath)
+  }
+
+  writeFileSync(
+    wikiIndexPath,
+    template({
+      MAIN_PAGE: `./${options.mainPage}`
     })
   )
 
