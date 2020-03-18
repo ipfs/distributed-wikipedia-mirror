@@ -7,44 +7,83 @@ set -euo pipefail
 
 usage() {
 	echo "USAGE:"
-	echo "	$0 <LANGUAGE_CODE> <WIKI_TYPE> [HOSTING_DNS_DOMAIN] [HOSTING_IPNS_HASH] [MAIN_PAGE_VERSION]";
+	echo " $0 - download a zim file, unpack it, convert to website then push to local ipfs instance"
 	echo ""
+	echo "SYNOPSIS"
+	echo " $0 --languagecode=<LANGUAGE_CODE> --wikitype=<WIKI_TYPE>"
+	echo "    [--hostingdnsdomain=<HOSTING_DNS_DOMAIN>]"
+	echo "    [--hostingipnshash=<HOSTING_IPNS_HASH>]"
+	echo "    [--mainpageversion=<MAIN_PAGE_VERSION>]"
+	echo ""
+	echo "OPTIONS"
+	echo ""
+	echo "  -l, --languagecode       string - the language of the wikimedia property e.g. tr - turkish, en - english"
+	echo "  -w, --wikitype           string - the type of the wikimedia property e.g. wikipedia, wikiquote"
+	echo "  -d, --hostingdnsdomain   string - the DNS domain name the mirror will be hosted at e.g. tr.wikipedia-on-ipfs.org"
+	echo "  -i, --hostingipnshash    string - the IPNS hash the mirror will be hosted at e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W"
+	echo "  -v, --mainpageversion    string - an override hack used on Turkish Wikipedia, it sets the main page version as there are issues with the Kiwix version id"
+
 	exit 2
 }
 
-if [ -z "${1-}" ]; then
+
+for i in "$@"
+do
+case $i in
+    -l=*|--languagecode=*)
+    LANGUAGE_CODE="${i#*=}"
+    shift
+    ;;
+    -w=*|--wikitype=*)
+    WIKI_TYPE="${i#*=}"
+    shift
+    ;;
+    -d=*|--hostingdnsdomain=*)
+    HOSTING_DNS_DOMAIN="${i#*=}"
+    shift
+    ;;
+	-i=*|--hostingipnshash=*)
+    HOSTING_IPNS_HASH="${i#*=}"
+    shift
+    ;;
+	-v=*|--mainpageversion=*)
+    MAIN_PAGE_VERSION="${i#*=}"
+    shift
+    ;;
+    --default)
+    DEFAULT=YES
+    shift
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
+
+if [ -z ${LANGUAGE_CODE+x} ]; then
 	echo "Missing wiki language code e.g. tr - turkish, en - english"
 	usage
 fi
 
-if [ -z "${2-}" ]; then
+if [ -z ${WIKI_TYPE+x} ]; then
 	echo "Missing wiki type e.g. wikipedia, wikiquote"
 	usage
 fi
 
-if [ -z "${3-}" ]; then
+if [ -z ${HOSTING_DNS_DOMAIN+x} ]; then
 	HOSTING_DNS_DOMAIN=""
-else 
-    HOSTING_DNS_DOMAIN="$3"
 fi
 
-if [ -z "${4-}" ]; then
+if [ -z ${HOSTING_IPNS_HASH+x} ]; then
 	HOSTING_IPNS_HASH=""
-else 
-    HOSTING_IPNS_HASH="$4"
 fi
 
-if [ -z "${5-}" ]; then
+if [ -z ${MAIN_PAGE_VERSION+x} ]; then
 	MAIN_PAGE_VERSION=""
-else
-    MAIN_PAGE_VERSION="$5"
 fi
-
-LANGUAGE_CODE="$1"
-WIKI="$2"
 
 printf "\nDownload the zim file...\n"
-ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI $WIKI $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
+ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
 ZIM_FILE=$(echo $ZIM_FILE_SOURCE_URL | rev | cut -d'/' -f1 | rev)
 TMP_DIRECTORY="./tmp/$(echo $ZIM_FILE | cut -d'.' -f1)"
 
@@ -55,7 +94,7 @@ printf "\nUnpack the zim file into $TMP_DIRECTORY...\n"
 ZIM_FILE_MAIN_PAGE=$(./extract_zim/extract_zim ./snapshots/$ZIM_FILE --out $TMP_DIRECTORY | grep 'Main page is' | cut -d' ' -f4)
 
 # Resolve the main page as it is on wikipedia over http
-MAIN_PAGE=$(./tools/find_main_page_name.sh "$LANGUAGE_CODE.$WIKI.org")
+MAIN_PAGE=$(./tools/find_main_page_name.sh "$LANGUAGE_CODE.$WIKI_TYPE.org")
 
 printf "\nConvert the unpacked zim directory to a website\n"
 node ./bin/run $TMP_DIRECTORY \

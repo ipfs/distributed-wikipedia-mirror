@@ -101,7 +101,12 @@ The mirror script will:
 To run the mirror script:
 
 ```sh
-$ ./mirrorzim.sh  <LANGUAGE_CODE> <WIKI_TYPE> [HOSTING_DNS_DOMAIN] [HOSTING_IPNS_HASH] [MAIN_PAGE_VERSION]
+$ ./mirrorzim.sh  \
+  --languagecode=<LANGUAGE_CODE> \
+  --wikitype=<WIKI_TYPE> \
+  [--hostingdnsdomain=<HOSTING_DNS_DOMAIN>] \
+  [--hostingipnshash=<HOSTING_IPNS_HASH>] \
+  [--mainpageversion=<MAIN_PAGE_VERSION>]
 ```
 
 The arguments require are:
@@ -119,13 +124,18 @@ The script will output the CID of the mirror site, which can then be shared.
 ##### English Wikiquote
 
 ```sh
-./mirrorzim.sh en wikiquote
+./mirrorzim.sh --languagecode=en --wikitype=wikiquote
 ```
 
 ##### Turkish Wikipedia
 
 ```sh
-./mirrorzim.sh tr wikipedia tr.wikipedia-on-ipfs.org QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W 19869765
+./mirrorzim.sh \
+  --languagecode=tr \
+  --wikitype=wikipedia \
+  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
+  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
+  --mainpageversion=19869765
 ```
 
 ## Manual Run
