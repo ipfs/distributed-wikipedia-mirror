@@ -101,13 +101,20 @@
     }
 
     var fixJpgExtension = function (src) {
-        return src.replace('.JPG', '.jpg').replace('.jpeg', '.jpg')
+        return src.replace('.JPG', '.jpg')
+            .replace('.JPEG', '.jpg')
+            .replace('.jpeg', '.jpg')
+    }
+
+    var fixPngExtension = function (src) {
+        return src.replace('.PNG', '.png')
     }
 
     // Fix internal links
     reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki, appendHtmlPostfix])
     // Fix broken image links
-    reworkAttr('img[src$=".JPG"]', 'src', [fixJpgExtension])
+    reworkAttr('img[src$=".JPG"], img[src$=".JPEG"], img[src$=".jpeg"]', 'src', [fixJpgExtension])
+    reworkAttr('img[src$=".PNG"]', 'src', [fixPngExtension])
 
     // Append copyright notice
     var copyrightInfringementLinkDiv = document.querySelector('copyright-infringement-link')
