@@ -3,3 +3,17 @@
 *.zim
 out
 IPFS_PATH
+
+notes.md
+
+*-debug.log
+*-error.log
+/.nyc_output
+/dist
+/lib
+/package-lock.json
+/tmp
+/snapshots
+node_modules
+/zim-tools
+/kiwix-tools

@@ -1,0 +1,19 @@
+{
+  "extends": ["oclif", "oclif-typescript", "plugin:prettier/recommended"],
+  "plugins": ["simple-import-sort"],
+  "rules": {
+    "unicorn/no-abusive-eslint-disable": ["off"],
+    "simple-import-sort/sort": "error",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none"
+        },
+        "singleline": {
+          "delimiter": "semi"
+        }
+      }
+    ]
+  }
+}

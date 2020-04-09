@@ -2,7 +2,7 @@
 
 # internal
 
-BASE=$(readlink -f $(dirname "$0"))
+BASE=$(pwd -P)
 CACHE="$BASE/.cache"
 
 # conf
@@ -53,7 +53,7 @@ fetch_with_cache() {
 }
 
 get_urls() {
-  grep href | grep -v "<pre>" | sed -r 's|.*href="(.*)".*|\1|g' | sed "s|/||g"
+  grep href | grep -v "<pre>" | sed -E 's|.*href="(.*)".*|\1|g' | sed "s|/||g"
 }
 
 # main funcs
@@ -239,7 +239,7 @@ cmd_download_url() {
   log "URL: $URL"
 
   # below is a mixture of https://stackoverflow.com/a/19841872/3990041, my knowledge and guesswork :P
-  SHA256=$(curl -sI "$URL" | grep digest | grep "SHA-256" | sed "s|digest: SHA-256=||g" | base64 -i -w 0 -d | od -t x1 -An | tr "\n" " " | sed "s| ||g")
+  SHA256=$(curl -sI "$URL" | grep digest | grep "SHA-256" | sed "s|digest: SHA-256=||g" | base64 -d | od -t x1 -An | tr "\n" " " | sed "s| ||g")
 
   log "SHA256: $SHA256"
 }
@@ -257,13 +257,13 @@ cmd_download() {
 
   dl_cycle() {
     log "Downloading $OUTNAME..."
-    wget --continue "$URL"
+    wget --continue -P ./snapshots "$URL"
     return $?
   }
 
   check_cycle() {
     log "Verifiying $OUTNAME..."
-    sha256="$SHA256  $OUTNAME"
+    sha256="$SHA256  ./snapshots/$OUTNAME"
     echo "$sha256" | sha256sum -c -
     return $?
   }

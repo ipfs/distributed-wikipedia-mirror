@@ -12,7 +12,7 @@ extract_zim: bin/extract_zim
 	cp -f bin/extract_zim extract_zim
 
 bin/extract_zim: cargo
-	cargo install --force --bin extract_zim --rev a283151105ab4c1905d7f5cb56fb8eb2a854ad67 --git https://github.com/dignifiedquire/zim --root .
+	cargo install --force --bin extract_zim --rev 9255580dd65fe4aab6361214620baff5947b0a91 --git https://github.com/dignifiedquire/zim --root .
 
 clean:
 	rm -rf $(CLEAN)

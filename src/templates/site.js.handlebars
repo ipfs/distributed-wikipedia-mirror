@@ -1,0 +1,171 @@
+<script>
+    // Distributed Wikipedia Mirror Modifications
+    // Append Distribution Footer
+
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function (search, this_len) {
+            if (this_len === undefined || this_len > this.length) {
+                this_len = this.length;
+            }
+            return this.substring(this_len - search.length, this_len) === search;
+        };
+    }
+
+    var footerTemplate = "{{{FOOTER_TEMPLATE}}}"
+
+    var dwmOptions = {{{ DWM_OPTIONS }}}
+
+    var canonicalUrl = $('link[rel="canonical"]').attr('href')
+
+    var resolveRelativeFilePath = function () {
+        var prefix = window.location.pathname.split('/wiki')[0]
+        var relativeFilePath = window.location.pathname.replace(prefix, '')
+
+        return {
+            relativeFilePath: relativeFilePath,
+            basePath: prefix
+        }
+    }
+
+    var resolution = resolveRelativeFilePath()
+    var relativeFilePath = resolution.relativeFilePath
+    var basePath = resolution.basePath
+
+    var footer = footerTemplate
+        .replace(/\{{ZIM_URL}}/g, dwmOptions.ZIM_URL)
+        .replace(/\{{SNAPSHOT_DATE}}/g, dwmOptions.SNAPSHOT_DATE)
+        .replace(/\{{IMAGES_DIR}}/g, basePath + '/I/m')
+        .replace(/\{{CANONICAL_URL}}/g, canonicalUrl)
+        .replace(/\{{CANONICAL_URL_DISPLAY}}/g, decodeURIComponent(canonicalUrl))
+
+    if ($("#distribution-footer").length === 0) {
+        $('#mw-mf-page-center').append(
+            "<div id='distribution-footer'>" + footer + "</div>"
+        )
+    }
+
+    // Fix links
+
+    var reworkAttr = function (
+        selector,
+        attr,
+        fns
+    ) {
+        var $links = $(selector)
+
+        $links.each(function (_index, link) {
+            var $link = $(link)
+
+            var attrValue = $link.attr(attr)
+
+            if (!attrValue) {
+                return
+            }
+
+            fns.forEach(function (fn) {
+                attrValue = fn(attrValue)
+            })
+
+            $link.attr(attr, attrValue)
+        })
+    }
+
+    var replaceANamespaceWithWiki = function (href) {
+        return href.replace('/A/', '/wiki/')
+    }
+
+    var appendHtmlPostfix = function (href) {
+        var parts = href.split(/[#?]+/)
+
+        if (parts.length === 0) {
+            throw new Error('Unexpected parsing of links')
+        }
+
+        if (parts.length === 1) {
+            if (href.endsWith('.html')) {
+                return href
+            }
+
+            return href + '.html'
+        }
+
+        if (parts[0].endsWith('.html')) {
+            return href
+        }
+
+        if (parts[0] === '') {
+            return href
+        }
+
+        return href.replace(parts[0], parts[0] + '.html')
+    }
+
+    var fixJpgExtension = function (src) {
+        return src.replace('.JPG', '.jpg')
+            .replace('.JPEG', '.jpg')
+            .replace('.jpeg', '.jpg')
+    }
+
+    var fixPngExtension = function (src) {
+        return src.replace('.PNG', '.png')
+    }
+
+    // Fix internal links
+    reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki, appendHtmlPostfix])
+    // Fix broken image links
+    reworkAttr('img[src$=".JPG"], img[src$=".JPEG"], img[src$=".jpeg"]', 'src', [fixJpgExtension])
+    reworkAttr('img[src$=".PNG"]', 'src', [fixPngExtension])
+
+    // Append copyright notice
+    var copyrightInfringementLinkDiv = document.querySelector('copyright-infringement-link')
+
+    if (window.location.hostname === 'ipfs.io' || window.location.hostname.indexOf('dweb.link') !== -1) {
+        document.querySelector('#copyright-infringement-link').innerHTML = 'To report copyright infringement please follow the instructions at <a class="external text" href="https://ipfs.io/legal">https://ipfs.io/legal</a>'
+    } else if (['localhost', '127.0.0.1', '[::1]'].indexOf(window.location.hostname) === -1 && window.location.protocol.indexOf('http:') === -1) {
+        var domainToolsLink = 'https://whois.domaintools.com/' + window.location.hostname
+        document.querySelector('#copyright-infringement-link').innerHTML = 'This content is provided by a third party IPFS gateway. To report copyright infringement please contact the owner of <a class="external text" href="https://whois.domaintools.com/' + window.location.hostname + '">' + window.location.hostname + '</a>'
+    }
+
+    // Append IPNS hash link
+    if (dwmOptions.HOSTING_IPNS_HASH) {
+        var ipnsHashLinkDiv = " \
+        <div> \
+            IPNS Link (most recent): \
+            <a class=\"external text dweb ipns\" href=\"/ipns/" + dwmOptions.HOSTING_IPNS_HASH + "\">/ipns/" + dwmOptions.HOSTING_IPNS_HASH + "</a> \
+        </div> \
+        "
+
+        document.querySelector("#footer-ipns-link").innerHTML = ipnsHashLinkDiv
+    }
+
+    // Append http link to IPFS version
+    if (dwmOptions.HOSTING_DNS_DOMAIN) {
+        var articleUrl = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + relativeFilePath
+        var articleUrlDisplay = 'https://' + dwmOptions.HOSTING_DNS_DOMAIN + decodeURIComponent(relativeFilePath)
+
+        var httpLinkDiv = " \
+            <div> \
+                HTTP Link: \
+                <a class=\"external text ipfs http - ipfs\" href=\"" + articleUrl + "\">" + articleUrlDisplay + "</a> \
+            </div> \
+        "
+
+        document.querySelector("#footer-http-link").innerHTML = httpLinkDiv
+    }
+
+    const $snapshotSourceRevisionLink = $('a.external[href*="oldid"]')
+
+    if ($snapshotSourceRevisionLink.length) {
+        var snapshotSourceRevisionUrl = $snapshotSourceRevisionLink.attr('href')
+
+        var snapshotSourceRevisionDiv = " \
+                <div> \
+                    Snapshot source revision: \
+                    <a class=\"external text\" href=\"" + snapshotSourceRevisionUrl + "\">" + decodeURIComponent(snapshotSourceRevisionUrl) + "</a> \
+                </div> \
+            "
+
+        document.querySelector("#snapshot-source-revision-link").innerHTML = snapshotSourceRevisionDiv
+    }
+
+</script>

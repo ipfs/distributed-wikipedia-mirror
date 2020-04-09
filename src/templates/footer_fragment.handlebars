@@ -1,0 +1,138 @@
+<div>
+  <style>
+    .mw-body {
+      padding-bottom: 0;
+    }
+
+    #distribution-footer {
+      max-width: 55.8em;
+      margin: 0px auto;
+    }
+
+    .footer-wrapper {
+      margin: 5px;
+      font-family: 'Linux Libertine', Georgia, Times, serif;
+    }
+
+    .footer-wrapper {
+      background-color: white;
+      border: 2px solid lightgrey;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .footer-wrapper a {
+      color: #0084b4;
+      text-decoration: none;
+      font-weight: bold;
+      /* letter-spacing: 1px; */
+    }
+
+    .footer-wrapper a:hover {
+      color: #0084b4;
+      /* text-decoration: ; */
+    }
+
+    .footer-main {
+      margin: 32px;
+    }
+
+    .footer-main>div {
+      margin-bottom: 12px;
+    }
+
+    .footer-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    .footer-logo {
+      width: 100px;
+      padding-left: 10px;
+    }
+
+    .footer-header-blank-slot {
+      width: 100px;
+      padding-right: 10px;
+    }
+
+    @media screen and (min-width: 0px) and (max-width: 600px) {
+      .footer-header-blank-slot {
+        display: none;
+      }
+    }
+
+    .footer-titles {
+      padding-top: 20px;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .footer-titles-title {
+      font-size: 19px;
+      margin-bottom: 10px;
+      font-weight: bolder;
+    }
+
+    .footer-sharing-icons {
+      width: 168px;
+      margin: 0 auto;
+    }
+
+    .footer-sharing-icon {
+      width: 32px;
+      height: 32px;
+      float: left;
+      margin: 5px;
+    }
+  </style>
+  <div class="footer-wrapper">
+    <div class="footer-header">
+      <div class="footer-logo">
+        <img src="{{IMAGES_DIR}}/wikipedia-on-ipfs.png" width="100" />
+      </div>
+      <div class="footer-titles">
+        <div class="footer-titles-title">Distributed Wikipedia Mirror Project</div>
+        <div class="footer-titles-subtitle">
+          Powered by <a href="https://ipfs.io">IPFS</a>
+        </div>
+      </div>
+      <div class="footer-header-blank-slot">
+        <!-- blank slot -->
+      </div>
+    </div>
+    <div class="footer-main">
+      <div>
+        This snapshot was generated and distributed by the
+        <a class="external text" href="https://github.com/ipfs/distributed-wikipedia-mirror">Distributed Wikipedia
+          Mirror
+          project</a>,
+        a global effort, independent from Wikipedia.
+      </div>
+      <div>
+        Created on: {{SNAPSHOT_DATE}} from the
+        <a class="external" href="{{ZIM_URL}}">kiwix ZIM file</a>
+      </div>
+      <div id="footer-ipns-link">
+        <!-- Placeholder -->
+      </div>
+      <div id="footer-http-link">
+        <!-- Placeholder -->
+      </div>
+      <div>
+        Canonical Link:
+        <a class="external text ipfs http-ipfs" href="{{CANONICAL_URL}}">{{CANONICAL_URL_DISPLAY}}</a>
+      </div>
+      <div id="snapshot-source-revision-link">
+        <!-- Placeholder -->
+      </div>
+      <div id="copyright-infringement-link">
+        <!-- Placeholder -->
+      </div>
+      <div>
+        Not sure where to start? <a class="external text" href="https://ipfs.io/#install">Download IPFS Here</a>
+      </div>
+    </div>
+  </div>
+</div>
