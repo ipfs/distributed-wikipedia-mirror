@@ -48,7 +48,7 @@ All commands assume to be run inside a cloned version of this repository
 Clone the distributed-wikipedia-mirror git repository
 
 ```sh
-$ git clone git@github.com:ipfs/distributed-wikipedia-mirror.git
+$ git clone https://github.com/ipfs/distributed-wikipedia-mirror.git
 ```
 
 then `cd` into that directory
