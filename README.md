@@ -71,22 +71,34 @@ The yarn install will install `zim_extract`, the rust based extract zim utility 
 
 ### Step 2: Configure your IPFS Node
 
-#### Enable Directory Sharding
+It is advised to use separate IPFS node for this:
 
-Configure your IPFS node to enable directory sharding
-
-```sh
-$ ipfs config --json 'Experimental.ShardingEnabled' true
+```console
+$ export IPFS_PATH=/path/to/IPFS_PATH_WIKIPEDIA_MIRROR
 ```
 
-#### Optional: Switch to `badgerds`
+#### Bader datastore
 
-Consider using a [datastore backed by BadgerDB](https://github.com/ipfs/go-ds-badger) for improved performance.  
+Make sure repo is initialized with [datastore backed by BadgerDB](https://github.com/ipfs/go-ds-badger) for improved performance: 
+
+```
+ipfs init -p badgerds
+```
+
+
 Existing repository can be converted to badgerds with [ipfs-ds-convert](https://github.com/ipfs/ipfs-ds-convert):
 
 ```sh
 $ ipfs config profile apply badgerds
 $ ipfs-ds-convert convert
+```
+
+#### Enable HAMT sharding
+
+Configure your IPFS node to enable directory sharding
+
+```sh
+$ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
 ### Step 3: Run the mirror script
