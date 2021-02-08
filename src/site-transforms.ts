@@ -100,9 +100,9 @@ export const insertIndexRedirect = (options: Options) => {
 
 export const resolveDirectories = (options: Options) => {
   const articleFolder = join(options.unpackedZimDir, 'A')
-  const imagesFolder = join(options.unpackedZimDir, 'I', 'm')
+  const imagesFolder = join(options.unpackedZimDir, 'I')
   const wikiFolder = join(options.unpackedZimDir, 'wiki')
-  const jsmodulesFolder = join(options.unpackedZimDir, '-', 'j', 'js_modules')
+  const jsmodulesFolder = join(options.unpackedZimDir, '-')
 
   const directories: Directories = {
     unpackedZimDir: options.unpackedZimDir,
@@ -120,7 +120,7 @@ export const generateMainPage = async (
   { wikiFolder, imagesFolder }: Directories
 ) => {
   const kiwixMainpage = readFileSync(
-    join(wikiFolder, `${options.kiwixMainPage}.html`)
+    join(wikiFolder, `${options.kiwixMainPage}`)
   )
 
   const mainPagePath = join(wikiFolder, options.mainPage)
@@ -192,7 +192,7 @@ export const generateMainPage = async (
       .find('.globegris')
       .attr(
         'style',
-        'background-image: url("../I/m/wikipedia-on-ipfs.png"); background-repeat:no-repeat; background-position:-20px -40px; background-size: 200px; width:100%; border:1px solid #a7d7f9; vertical-align:top;'
+        'background-image: url("../I/wikipedia-on-ipfs.png"); background-repeat:no-repeat; background-position:-20px -40px; background-size: 200px; width:100%; border:1px solid #a7d7f9; vertical-align:top;'
       )
 
     // Copy image downloads
@@ -209,7 +209,7 @@ export const generateMainPage = async (
         new URL(`http:${src}`),
         join(imagesFolder, decodeURIComponent(filename))
       )
-      $externalImage.attribs.src = `../I/m/${filename}`
+      $externalImage.attribs.src = `../I/${filename}`
       delete $externalImage.attribs.srcset
     }
 
@@ -271,8 +271,8 @@ export const appendJavscript = (
 ) => {
   cli.action.start('  Appending custom javascript to site.js ')
 
-  const delimiter = '/* Appended by Distributed Wikipedia Mirror */'
-  const targetSiteJsFile = join(jsmodulesFolder, 'site.js')
+  const delimiter = '/* Appended by Distributed Wikipedia Mirror – details at https://github.com/ipfs/distributed-wikipedia-mirror */'
+  const targetSiteJsFile = join(jsmodulesFolder, 'mw', 'site.js')
 
   const dwmSitejsTemplate = readFileSync('./src/templates/site.js.handlebars')
     .toString()
@@ -314,11 +314,11 @@ export const appendJavscript = (
   writeFileSync(targetSiteJsFile, updatedSiteJs)
 
   // hack to stop console error
-  const targetJsConfigVarFile = join(jsmodulesFolder, 'jsConfigVars.js')
+  const targetJsConfigVarFile = join(jsmodulesFolder, 'mw', 'jsConfigVars.js')
   writeFileSync(targetJsConfigVarFile, '{}')
 
   // hack replace the unexpected var in startup.js
-  const startupJsFile = join(jsmodulesFolder, 'startup.js')
+  const startupJsFile = join(jsmodulesFolder, 'mw', 'startup.js')
   let startJs = readFileSync(startupJsFile).toString()
   startJs = startJs
     .replace('function domEval(code){var', 'function domEval(code){')
@@ -334,7 +334,7 @@ export const appendJavscript = (
 
   // hack: overwrite erroring js files see https://github.com/openzim/mwoffliner/issues/894
   for (const file of ['ext.cite.ux-enhancements.js']) {
-    const filepath = join(jsmodulesFolder, file)
+    const filepath = join(jsmodulesFolder, 'mw', file)
     const overwriteText =
       '/* Overwritten by Distributed Wikipedia Mirror to prevent js errors, see https://github.com/openzim/mwoffliner/issues/894 */'
     writeFileSync(filepath, overwriteText)

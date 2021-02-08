@@ -43,6 +43,8 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
 }
 
 export const appendHtmlPostfix = (href: string) => {
+  return href
+  /*  .html no longer needed since we switched to zimdump
   if (href.includes('/w/index.php')) {
     return href
   }
@@ -66,6 +68,7 @@ export const appendHtmlPostfix = (href: string) => {
   }
 
   return href.replace(parts[0], `${parts[0]}.html`)
+  */
 }
 
 export const prefixRelativeRoot = (href: string) => {
