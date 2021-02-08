@@ -1,8 +1,8 @@
 {
   "name": "distributed-wikipedia-mirror",
   "description": "Mirror wikipedia on IPFS",
-  "version": "0.1.0",
-  "private": true,  
+  "version": "0.2.0",
+  "private": true,
   "bin": {
     "zim-to-website": "./bin/run"
   },
@@ -58,7 +58,6 @@
   },
   "repository": "https://github.com/ipfs/distributed-wikipedia-mirror.git",
   "scripts": {
-    "preinstall": "cd ./extract_zim && make",
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",

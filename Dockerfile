@@ -13,10 +13,10 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh \
     && apt-get -y install --no-install-recommends nodejs \
     && npm install -g yarn http-server
 
-RUN wget -nv https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_linux-amd64.tar.gz \
-    && tar xvfz go-ipfs_v0.4.23_linux-amd64.tar.gz \
+RUN wget -nv https://dist.ipfs.io/go-ipfs/v0.7.0/go-ipfs_v0.7.0_linux-amd64.tar.gz \
+    && tar xvfz go-ipfs_v0.7.0_linux-amd64.tar.gz \
     && mv go-ipfs/ipfs /usr/local/bin/ipfs \
-    && rm -r go-ipfs && rm go-ipfs_v0.4.23_linux-amd64.tar.gz \
+    && rm -r go-ipfs && rm go-ipfs_v0.7.0_linux-amd64.tar.gz \
     && ipfs init --profile badgerds \
     && ipfs config --json 'Experimental.ShardingEnabled' true
 

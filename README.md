@@ -59,15 +59,16 @@ $ cd distributed-wikipedia-mirror
 
 ### Step 1: Install dependencies
 
-`Node`, `yarn`, `rust` and `make` are required. On Mac OS X you will need `sha256sum`, available in coreutils.
+`Node` and `yarn` are required. On Mac OS X you will need `sha256sum`, available in coreutils.
 
-Install the node and rust dependencies:
+Install the node dependencies:
 
 ```sh
 $ yarn
 ```
 
-The yarn install will install `zim_extract`, the rust based extract zim utility (see https://github.com/dignifiedquire/zim), and the `zim-to-website` node script and its node modules.
+Then, download the latest [zim-tools](https://download.openzim.org/release/zim-tools/) and add `zimdump` to your `PATH`.
+This tool is necessary for unpacking ZIM.
 
 ### Step 2: Configure your IPFS Node
 
@@ -101,66 +102,13 @@ Configure your IPFS node to enable directory sharding
 $ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
-### Step 3: Run the mirror script
-
-The mirror script will:
-
-1. Download the latest chosen ZIM file from `https://download.kiwix.org/zim/` into the snapshots folder, if the file has been previously downloaded, the file will only be verified (SHA-256).
-2. Unpack the ZIM files contents to a directory under `tmp`, e.g. `.tmp/wikipedia_tr_all_maxi_2019-12/`
-3. Run a nodejs conversion script on the unpacked directory to create an IPFS hostable website
-4. Add the processed directory to your local IPFS instance
-
-To run the mirror script:
-
-```sh
-$ ./mirrorzim.sh  \
-  --languagecode=<LANGUAGE_CODE> \
-  --wikitype=<WIKI_TYPE> \
-  [--hostingdnsdomain=<HOSTING_DNS_DOMAIN>] \
-  [--hostingipnshash=<HOSTING_IPNS_HASH>] \
-  [--mainpageversion=<MAIN_PAGE_VERSION>]
-```
-
-The arguments require are:
-
-- LANGUAGE_CODE - the language of the wikimedia site e.g. tr (Turkish) or en (English)
-- WIKI_TYPE - the type of the wikimedia site e.g. wikipedia, wikiquote
-- HOSTING_DNS_DOMAIN - optional - the domain the IPFS site will be hosted at e.g. tr.wikipedia-on-ipfs.org
-- HOSTING_IPNS_HASH - optional - the IPNS hash the IPFS site will be hosted at e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W
-- MAIN_PAGE_VERSION - optional - an override hack used on Turkish Wikipedia, it sets the main page version as there are issues with the Kiwix version id
-
-The script will output the CID of the mirror site, which can then be shared.
-
-#### Examples
-
-##### English Wikiquote
-
-```sh
-./mirrorzim.sh --languagecode=en --wikitype=wikiquote
-```
-
-##### Turkish Wikipedia
-
-```sh
-./mirrorzim.sh \
-  --languagecode=tr \
-  --wikitype=wikipedia \
-  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
-  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
-  --mainpageversion=19869765
-```
-
-## Manual Run
-
-To run the parts of the mirror script individually for debugging:
-
-### Step 0: Install dependencies
-
-See above
 
 ### Step 1: Download the latest snapshot from kiwix.org
 
-For that you can use the getzim.sh script
+Source of ZIM files is at https://download.kiwix.org/zim/wikipedia/  
+Make sure you download `_all_maxi_` snapshots, as those include images.
+
+To automate this, you can also use the `getzim.sh` script:
 
 First, download the latest wiki lists using `bash ./tools/getzim.sh cache_update`
 
@@ -173,29 +121,23 @@ Download command:
 
 Running the command will download the choosen zim file to the `./snapshots` directory.
 
-### Step 2: Unpack the ZIM snapshot
+
+
+### Step 3: Unpack the ZIM snapshot
 
 Unpack the ZIM snapshot using `extract_zim`:
 
 ```sh
-$ ./extract_zim/extract_zim --skip-link ./snapshots/wikipedia_tr_all_maxi_2019-12.zim --out ./tmp/wikipedia_tr_all_maxi_2019-12
-Extracting file: ./snapshots/wikipedia_tr_all_maxi_2019-12.zim to ./out
-
-Generating symlinks: false
-Generating copies for links: false
-Main page is Kullanıcı:The_other_Kiwix_guy/Landing
-
-Extraction done in 25.91s
+$ zimdump dump ./snapshots/wikipedia_tr_all_maxi_2021-01.zim --dir ./tmp/wikipedia_tr_all_maxi_2021-01
 ```
 
 > ### ℹ️ ZIM's main page
 >
-> The string after `Main page is` as it is the name
-> of the landing page set for the ZIM archive.  
-> You may also decide to use the original landing page instead (eg. `Main_Page` in `en`, `Anasayfa` in `tr` etc)  
-> Kiwix Main page needs to be passed to `zim-to-website`.
+> Each ZIM file has "main page" attribute which defines the landing page set for the ZIM archive.  
+> It is often different than the "main page" of upstream Wikipedia.  
+> Kiwix Main page needs to be passed in the next step, so until there is an automated way to determine "main page" of ZIM, you need to open ZIM in Kiwix reader and eyeball the name of the landing page.
 
-### Step 3: Convert the unpacked zim directory to a website with mirror info
+### Step 4: Convert the unpacked zim directory to a website with mirror info
 
 IMPORTANT: The snapshots must say who disseminated them. This effort to mirror Wikipedia snapshots is not affiliated with the Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia.
 
@@ -205,25 +147,23 @@ The conversion to a working website and the appending of necessary information i
 $ node ./bin/run --help
 ```
 
-First though the main page, as the archive appears on the appropriate wikimedia website, must be determined. For instance, the zim file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa.html` as the main page. Both must be passed to the node script.
+First though the main page, as the archive appears on the appropriate wikimedia website, must be determined. For instance, the zim file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa` as the main page. Both must be passed to the node script.
 
 To determine the website main page use `./tools/find_main_page_name.sh` passing the website:
 
 ```sh
 $ ./tools/find_main_page_name.sh tr.wikiquote.org
-Anasayfa.html
+Anasayfa
 ```
 
 The conversion is done on the unpacked zim directory:
 
 ```sh
-node ./bin/run ./tmp/wikipedia_tr_all_maxi_2019-12 \
+node ./bin/run ./tmp/wikipedia_tr_all_maxi_2021-01 \
   --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
-  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
   --zimfilesourceurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \
   --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \
-  --mainpage=Anasayfa.html \
-  --mainpageversion=19869765
+  --mainpage=Anasayfa
 ```
 
 ### Step 4: Import website directory to IPFS
@@ -231,13 +171,6 @@ node ./bin/run ./tmp/wikipedia_tr_all_maxi_2019-12 \
 #### Add immutable copy
 
 Add all the data to your node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the website that you created in Step 4 (`./tmp/wikipedia_en_all_maxi_2018-10`).
-
-```sh
-$ ipfs add -r --cid-version 1 $unpacked_wiki
-```
-
-If you find it takes too long, and your IPFS node is located on the same machine,
-consider running this step in offline mode:
 
 ```sh
 $ ipfs add -r --cid-version 1 --offline $unpacked_wiki
