@@ -43,32 +43,8 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
 }
 
 export const appendHtmlPostfix = (href: string) => {
+  // noop:  .html no longer needed since we switched to zimdump
   return href
-  /*  .html no longer needed since we switched to zimdump
-  if (href.includes('/w/index.php')) {
-    return href
-  }
-
-  const parts = href.split(/[#?]+/)
-
-  if (parts.length === 0) {
-    throw new Error('Unexpected parsing of links')
-  }
-
-  if (parts.length === 1) {
-    if (href.endsWith('.html')) {
-      return href
-    }
-
-    return `${href}.html`
-  }
-
-  if (parts[0].endsWith('.html')) {
-    return href
-  }
-
-  return href.replace(parts[0], `${parts[0]}.html`)
-  */
 }
 
 export const prefixRelativeRoot = (href: string) => {
@@ -81,6 +57,10 @@ export const prefixRelativeRoot = (href: string) => {
 
 export const moveRelativeLinksUpOneLevel = (href: string) => {
   return href.replace('../', '')
+}
+
+export const moveRelativeLinksDownOneLevel = (href: string) => {
+  return href.replace('../', '../../')
 }
 
 export const makeScriptLinksRelativeToWiki = (href: string) => {

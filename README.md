@@ -149,11 +149,26 @@ $ node ./bin/run --help
 
 First though the main page, as the archive appears on the appropriate wikimedia website, must be determined. For instance, the zim file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa` as the main page. Both must be passed to the node script.
 
-To determine the website main page use `./tools/find_main_page_name.sh` passing the website:
+To determine the original main page use `./tools/find_main_page_name.sh`:
 
-```sh
+```console
 $ ./tools/find_main_page_name.sh tr.wikiquote.org
 Anasayfa
+```
+
+To determine the main page in ZIM file open in in a [Kiwix reader](https://www.kiwix.org/en/kiwix-reader) or use `zimdump info` (version 2.2.0 or later) and ignore the `A/` prefix:
+
+```console
+$ zimdump info wikipedia_tr_all_maxi_2021-01.zim
+count-entries: 1088190
+uuid: 840fc82f-8f14-e11e-c185-6112dba6782e
+cluster count: 5288
+checksum: 50113b4f4ef5ddb62596d361e0707f79
+main page: A/Kullanıcı:The_other_Kiwix_guy/Landing
+favicon: -/favicon
+
+$ zimdump info wikipedia_tr_all_maxi_2021-01.zim | grep -oP 'main page: A/\K\S+'
+Kullanıcı:The_other_Kiwix_guy/Landing
 ```
 
 The conversion is done on the unpacked zim directory:
