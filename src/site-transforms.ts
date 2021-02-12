@@ -79,7 +79,7 @@ export const includeSourceZim = ({
     return
   }
 
-  cli.action.start('  Copying source ZIM to the root of unpacked version ')
+  cli.action.start('  Copying source ZIM to the root of unpacked zim directory ')
   copyFileSync(zimFile, zimCopy)
   cli.action.stop()
 }

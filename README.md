@@ -12,8 +12,8 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 
 - [Purpose](#purpose)
 - [How to add new Wikipedia snapshots to IPFS](#how-to-add-new-wikipedia-snapshots-to-ipfs)
-  - [Manual steps](#manual-steps)
-  - [Docker](#docker)
+  - [Manual build](#manual-build)
+  - [Docker](#docker-build)
 - [How to help](#how-to-help)
   - [Cohost a lazy copy](#cohost-a-lazy-copy)
   - [Cohost a full copy](#cohost-a-full-copy)
@@ -49,7 +49,7 @@ The process can be nearly fully automated, however it consists of many stages
 and understanding what happens during each stage is paramount if ZIM format
 changes and our build toolchain requires a debug and update.
 
-- [Manual steps](#manual-steps) are useful in debug situations, when specific stage  needs to be executed multiple times to fix a bug.
+- [Manual build](#manual-build) are useful in debug situations, when specific stage  needs to be executed multiple times to fix a bug.
   - [mirrorzim.sh](#mirrorzim.sh) automates some steps for QA purposes and ad-hoc experimentation
 - [Docker build](#docker-build) is fully automated blackbox which takes ZIM file and produces CID and `IPFS_PATH` with datastore.
 
@@ -61,7 +61,7 @@ easy as we want them to be. If you run into trouble, seek help through a github
 issue, commenting in the `#ipfs` channel on IRC, or by posting a thread on
 https://discuss.ipfs.io.
 
-## Manual steps
+## Manual build
 
 If you would like to create an updated Wikipedia snapshot on IPFS, you can follow these steps.
 

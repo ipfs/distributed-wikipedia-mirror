@@ -108,9 +108,6 @@ node ./bin/run $TMP_DIRECTORY \
   ${HOSTING_IPNS_HASH:+--hostingipnshash=$HOSTING_IPNS_HASH} \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
 
-printf "\nAdding original ZIM to the root dir:\n"
-cp -v ./snapshots/$ZIM_FILE $TMP_DIRECTORY
-
 printf "\nAdding the processed tmp directory to IPFS: be patient (it takes a few hours), and keep this terminal open\n"
 CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)
 MFS_DIR="/${ZIM_FILE}_$(date +%F_%T)"
