@@ -15,7 +15,7 @@ import {
 import Handlebars from 'handlebars'
 import fetch from 'node-fetch'
 import path from 'path'
-import { join } from 'path'
+import { join, basename, relative } from 'path'
 
 import {
   appendHtmlPostfix,
@@ -67,6 +67,20 @@ export const moveArticleFolderToWiki = ({
 
   cli.action.start('  Renaming A namespace to wiki ')
   renameSync(articleFolder, wikiFolder)
+  cli.action.stop()
+}
+
+export const includeSourceZim = ({
+  zimFile,
+  unpackedZimDir
+}: Options) => {
+  const zimCopy = join(unpackedZimDir, basename(zimFile))
+  if (existsSync(zimCopy)) {
+    return
+  }
+
+  cli.action.start('  Copying source ZIM to the root of unpacked version ')
+  copyFileSync(zimFile, zimCopy)
   cli.action.stop()
 }
 
@@ -283,9 +297,7 @@ export const appendJavscript = (
     SNAPSHOT_DATE: format(new Date(), 'yyyy-MM'),
     HOSTING_IPNS_HASH: options.hostingIPNSHash,
     HOSTING_DNS_DOMAIN: options.hostingDNSDomain,
-    ZIM_URL:
-      options.zimFileSourceUrl ??
-      'https://wiki.kiwix.org/wiki/Content_in_all_languages'
+    ZIM_NAME: basename(options.zimFile)
   }
 
   const dwmSitejs = Handlebars.compile(dwmSitejsTemplate.toString())({

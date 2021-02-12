@@ -30,9 +30,9 @@
     var resolution = resolveRelativeFilePath()
     var relativeFilePath = resolution.relativeFilePath
     var basePath = resolution.basePath
-
     var footer = footerTemplate
-        .replace(/\{{ZIM_URL}}/g, dwmOptions.ZIM_URL)
+        .replace(/\{{ZIM_URL}}/g, `${basePath}/${dwmOptions.ZIM_NAME}`)
+        .replace(/\{{ZIM_NAME}}/g, dwmOptions.ZIM_NAME)
         .replace(/\{{SNAPSHOT_DATE}}/g, dwmOptions.SNAPSHOT_DATE)
         .replace(/\{{IMAGES_DIR}}/g, basePath + '/I')
         .replace(/\{{CANONICAL_URL}}/g, canonicalUrl)

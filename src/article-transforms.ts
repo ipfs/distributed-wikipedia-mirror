@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { readFileSync } from 'fs'
+import { basename, relative } from 'path'
 import Handlebars from 'handlebars'
 
 import { EnhancedOpts } from './domain'
@@ -22,9 +23,7 @@ const generateFooterFrom = (options: EnhancedOpts) => {
     CANONICAL_URL: options.canonicalUrl,
     CANONICAL_URL_DISPLAY: decodeURIComponent(options.canonicalUrl),
     IMAGES_DIR: options.relativeImagePath,
-    ZIM_URL:
-      options.zimFileSourceUrl ??
-      'https://wiki.kiwix.org/wiki/Content_in_all_languages'
+    ZIM_NAME: basename(options.zimFile)
   }
 
   const footerTemplate = Handlebars.compile(footerFragment.toString())

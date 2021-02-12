@@ -3,6 +3,7 @@ import { cli } from 'cli-ux'
 import { Options } from './domain'
 import {
   appendJavscript as appendJavascript,
+  includeSourceZim,
   copyImageAssetsIntoWiki,
   generateMainPage,
   insertIndexRedirect,
@@ -20,7 +21,7 @@ export const zimToWebsite = async (options: Options) => {
   cli.log('Zim to Website Conversion')
   cli.log('-------------------------')
   cli.log(`  Unpacked Zim Directory: ${options.unpackedZimDir}`)
-  cli.log(`   Zim File Download Url: ${options.zimFileSourceUrl}`)
+  cli.log(`                Zim File: ${options.zimFile}`)
   cli.log(`               Main Page: ${options.mainPage}`)
   cli.log(`         Kiwix Main Page: ${options.kiwixMainPage}`)
 
@@ -41,6 +42,7 @@ export const zimToWebsite = async (options: Options) => {
 
   cli.log(`Starting zim to website conversion ...`)
 
+  includeSourceZim(options)
   copyImageAssetsIntoWiki('./assets', directories)
   moveArticleFolderToWiki(directories)
   insertIndexRedirect(options)

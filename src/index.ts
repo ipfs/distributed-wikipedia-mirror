@@ -7,15 +7,15 @@ class ZimToWebsite extends Command {
   static description = 'Convert unpacked zim files to usable websites'
 
   static examples = [
-    '$ zim-to-website ./tmp \\\n  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \\\n  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \\\n  --zimfilesourceurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \\\n  --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \\\n  --mainpage=Anasayfa'
+    '$ zim-to-website ./tmp \\\n  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \\\n  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \\\n  --zimfile=/path/to/wikipedia_tr_all_maxi_2019-12.zim \\\n  --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \\\n  --mainpage=Anasayfa'
   ]
 
   static flags = {
     version: flags.version({ char: 'v' }),
     help: flags.help({ char: 'h' }),
-    zimfilesourceurl: flags.string({
+    zimfile: flags.string({
       required: true,
-      description: 'the url of the original (before unpacking) source zim file'
+      description: 'the location of the original (before unpacking) source zim file'
     }),
     kiwixmainpage: flags.string({
       required: true,
@@ -55,7 +55,7 @@ class ZimToWebsite extends Command {
       unpackedZimDir: args.unpackedzimdir,
       hostingDNSDomain: flags.hostingdnsdomain,
       hostingIPNSHash: flags.hostingipnshash,
-      zimFileSourceUrl: flags.zimfilesourceurl,
+      zimFile: flags.zimfile,
       kiwixMainPage: flags.kiwixmainpage,
       mainPage: flags.mainpage,
       mainPageVersion: flags.mainpageversion,
