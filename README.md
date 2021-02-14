@@ -50,7 +50,7 @@ and understanding what happens during each stage is paramount if ZIM format
 changes and our build toolchain requires a debug and update.
 
 - [Manual build](#manual-build) are useful in debug situations, when specific stage  needs to be executed multiple times to fix a bug.
-  - [mirrorzim.sh](#mirrorzim.sh) automates some steps for QA purposes and ad-hoc experimentation
+  - [mirrorzim.sh](#mirrorzimsh) automates some steps for QA purposes and ad-hoc experimentation
 - [Docker build](#docker-build) is fully automated blackbox which takes ZIM file and produces CID and `IPFS_PATH` with datastore.
 
 **Note: This is a work in progress.**. We intend to make it easy for anyone to
