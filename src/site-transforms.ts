@@ -70,6 +70,22 @@ export const moveArticleFolderToWiki = ({
   cli.action.stop()
 }
 
+export const fixFavicon = ({
+  unpackedZimDir
+}: Directories) => {
+  const favicon = join(unpackedZimDir, '-', 'favicon')
+  const faviconIco = join(unpackedZimDir, 'favicon.ico')
+  console.log('favicon', favicon)
+  console.log('faviconIco', faviconIco)
+  if (existsSync(faviconIco) || !existsSync(favicon)) {
+    return
+  }
+
+  cli.action.start('  Fixing favicon ')
+  copyFileSync(favicon, faviconIco)
+  cli.action.stop()
+}
+
 export const includeSourceZim = ({
   zimFile,
   unpackedZimDir

@@ -5,6 +5,7 @@ import {
   appendJavscript as appendJavascript,
   includeSourceZim,
   copyImageAssetsIntoWiki,
+  fixFavicon,
   generateMainPage,
   insertIndexRedirect,
   moveArticleFolderToWiki,
@@ -44,6 +45,7 @@ export const zimToWebsite = async (options: Options) => {
 
   includeSourceZim(options)
   copyImageAssetsIntoWiki('./assets', directories)
+  fixFavicon(directories)
   moveArticleFolderToWiki(directories)
   insertIndexRedirect(options)
   appendJavascript(options, directories)
