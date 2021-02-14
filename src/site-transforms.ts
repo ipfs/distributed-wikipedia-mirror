@@ -75,8 +75,6 @@ export const fixFavicon = ({
 }: Directories) => {
   const favicon = join(unpackedZimDir, '-', 'favicon')
   const faviconIco = join(unpackedZimDir, 'favicon.ico')
-  console.log('favicon', favicon)
-  console.log('faviconIco', faviconIco)
   if (existsSync(faviconIco) || !existsSync(favicon)) {
     return
   }
@@ -110,7 +108,7 @@ export const insertIndexRedirect = (options: Options) => {
   writeFileSync(
     indexPath,
     template({
-      MAIN_PAGE: `wiki/${options.mainPage}`
+      MAIN_PAGE: 'wiki/'
     })
   )
 
@@ -153,7 +151,12 @@ export const generateMainPage = async (
     join(wikiFolder, `${options.kiwixMainPage}`)
   )
 
-  const mainPagePath = join(wikiFolder, options.mainPage)
+  // We copy "kiwix main page" to /wiki/index.html
+  // This way original one can still be loaded if needed
+  // Example for tr:
+  // /wiki/index.html is https://tr.wikipedia.org/wiki/Kullanıcı:The_other_Kiwix_guy/Landing
+  // /wiki/Anasayfa is https://tr.wikipedia.org/wiki/Anasayfa
+  const mainPagePath = join(wikiFolder, 'index.html')
 
   cli.action.start(`  Generating main page into ${mainPagePath} `)
 
