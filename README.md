@@ -51,7 +51,9 @@ changes and our build toolchain requires a debug and update.
 
 - [Manual build](#manual-build) are useful in debug situations, when specific stage  needs to be executed multiple times to fix a bug.
   - [mirrorzim.sh](#mirrorzimsh) automates some steps for QA purposes and ad-hoc experimentation
+<!--
 - [Docker build](#docker-build) is fully automated blackbox which takes ZIM file and produces CID and `IPFS_PATH` with datastore.
+-->
 
 **Note: This is a work in progress.**. We intend to make it easy for anyone to
 create their own wikipedia snapshots and add them to IPFS, making sure those
@@ -239,7 +241,11 @@ $ ./mirrorzim.sh --languagecode=cu --wikitype=wikipedia --hostingdnsdomain=cu.wi
 
 ## Docker build
 
-A `Dockerfile` with the software requirements is provided.
+A `Dockerfile` with all the software requirements is provided.  
+For now it is only a handy container for running the process on non-Linux
+systems or if you don't want to pollute your system with all the dependencies.  
+In the future it will be end-to-end blackbox that takes ZIM and spits out CID
+and repo.
 
 To build the docker image:
 
@@ -250,7 +256,7 @@ docker build . -t distributed-wikipedia-mirror-build
 To use it as a development environment:
 
 ```sh
-docker run -it -v $(pwd):/root/distributed-wikipedia-mirror -p 8080:8080 --entrypoint bash distributed-wikipedia-mirror-build
+docker run -it -v $(pwd):/root/distributed-wikipedia-mirror --net=host --entrypoint bash distributed-wikipedia-mirror-build
 ```
 
 # How to Help
