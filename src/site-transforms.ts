@@ -84,6 +84,28 @@ export const fixFavicon = ({
   cli.action.stop()
 }
 
+
+// Fix any broken redirects (https://github.com/openzim/zim-tools/issues/224)
+export const fixRedirects = async ({
+  unpackedZimDir,
+  wikiFolder
+}: Directories) => {
+  cli.action.start('  Fixing redirects ')
+  const fixupLog = `${unpackedZimDir}_redirect-fixups.log`
+  if (existsSync(fixupLog)) {
+    unlinkSync(fixupLog)
+  }
+  const util = require('util')
+  const exec = util.promisify(require('child_process').exec)
+  // redirect files are smaller than 1k so we can skip bigger ones, making the performance acceptable
+  const findRedirects = String.raw`find ${wikiFolder} -type f -size -800c -exec fgrep -l "0;url=A/" {} + -exec sed -i "s|0;url=A/|0;url=|" {} >> ${fixupLog} +`
+  const { stdout, stderr } = await exec(findRedirects, {env: {'LC_ALL': 'C'}})
+  cli.action.stop()
+  if (stdout) console.log('redirect fix stdout:', stdout)
+  if (stderr) console.error('redirect fix stderr:', stderr)
+}
+
+
 export const includeSourceZim = ({
   zimFile,
   unpackedZimDir
