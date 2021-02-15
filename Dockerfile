@@ -1,30 +1,28 @@
-FROM ubuntu:18.04
+FROM debian:stable
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
-RUN apt-get -y install --no-install-recommends git ca-certificates make build-essential curl wget apt-utils golang-go
+RUN apt update
+RUN apt -y install --no-install-recommends git ca-certificates curl wget apt-utils
 
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile default \
-    && cat $HOME/.cargo/env >> ~/.bashrc
-
-RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh \
+# install:
+# - zimdump from zim-tools_linux-x86_64-2021-02-12 (2.2.0 nightly)
+# - node and yarn
+# - go-ipfs
+RUN curl - sL https://ipfs.io/ipfs/QmaXutNuSv9T7w62TzMMKUgtxs9g81GvMt1vKqduLn77Yj -o /usr/local/bin/zimdump \
+    && chmod +x /usr/local/bin/zimdump \
+    && curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh \
     && bash nodesource_setup.sh \
-    && apt-get -y install --no-install-recommends nodejs \
-    && npm install -g yarn http-server
-
-RUN wget -nv https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_linux-amd64.tar.gz \
-    && tar xvfz go-ipfs_v0.4.23_linux-amd64.tar.gz \
+    && apt -y install --no-install-recommends nodejs \
+    && npm install -g yarn \
+    && wget -nv https://dist.ipfs.io/go-ipfs/v0.7.0/go-ipfs_v0.7.0_linux-amd64.tar.gz \
+    && tar xvfz go-ipfs_v0.7.0_linux-amd64.tar.gz \
     && mv go-ipfs/ipfs /usr/local/bin/ipfs \
-    && rm -r go-ipfs && rm go-ipfs_v0.4.23_linux-amd64.tar.gz \
-    && ipfs init --profile badgerds \
+    && rm -r go-ipfs && rm go-ipfs_v0.7.0_linux-amd64.tar.gz \
+    && ipfs init --profile badgerds --empty-repo \
     && ipfs config --json 'Experimental.ShardingEnabled' true
 
-# #
-# # Clean up
-# && apt-get autoremove -y \
-# && apt-get clean -y \
-# && rm -rf /var/lib/apt/lists/*
+# TODO: move repo init after external volume is mounted
 
 ENV DEBIAN_FRONTEND=dialog
 

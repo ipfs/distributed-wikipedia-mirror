@@ -18,4 +18,4 @@ if [ -z "${1-}" ]; then
 fi
 
 MAIN_PAGE=$(curl -Ls -o /dev/null -w %{url_effective} https://${1} | cut -d"/" -f5)
-printf "%s.html\n" "${MAIN_PAGE}"
+printf "%s\n" "${MAIN_PAGE}"

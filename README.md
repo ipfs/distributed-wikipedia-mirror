@@ -10,6 +10,14 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
  Existing Mirrors: https://en.wikipedia-on-ipfs.org, https://tr.wikipedia-on-ipfs.org
 </p>
 
+- [Purpose](#purpose)
+- [How to add new Wikipedia snapshots to IPFS](#how-to-add-new-wikipedia-snapshots-to-ipfs)
+  - [Manual build](#manual-build)
+  - [Docker](#docker-build)
+- [How to help](#how-to-help)
+  - [Cohost a lazy copy](#cohost-a-lazy-copy)
+  - [Cohost a full copy](#cohost-a-full-copy)
+
 ## Purpose
 
 “We believe that information—knowledge—makes the world better. That when we ask questions, get the facts, and are able to understand all perspectives on an issue, it allows us to build the foundation for a more just and tolerant society”
@@ -35,11 +43,30 @@ The long term goal is to get the full-fledged read-write Wikipedia to work on to
 
 A full read-write version (2) would require a strong collaboration with Wikipedia.org itself, and finishing work on important dynamic content challenges -- we are working on all the technology (2) needs, but it's not ready for prime-time yet. We will update when it is.
 
-## How to add new Wikipedia snapshots to IPFS
+# How to add new Wikipedia snapshots to IPFS
+
+The process can be nearly fully automated, however it consists of many stages
+and understanding what happens during each stage is paramount if ZIM format
+changes and our build toolchain requires a debug and update.
+
+- [Manual build](#manual-build) are useful in debug situations, when specific stage  needs to be executed multiple times to fix a bug.
+  - [mirrorzim.sh](#mirrorzimsh) automates some steps for QA purposes and ad-hoc experimentation
+<!--
+- [Docker build](#docker-build) is fully automated blackbox which takes ZIM file and produces CID and `IPFS_PATH` with datastore.
+-->
+
+**Note: This is a work in progress.**. We intend to make it easy for anyone to
+create their own wikipedia snapshots and add them to IPFS, making sure those
+builds are deterministic and auditable, but our first emphasis has been to get
+the initial snapshots onto the network. This means some of the steps aren't as
+easy as we want them to be. If you run into trouble, seek help through a github
+issue, commenting in the `#ipfs` channel on IRC, or by posting a thread on
+https://discuss.ipfs.io.
+
+## Manual build
 
 If you would like to create an updated Wikipedia snapshot on IPFS, you can follow these steps.
 
-**Note: This is a work in progress.**. We intend to make it easy for anyone to create their own wikipedia snapshots and add them to IPFS, but our first emphasis has been to get the initial snapshots onto the network. This means some of the steps aren't as easy as we want them to be. If you run into trouble, seek help through a github issue, commenting in the #ipfs channel in IRC, or by posting a thread on https://discuss.ipfs.io.
 
 ### Step 0: Clone this repository
 
@@ -59,29 +86,34 @@ $ cd distributed-wikipedia-mirror
 
 ### Step 1: Install dependencies
 
-`Node`, `yarn`, `rust` and `make` are required. On Mac OS X you will need `sha256sum`, available in coreutils.
+`Node` and `yarn` are required. On Mac OS X you will need `sha256sum`, available in coreutils.
 
-Install the node and rust dependencies:
+Install the node dependencies:
 
 ```sh
 $ yarn
 ```
 
-The yarn install will install `zim_extract`, the rust based extract zim utility (see https://github.com/dignifiedquire/zim), and the `zim-to-website` node script and its node modules.
+Then, download the latest [zim-tools](https://download.openzim.org/release/zim-tools/) and add `zimdump` to your `PATH`.
+This tool is necessary for unpacking ZIM.
 
 ### Step 2: Configure your IPFS Node
 
-#### Enable Directory Sharding
+It is advised to use separate IPFS node for this:
 
-Configure your IPFS node to enable directory sharding
-
-```sh
-$ ipfs config --json 'Experimental.ShardingEnabled' true
+```console
+$ export IPFS_PATH=/path/to/IPFS_PATH_WIKIPEDIA_MIRROR
 ```
 
-#### Optional: Switch to `badgerds`
+#### Bader datastore
 
-Consider using a [datastore backed by BadgerDB](https://github.com/ipfs/go-ds-badger) for improved performance.  
+Make sure repo is initialized with [datastore backed by BadgerDB](https://github.com/ipfs/go-ds-badger) for improved performance: 
+
+```
+ipfs init -p badgerds --empty-repo
+```
+
+
 Existing repository can be converted to badgerds with [ipfs-ds-convert](https://github.com/ipfs/ipfs-ds-convert):
 
 ```sh
@@ -89,66 +121,21 @@ $ ipfs config profile apply badgerds
 $ ipfs-ds-convert convert
 ```
 
-### Step 3: Run the mirror script
+#### Enable HAMT sharding
 
-The mirror script will:
-
-1. Download the latest chosen ZIM file from `https://download.kiwix.org/zim/` into the snapshots folder, if the file has been previously downloaded, the file will only be verified (SHA-256).
-2. Unpack the ZIM files contents to a directory under `tmp`, e.g. `.tmp/wikipedia_tr_all_maxi_2019-12/`
-3. Run a nodejs conversion script on the unpacked directory to create an IPFS hostable website
-4. Add the processed directory to your local IPFS instance
-
-To run the mirror script:
+Configure your IPFS node to enable directory sharding
 
 ```sh
-$ ./mirrorzim.sh  \
-  --languagecode=<LANGUAGE_CODE> \
-  --wikitype=<WIKI_TYPE> \
-  [--hostingdnsdomain=<HOSTING_DNS_DOMAIN>] \
-  [--hostingipnshash=<HOSTING_IPNS_HASH>] \
-  [--mainpageversion=<MAIN_PAGE_VERSION>]
+$ ipfs config --json 'Experimental.ShardingEnabled' true
 ```
 
-The arguments require are:
 
-- LANGUAGE_CODE - the language of the wikimedia site e.g. tr (Turkish) or en (English)
-- WIKI_TYPE - the type of the wikimedia site e.g. wikipedia, wikiquote
-- HOSTING_DNS_DOMAIN - optional - the domain the IPFS site will be hosted at e.g. tr.wikipedia-on-ipfs.org
-- HOSTING_IPNS_HASH - optional - the IPNS hash the IPFS site will be hosted at e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W
-- MAIN_PAGE_VERSION - optional - an override hack used on Turkish Wikipedia, it sets the main page version as there are issues with the Kiwix version id
+### Step 3: Download the latest snapshot from kiwix.org
 
-The script will output the CID of the mirror site, which can then be shared.
+Source of ZIM files is at https://download.kiwix.org/zim/wikipedia/  
+Make sure you download `_all_maxi_` snapshots, as those include images.
 
-#### Examples
-
-##### English Wikiquote
-
-```sh
-./mirrorzim.sh --languagecode=en --wikitype=wikiquote
-```
-
-##### Turkish Wikipedia
-
-```sh
-./mirrorzim.sh \
-  --languagecode=tr \
-  --wikitype=wikipedia \
-  --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
-  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
-  --mainpageversion=19869765
-```
-
-## Manual Run
-
-To run the parts of the mirror script individually for debugging:
-
-### Step 0: Install dependencies
-
-See above
-
-### Step 1: Download the latest snapshot from kiwix.org
-
-For that you can use the getzim.sh script
+To automate this, you can also use the `getzim.sh` script:
 
 First, download the latest wiki lists using `bash ./tools/getzim.sh cache_update`
 
@@ -161,29 +148,23 @@ Download command:
 
 Running the command will download the choosen zim file to the `./snapshots` directory.
 
-### Step 2: Unpack the ZIM snapshot
+
+
+### Step 4: Unpack the ZIM snapshot
 
 Unpack the ZIM snapshot using `extract_zim`:
 
 ```sh
-$ ./extract_zim/extract_zim --skip-link ./snapshots/wikipedia_tr_all_maxi_2019-12.zim --out ./tmp/wikipedia_tr_all_maxi_2019-12
-Extracting file: ./snapshots/wikipedia_tr_all_maxi_2019-12.zim to ./out
-
-Generating symlinks: false
-Generating copies for links: false
-Main page is Kullanıcı:The_other_Kiwix_guy/Landing
-
-Extraction done in 25.91s
+$ zimdump dump ./snapshots/wikipedia_tr_all_maxi_2021-01.zim --dir ./tmp/wikipedia_tr_all_maxi_2021-01
 ```
 
 > ### ℹ️ ZIM's main page
 >
-> The string after `Main page is` as it is the name
-> of the landing page set for the ZIM archive.  
-> You may also decide to use the original landing page instead (eg. `Main_Page` in `en`, `Anasayfa` in `tr` etc)  
-> Kiwix Main page needs to be passed to `zim-to-website`.
+> Each ZIM file has "main page" attribute which defines the landing page set for the ZIM archive.  
+> It is often different than the "main page" of upstream Wikipedia.  
+> Kiwix Main page needs to be passed in the next step, so until there is an automated way to determine "main page" of ZIM, you need to open ZIM in Kiwix reader and eyeball the name of the landing page.
 
-### Step 3: Convert the unpacked zim directory to a website with mirror info
+### Step 5: Convert the unpacked zim directory to a website with mirror info
 
 IMPORTANT: The snapshots must say who disseminated them. This effort to mirror Wikipedia snapshots is not affiliated with the Wikimedia foundation and is not connected to the volunteers whose contributions are contained in the snapshots. The snapshots must include information explaining that they were created and disseminated by independent parties, not by Wikipedia.
 
@@ -193,39 +174,45 @@ The conversion to a working website and the appending of necessary information i
 $ node ./bin/run --help
 ```
 
-First though the main page, as the archive appears on the appropriate wikimedia website, must be determined. For instance, the zim file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa.html` as the main page. Both must be passed to the node script.
+The program requires main page for ZIM and online versions as one of inputs. For instance, the ZIM file for Turkish Wikipedia has a main page of `Kullanıcı:The_other_Kiwix_guy/Landing` but `https://tr.wikipedia.org` uses `Anasayfa` as the main page. Both must be passed to the node script.
 
-To determine the website main page use `./tools/find_main_page_name.sh` passing the website:
+To determine the original main page use `./tools/find_main_page_name.sh`:
 
-```sh
+```console
 $ ./tools/find_main_page_name.sh tr.wikiquote.org
-Anasayfa.html
+Anasayfa
+```
+
+To determine the main page in ZIM file open in in a [Kiwix reader](https://www.kiwix.org/en/kiwix-reader) or use `zimdump info` (version 2.2.0 or later) and ignore the `A/` prefix:
+
+```console
+$ zimdump info wikipedia_tr_all_maxi_2021-01.zim
+count-entries: 1088190
+uuid: 840fc82f-8f14-e11e-c185-6112dba6782e
+cluster count: 5288
+checksum: 50113b4f4ef5ddb62596d361e0707f79
+main page: A/Kullanıcı:The_other_Kiwix_guy/Landing
+favicon: -/favicon
+
+$ zimdump info wikipedia_tr_all_maxi_2021-01.zim | grep -oP 'main page: A/\K\S+'
+Kullanıcı:The_other_Kiwix_guy/Landing
 ```
 
 The conversion is done on the unpacked zim directory:
 
 ```sh
-node ./bin/run ./tmp/wikipedia_tr_all_maxi_2019-12 \
+node ./bin/run ./tmp/wikipedia_tr_all_maxi_2021-02 \
   --hostingdnsdomain=tr.wikipedia-on-ipfs.org \
-  --hostingipnshash=QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W \
-  --zimfilesourceurl=https://download.kiwix.org/zim/wikipedia/wikipedia_tr_all_maxi_2019-12.zim \
+  --zimfile=./snapshots/wikipedia_tr_all_maxi_2021-02.zim \
   --kiwixmainpage=Kullanıcı:The_other_Kiwix_guy/Landing \
-  --mainpage=Anasayfa.html \
-  --mainpageversion=19869765
+  --mainpage=Anasayfa
 ```
 
-### Step 4: Import website directory to IPFS
+### Step 6: Import website directory to IPFS
 
 #### Add immutable copy
 
 Add all the data to your node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the website that you created in Step 4 (`./tmp/wikipedia_en_all_maxi_2018-10`).
-
-```sh
-$ ipfs add -r --cid-version 1 $unpacked_wiki
-```
-
-If you find it takes too long, and your IPFS node is located on the same machine,
-consider running this step in offline mode:
 
 ```sh
 $ ipfs add -r --cid-version 1 --offline $unpacked_wiki
@@ -233,13 +220,32 @@ $ ipfs add -r --cid-version 1 --offline $unpacked_wiki
 
 Save the last hash of the output from the above process. It is the CID of the website.
 
-### Step 6: Share the hash
+### Step 7: Share the root CID
 
 Share the CID of your new snapshot so people can access it and replicate it onto their machines.
 
-# Docker
+### Step 8: Update *.wikipedia-on-ipfs.org
 
-A dockerfile with the software requirements is provided.
+Make sure at least two full reliable copies exist before updating DNSLink.
+
+## mirrorzim.sh
+
+It is possible to automate steps 3-6 via a wrapper script named `mirrorzim.sh`.  
+It will download the latest snapshot of specified language (if needed), unpack it, and add it to IPFS.
+
+To see how the script behaves try running it on one of the smallest wikis, such as `cu`:
+
+```console
+$ ./mirrorzim.sh --languagecode=cu --wikitype=wikipedia --hostingdnsdomain=cu.wikipedia-on-ipfs.org
+```
+
+## Docker build
+
+A `Dockerfile` with all the software requirements is provided.  
+For now it is only a handy container for running the process on non-Linux
+systems or if you don't want to pollute your system with all the dependencies.  
+In the future it will be end-to-end blackbox that takes ZIM and spits out CID
+and repo.
 
 To build the docker image:
 
@@ -250,9 +256,75 @@ docker build . -t distributed-wikipedia-mirror-build
 To use it as a development environment:
 
 ```sh
-docker run -it -v $(pwd):/root/distributed-wikipedia-mirror -p 8080:8080 --entrypoint bash distributed-wikipedia-mirror-build
+docker run -it -v $(pwd):/root/distributed-wikipedia-mirror --net=host --entrypoint bash distributed-wikipedia-mirror-build
 ```
 
 # How to Help
 
-If you would like to contribute to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted).
+If you don't mind command line interface and have a lot of disk space,
+bandwidth, or code skills, continue reading.
+
+## Share mirror CID with people who can't trust DNS
+
+Sharing a CID instead of a DNS name is useful when DNS is not reliable or
+trustworthy.  The latest CID for specific language mirror can be found via
+DNSLink:
+
+```console
+$ ipfs resolve -r /ipns/tr.wikipedia-on-ipfs.org
+/ipfs/bafy..
+```
+
+CID can then be opened via `ipfs://bafy..` in a web browser with [IPFS Companion](https://github.com/ipfs-shipyard/ipfs-desktop) extension
+resolving IPFS addresses via [IPFS Desktop](https://docs.ipfs.io/install/ipfs-desktop/) node.
+
+You can also try [Brave browser](https://brave.com), which ships with [native support for IPFS](https://brave.com/ipfs-support/).
+
+## Cohost a lazy copy
+
+Using MFS makes it easier to protect snapshots from being garbage collected
+than low level pinning because you can assign meaningful names and it won't
+prefetch any blocks unless you explicitly ask.
+
+Every mirrored Wikipedia article you visit will be added to your lazy
+copy, and will be contributing to your partial mirror. , and you won't need to host
+the entire thing.
+
+To cohost a lazy copy, execute:
+
+```console
+$ export LNG="tr"
+$ ipfs files mkdir -p /wikipedia-mirror/$LNG
+$ ipfs files cp $(ipfs resolve -r /ipns/$LNG.wikipedia-on-ipfs.org) /wikipedia-mirror/$LNG/$LNG_$(date +%F_%T)
+```
+
+Then simply start browsing the `$LNG.wikipedia-on-ipfs.org` site via your node.
+Every visited page will be cached, cohosted, and protected from garbage collection.
+
+## Cohost a full copy
+
+Steps are the same as  for a lazy copy, but you execute additional preload
+after a lazy copy is in place:
+
+```console
+$ # export LNG="tr"
+$ ipfs refs -r /ipns/$LNG.wikipedia-on-ipfs.org
+```
+
+Before you execute this, check if you have enough disk space to fit `CumulativeSize`:
+
+```console
+$ # export LNG="tr"
+$ ipfs object stat --human /ipns/$LNG.wikipedia-on-ipfs.org                                                                                                                                 ...rror MM?fix/build-2021
+NumLinks:       5
+BlockSize:      281
+LinksSize:      251
+DataSize:       30
+CumulativeSize: 15 GB
+```
+
+We are working on improving deduplication between snapshots, but for now YMMV.
+
+## Code
+
+If you would like to contribute more to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted).

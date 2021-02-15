@@ -5,7 +5,7 @@ export interface Options {
   mainPageVersion?: number
   hostingDNSDomain?: string
   hostingIPNSHash?: string
-  zimFileSourceUrl: string
+  zimFile: string
   noOfWorkerThreads: number
 }
 

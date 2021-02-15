@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { readFileSync } from 'fs'
+import { basename, relative } from 'path'
 import Handlebars from 'handlebars'
 
 import { EnhancedOpts } from './domain'
@@ -22,9 +23,7 @@ const generateFooterFrom = (options: EnhancedOpts) => {
     CANONICAL_URL: options.canonicalUrl,
     CANONICAL_URL_DISPLAY: decodeURIComponent(options.canonicalUrl),
     IMAGES_DIR: options.relativeImagePath,
-    ZIM_URL:
-      options.zimFileSourceUrl ??
-      'https://wiki.kiwix.org/wiki/Content_in_all_languages'
+    ZIM_NAME: basename(options.zimFile)
   }
 
   const footerTemplate = Handlebars.compile(footerFragment.toString())
@@ -43,29 +42,8 @@ export const appendFooter = ($html: any, options: EnhancedOpts) => {
 }
 
 export const appendHtmlPostfix = (href: string) => {
-  if (href.includes('/w/index.php')) {
-    return href
-  }
-
-  const parts = href.split(/[#?]+/)
-
-  if (parts.length === 0) {
-    throw new Error('Unexpected parsing of links')
-  }
-
-  if (parts.length === 1) {
-    if (href.endsWith('.html')) {
-      return href
-    }
-
-    return `${href}.html`
-  }
-
-  if (parts[0].endsWith('.html')) {
-    return href
-  }
-
-  return href.replace(parts[0], `${parts[0]}.html`)
+  // noop:  .html no longer needed since we switched to zimdump
+  return href
 }
 
 export const prefixRelativeRoot = (href: string) => {
@@ -78,6 +56,10 @@ export const prefixRelativeRoot = (href: string) => {
 
 export const moveRelativeLinksUpOneLevel = (href: string) => {
   return href.replace('../', '')
+}
+
+export const moveRelativeLinksDownOneLevel = (href: string) => {
+  return href.replace('../', '../../')
 }
 
 export const makeScriptLinksRelativeToWiki = (href: string) => {

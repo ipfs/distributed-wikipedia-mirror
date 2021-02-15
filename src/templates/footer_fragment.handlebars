@@ -1,7 +1,7 @@
 <div>
   <style>
     .mw-body {
-      padding-bottom: 0;
+      padding-bottom: 0 !important;
     }
 
     #distribution-footer {
@@ -10,27 +10,14 @@
     }
 
     .footer-wrapper {
-      margin: 5px;
-      font-family: 'Linux Libertine', Georgia, Times, serif;
-    }
-
-    .footer-wrapper {
       background-color: white;
       border: 2px solid lightgrey;
-      border-radius: 10px;
-      margin-bottom: 25px;
-    }
-
-    .footer-wrapper a {
-      color: #0084b4;
-      text-decoration: none;
-      font-weight: bold;
-      /* letter-spacing: 1px; */
-    }
-
-    .footer-wrapper a:hover {
-      color: #0084b4;
-      /* text-decoration: ; */
+      border-radius: 0.5em;
+      padding: 2em 0 0.5em 0;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      font-family: inherit;
+      clear: both;
     }
 
     .footer-main {
@@ -75,27 +62,46 @@
       font-weight: bolder;
     }
 
-    .footer-sharing-icons {
-      width: 168px;
-      margin: 0 auto;
+    @keyframes heartbeat {
+      0% {
+        transform: scale(1);
+      }
+      5% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 1.05em rgba(95, 203, 207, 0.5));
+      }
+      10% {
+        transform: scale(1.025);
+        filter: drop-shadow(0 0 1.025em rgba(95, 203, 207, 0.25));
+      }
+      15% {
+        transform: scale(1.075);
+        filter: drop-shadow(0 0 1.075em rgba(95, 203, 207, 0.5));
+      }
+      50% {
+        transform: scale(1);
+      }
+      100% {
+        transform: scale(1);
+      }
     }
 
-    .footer-sharing-icon {
-      width: 32px;
-      height: 32px;
-      float: left;
-      margin: 5px;
+    .heartbeat {
+      animation-name: heartbeat;
+      animation-iteration-count: infinite;
+      animation-duration: 2.5s;
     }
+
   </style>
   <div class="footer-wrapper">
     <div class="footer-header">
-      <div class="footer-logo">
-        <img src="{{IMAGES_DIR}}/wikipedia-on-ipfs.png" width="100" />
+      <div class="footer-logo heartbeat">
+        <a href="https://github.com/ipfs/distributed-wikipedia-mirror"><img src="{{IMAGES_DIR}}/wikipedia-on-ipfs.png" width="100" /></a>
       </div>
       <div class="footer-titles">
         <div class="footer-titles-title">Distributed Wikipedia Mirror Project</div>
         <div class="footer-titles-subtitle">
-          Powered by <a href="https://ipfs.io">IPFS</a>
+          Powered by <a class="external" href="https://ipfs.io">IPFS</a>
         </div>
       </div>
       <div class="footer-header-blank-slot">
@@ -111,8 +117,8 @@
         a global effort, independent from Wikipedia.
       </div>
       <div>
-        Created on: {{SNAPSHOT_DATE}} from the
-        <a class="external" href="{{ZIM_URL}}">kiwix ZIM file</a>
+        Created on {{SNAPSHOT_DATE}} from the kiwix ZIM file:
+        <a href="{{ZIM_URL}}">{{ZIM_NAME}}</a>
       </div>
       <div id="footer-ipns-link">
         <!-- Placeholder -->
@@ -131,7 +137,7 @@
         <!-- Placeholder -->
       </div>
       <div>
-        Not sure where to start? <a class="external text" href="https://ipfs.io/#install">Download IPFS Here</a>
+        Not sure where to start? <a class="external text" href="https://ipfs.io">Learn about IPFS here</a>.
       </div>
     </div>
   </div>

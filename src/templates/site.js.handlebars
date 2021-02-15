@@ -15,7 +15,7 @@
 
     var dwmOptions = {{{ DWM_OPTIONS }}}
 
-    var canonicalUrl = $('link[rel="canonical"]').attr('href')
+    var canonicalUrl = document.querySelector('link[rel="canonical"]').href
 
     var resolveRelativeFilePath = function () {
         var prefix = window.location.pathname.split('/wiki')[0]
@@ -30,11 +30,11 @@
     var resolution = resolveRelativeFilePath()
     var relativeFilePath = resolution.relativeFilePath
     var basePath = resolution.basePath
-
     var footer = footerTemplate
-        .replace(/\{{ZIM_URL}}/g, dwmOptions.ZIM_URL)
+        .replace(/\{{ZIM_URL}}/g, `${basePath}/${dwmOptions.ZIM_NAME}`)
+        .replace(/\{{ZIM_NAME}}/g, dwmOptions.ZIM_NAME)
         .replace(/\{{SNAPSHOT_DATE}}/g, dwmOptions.SNAPSHOT_DATE)
-        .replace(/\{{IMAGES_DIR}}/g, basePath + '/I/m')
+        .replace(/\{{IMAGES_DIR}}/g, basePath + '/I')
         .replace(/\{{CANONICAL_URL}}/g, canonicalUrl)
         .replace(/\{{CANONICAL_URL_DISPLAY}}/g, decodeURIComponent(canonicalUrl))
 
@@ -74,32 +74,6 @@
         return href.replace('/A/', '/wiki/')
     }
 
-    var appendHtmlPostfix = function (href) {
-        var parts = href.split(/[#?]+/)
-
-        if (parts.length === 0) {
-            throw new Error('Unexpected parsing of links')
-        }
-
-        if (parts.length === 1) {
-            if (href.endsWith('.html')) {
-                return href
-            }
-
-            return href + '.html'
-        }
-
-        if (parts[0].endsWith('.html')) {
-            return href
-        }
-
-        if (parts[0] === '') {
-            return href
-        }
-
-        return href.replace(parts[0], parts[0] + '.html')
-    }
-
     var fixJpgExtension = function (src) {
         return src.replace('.JPG', '.jpg')
             .replace('.JPEG', '.jpg')
@@ -111,7 +85,7 @@
     }
 
     // Fix internal links
-    reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki, appendHtmlPostfix])
+    reworkAttr('a:not(.external)', 'href', [replaceANamespaceWithWiki])
     // Fix broken image links
     reworkAttr('img[src$=".JPG"], img[src$=".JPEG"], img[src$=".jpeg"]', 'src', [fixJpgExtension])
     reworkAttr('img[src$=".PNG"]', 'src', [fixPngExtension])

@@ -15,7 +15,7 @@ import {
 import Handlebars from 'handlebars'
 import fetch from 'node-fetch'
 import path from 'path'
-import { join } from 'path'
+import { join, basename, relative } from 'path'
 
 import {
   appendHtmlPostfix,
@@ -70,6 +70,56 @@ export const moveArticleFolderToWiki = ({
   cli.action.stop()
 }
 
+export const fixFavicon = ({
+  unpackedZimDir
+}: Directories) => {
+  const favicon = join(unpackedZimDir, '-', 'favicon')
+  const faviconIco = join(unpackedZimDir, 'favicon.ico')
+  if (existsSync(faviconIco) || !existsSync(favicon)) {
+    return
+  }
+
+  cli.action.start('  Fixing favicon ')
+  copyFileSync(favicon, faviconIco)
+  cli.action.stop()
+}
+
+
+// Fix any broken redirects (https://github.com/openzim/zim-tools/issues/224)
+export const fixRedirects = async ({
+  unpackedZimDir,
+  wikiFolder
+}: Directories) => {
+  cli.action.start('  Fixing redirects ')
+  const fixupLog = `${unpackedZimDir}_redirect-fixups.log`
+  if (existsSync(fixupLog)) {
+    unlinkSync(fixupLog)
+  }
+  const util = require('util')
+  const exec = util.promisify(require('child_process').exec)
+  // redirect files are smaller than 1k so we can skip bigger ones, making the performance acceptable
+  const findRedirects = String.raw`find ${wikiFolder} -type f -size -800c -exec fgrep -l "0;url=A/" {} + -exec sed -i "s|0;url=A/|0;url=|" {} >> ${fixupLog} +`
+  const { stdout, stderr } = await exec(findRedirects, {env: {'LC_ALL': 'C'}})
+  cli.action.stop()
+  if (stdout) console.log('redirect fix stdout:', stdout)
+  if (stderr) console.error('redirect fix stderr:', stderr)
+}
+
+
+export const includeSourceZim = ({
+  zimFile,
+  unpackedZimDir
+}: Options) => {
+  const zimCopy = join(unpackedZimDir, basename(zimFile))
+  if (existsSync(zimCopy)) {
+    return
+  }
+
+  cli.action.start('  Copying source ZIM to the root of unpacked zim directory ')
+  copyFileSync(zimFile, zimCopy)
+  cli.action.stop()
+}
+
 export const insertIndexRedirect = (options: Options) => {
   cli.action.start("  Inserting root 'index.html' as redirect to main page")
   const template = Handlebars.compile(indexRedirectFragment.toString())
@@ -80,7 +130,7 @@ export const insertIndexRedirect = (options: Options) => {
   writeFileSync(
     indexPath,
     template({
-      MAIN_PAGE: `wiki/${options.mainPage}`
+      MAIN_PAGE: 'wiki/'
     })
   )
 
@@ -100,9 +150,9 @@ export const insertIndexRedirect = (options: Options) => {
 
 export const resolveDirectories = (options: Options) => {
   const articleFolder = join(options.unpackedZimDir, 'A')
-  const imagesFolder = join(options.unpackedZimDir, 'I', 'm')
+  const imagesFolder = join(options.unpackedZimDir, 'I')
   const wikiFolder = join(options.unpackedZimDir, 'wiki')
-  const jsmodulesFolder = join(options.unpackedZimDir, '-', 'j', 'js_modules')
+  const jsmodulesFolder = join(options.unpackedZimDir, '-')
 
   const directories: Directories = {
     unpackedZimDir: options.unpackedZimDir,
@@ -120,10 +170,15 @@ export const generateMainPage = async (
   { wikiFolder, imagesFolder }: Directories
 ) => {
   const kiwixMainpage = readFileSync(
-    join(wikiFolder, `${options.kiwixMainPage}.html`)
+    join(wikiFolder, `${options.kiwixMainPage}`)
   )
 
-  const mainPagePath = join(wikiFolder, options.mainPage)
+  // We copy "kiwix main page" to /wiki/index.html
+  // This way original one can still be loaded if needed
+  // Example for tr:
+  // /wiki/index.html is https://tr.wikipedia.org/wiki/Kullanıcı:The_other_Kiwix_guy/Landing
+  // /wiki/Anasayfa is https://tr.wikipedia.org/wiki/Anasayfa
+  const mainPagePath = join(wikiFolder, 'index.html')
 
   cli.action.start(`  Generating main page into ${mainPagePath} `)
 
@@ -192,7 +247,7 @@ export const generateMainPage = async (
       .find('.globegris')
       .attr(
         'style',
-        'background-image: url("../I/m/wikipedia-on-ipfs.png"); background-repeat:no-repeat; background-position:-20px -40px; background-size: 200px; width:100%; border:1px solid #a7d7f9; vertical-align:top;'
+        'background-image: url("../I/wikipedia-on-ipfs.png"); background-repeat:no-repeat; background-position:-20px -40px; background-size: 200px; width:100%; border:1px solid #a7d7f9; vertical-align:top;'
       )
 
     // Copy image downloads
@@ -209,7 +264,7 @@ export const generateMainPage = async (
         new URL(`http:${src}`),
         join(imagesFolder, decodeURIComponent(filename))
       )
-      $externalImage.attribs.src = `../I/m/${filename}`
+      $externalImage.attribs.src = `../I/${filename}`
       delete $externalImage.attribs.srcset
     }
 
@@ -271,8 +326,8 @@ export const appendJavscript = (
 ) => {
   cli.action.start('  Appending custom javascript to site.js ')
 
-  const delimiter = '/* Appended by Distributed Wikipedia Mirror */'
-  const targetSiteJsFile = join(jsmodulesFolder, 'site.js')
+  const delimiter = '/* Appended by Distributed Wikipedia Mirror – details at https://github.com/ipfs/distributed-wikipedia-mirror */'
+  const targetSiteJsFile = join(jsmodulesFolder, 'mw', 'site.js')
 
   const dwmSitejsTemplate = readFileSync('./src/templates/site.js.handlebars')
     .toString()
@@ -283,9 +338,7 @@ export const appendJavscript = (
     SNAPSHOT_DATE: format(new Date(), 'yyyy-MM'),
     HOSTING_IPNS_HASH: options.hostingIPNSHash,
     HOSTING_DNS_DOMAIN: options.hostingDNSDomain,
-    ZIM_URL:
-      options.zimFileSourceUrl ??
-      'https://wiki.kiwix.org/wiki/Content_in_all_languages'
+    ZIM_NAME: basename(options.zimFile)
   }
 
   const dwmSitejs = Handlebars.compile(dwmSitejsTemplate.toString())({
@@ -314,11 +367,11 @@ export const appendJavscript = (
   writeFileSync(targetSiteJsFile, updatedSiteJs)
 
   // hack to stop console error
-  const targetJsConfigVarFile = join(jsmodulesFolder, 'jsConfigVars.js')
+  const targetJsConfigVarFile = join(jsmodulesFolder, 'mw', 'jsConfigVars.js')
   writeFileSync(targetJsConfigVarFile, '{}')
 
   // hack replace the unexpected var in startup.js
-  const startupJsFile = join(jsmodulesFolder, 'startup.js')
+  const startupJsFile = join(jsmodulesFolder, 'mw', 'startup.js')
   let startJs = readFileSync(startupJsFile).toString()
   startJs = startJs
     .replace('function domEval(code){var', 'function domEval(code){')
@@ -334,7 +387,7 @@ export const appendJavscript = (
 
   // hack: overwrite erroring js files see https://github.com/openzim/mwoffliner/issues/894
   for (const file of ['ext.cite.ux-enhancements.js']) {
-    const filepath = join(jsmodulesFolder, file)
+    const filepath = join(jsmodulesFolder, 'mw', file)
     const overwriteText =
       '/* Overwritten by Distributed Wikipedia Mirror to prevent js errors, see https://github.com/openzim/mwoffliner/issues/894 */'
     writeFileSync(filepath, overwriteText)

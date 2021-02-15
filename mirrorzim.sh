@@ -7,7 +7,7 @@ set -euo pipefail
 
 usage() {
 	echo "USAGE:"
-	echo " $0 - download a zim file, unpack it, convert to website then push to local ipfs instance"
+	echo " $0 - download a zim file, unpack it, convert to website then add to MFS at local IPFS instance"
 	echo ""
 	echo "SYNOPSIS"
 	echo " $0 --languagecode=<LANGUAGE_CODE> --wikitype=<WIKI_TYPE>"
@@ -91,21 +91,31 @@ printf "\nRemove tmp directory $TMP_DIRECTORY before run ..."
 rm -rf $TMP_DIRECTORY
 
 printf "\nUnpack the zim file into $TMP_DIRECTORY...\n"
-ZIM_FILE_MAIN_PAGE=$(./extract_zim/extract_zim ./snapshots/$ZIM_FILE --out $TMP_DIRECTORY | grep 'Main page is' | cut -d' ' -f4)
+zimdump dump ./snapshots/$ZIM_FILE --dir $TMP_DIRECTORY
+
+# Find the main page of ZIM
+ZIM_FILE_MAIN_PAGE=$(zimdump info ./snapshots/$ZIM_FILE | grep -oP 'main page: A/\K\S+')
 
 # Resolve the main page as it is on wikipedia over http
 MAIN_PAGE=$(./tools/find_main_page_name.sh "$LANGUAGE_CODE.$WIKI_TYPE.org")
 
 printf "\nConvert the unpacked zim directory to a website\n"
 node ./bin/run $TMP_DIRECTORY \
-  --zimfilesourceurl=$ZIM_FILE_SOURCE_URL \
+  --zimfile=./snapshots/$ZIM_FILE \
   --kiwixmainpage=$ZIM_FILE_MAIN_PAGE \
   --mainpage=$MAIN_PAGE \
   ${HOSTING_DNS_DOMAIN:+--hostingdnsdomain=$HOSTING_DNS_DOMAIN} \
   ${HOSTING_IPNS_HASH:+--hostingipnshash=$HOSTING_IPNS_HASH} \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
 
-printf "\nAdd the processed tmp directory to IPFS\n"
-CID=$(ipfs add -r --cid-version 1 --offline $TMP_DIRECTORY | tail -n -1 | cut -d' ' -f2 )
+printf "\nAdding the processed tmp directory to IPFS\n(this part may take long time on a slow disk):\n"
+CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)
+MFS_DIR="/${ZIM_FILE}__$(date +%F_%T)"
 
-printf "\nThe CID of $ZIM_FILE is:\n$CID\n"
+# pin by adding to MFS under a meaningful name
+ipfs files cp /ipfs/$CID "$MFS_DIR"
+
+printf "\n\n-------------------------\nD O N E !\n-------------------------\n"
+printf "MFS: $MFS_DIR\n"
+printf "CID: $CID"
+printf "\n-------------------------\n"
