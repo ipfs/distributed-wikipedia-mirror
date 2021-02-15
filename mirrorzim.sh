@@ -108,12 +108,14 @@ node ./bin/run $TMP_DIRECTORY \
   ${HOSTING_IPNS_HASH:+--hostingipnshash=$HOSTING_IPNS_HASH} \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
 
-printf "\nAdding the processed tmp directory to IPFS: be patient (it takes a few hours), and keep this terminal open\n"
+printf "\nAdding the processed tmp directory to IPFS\n(this part may take long time on a slow disk):\n"
 CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)
-MFS_DIR="/${ZIM_FILE}_$(date +%F_%T)"
+MFS_DIR="/${ZIM_FILE}__$(date +%F_%T)"
 
 # pin by adding to MFS under a meaningful name
 ipfs files cp /ipfs/$CID "$MFS_DIR"
 
-printf "\nThe root CID of $ZIM_FILE is:\n$CID\n"
-printf "\nSaved in MFS under:\n$MFS_DIR\n"
+printf "\n\n-------------------------\nD O N E !\n-------------------------\n"
+printf "MFS: $MFS_DIR\n"
+printf "CID: $CID"
+printf "\n-------------------------\n"
