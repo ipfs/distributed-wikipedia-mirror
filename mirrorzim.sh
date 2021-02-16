@@ -92,7 +92,8 @@ TMP_DIRECTORY="./tmp/$(echo $ZIM_FILE | cut -d'.' -f1)"
 # We use it as a hint  if tmpdir  should be purged or not
 
 printf "\nRemove any partial tmp directory $TMP_DIRECTORY before run ..."
-test -e $TMP_DIRECTORY/zimdump_version || rm -rf $TMP_DIRECTORY
+# so.. turns out rsync is the fastest: https://www.slashroot.in/which-is-the-fastest-method-to-delete-files-in-linux
+test -e $TMP_DIRECTORY/zimdump_version || (mkdir -p ./tmp/blank && rsync -a --delete ./tmp/blank/ $TMP_DIRECTORY ; rm -rf $TMP_DIRECTORY ./tmp/blank)
 
 printf "\nUnpack the zim file into $TMP_DIRECTORY if not there already...\n"
 test -e $TMP_DIRECTORY/zimdump_version || (zimdump dump ./snapshots/$ZIM_FILE --dir $TMP_DIRECTORY && zimdump --version > $TMP_DIRECTORY/zimdump_version)
