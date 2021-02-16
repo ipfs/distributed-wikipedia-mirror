@@ -82,16 +82,20 @@ if [ -z ${MAIN_PAGE_VERSION+x} ]; then
 	MAIN_PAGE_VERSION=""
 fi
 
+
 printf "\nDownload the zim file...\n"
 ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
 ZIM_FILE=$(echo $ZIM_FILE_SOURCE_URL | rev | cut -d'/' -f1 | rev)
 TMP_DIRECTORY="./tmp/$(echo $ZIM_FILE | cut -d'.' -f1)"
 
-printf "\nRemove tmp directory $TMP_DIRECTORY before run ..."
-rm -rf $TMP_DIRECTORY
+# Note: successful zimdump ends with creation of $TMP_DIRECTORY/zimdump_version
+# We use it as a hint  if tmpdir  should be purged or not
 
-printf "\nUnpack the zim file into $TMP_DIRECTORY...\n"
-zimdump dump ./snapshots/$ZIM_FILE --dir $TMP_DIRECTORY
+printf "\nRemove any partial tmp directory $TMP_DIRECTORY before run ..."
+test -e $TMP_DIRECTORY/zimdump_version || rm -rf $TMP_DIRECTORY
+
+printf "\nUnpack the zim file into $TMP_DIRECTORY if not there already...\n"
+test -e $TMP_DIRECTORY/zimdump_version || (zimdump dump ./snapshots/$ZIM_FILE --dir $TMP_DIRECTORY && zimdump --version > $TMP_DIRECTORY/zimdump_version)
 
 # Find the main page of ZIM
 ZIM_FILE_MAIN_PAGE=$(zimdump info ./snapshots/$ZIM_FILE | grep -oP 'main page: A/\K\S+')
@@ -107,6 +111,9 @@ node ./bin/run $TMP_DIRECTORY \
   ${HOSTING_DNS_DOMAIN:+--hostingdnsdomain=$HOSTING_DNS_DOMAIN} \
   ${HOSTING_IPNS_HASH:+--hostingipnshash=$HOSTING_IPNS_HASH} \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
+
+printf "\n-------------------------\n"
+printf "\nIPFS_PATH=$IPFS_PATH\n"
 
 printf "\nAdding the processed tmp directory to IPFS\n(this part may take long time on a slow disk):\n"
 CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)

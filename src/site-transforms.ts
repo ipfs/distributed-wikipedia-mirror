@@ -9,6 +9,8 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
+  closeSync,
+  openSync,
   unlinkSync,
   writeFileSync
 } from 'fs'
@@ -90,16 +92,23 @@ export const fixRedirects = async ({
   unpackedZimDir,
   wikiFolder
 }: Directories) => {
+  const done = `${unpackedZimDir}/redirects_fixed`
+  if (existsSync(done)) {
+    return
+  }
+
   cli.action.start('  Fixing redirects ')
   const fixupLog = `${unpackedZimDir}_redirect-fixups.log`
   if (existsSync(fixupLog)) {
     unlinkSync(fixupLog)
   }
+  const output = process.env.DEBUG ? `>> ${fixupLog}` : '> /dev/null'
   const util = require('util')
   const exec = util.promisify(require('child_process').exec)
   // redirect files are smaller than 1k so we can skip bigger ones, making the performance acceptable
-  const findRedirects = String.raw`find ${wikiFolder} -type f -size -800c -exec fgrep -l "0;url=A/" {} + -exec sed -i "s|0;url=A/|0;url=|" {} >> ${fixupLog} +`
+  const findRedirects = String.raw`find ${wikiFolder} -type f -size -800c -exec fgrep -l "0;url=A/" {} + -exec sed -i "s|0;url=A/|0;url=|" {} + ${output} || true`
   const { stdout, stderr } = await exec(findRedirects, {env: {'LC_ALL': 'C'}})
+  if (!stderr) closeSync(openSync(done, 'w'))
   cli.action.stop()
   if (stdout) console.log('redirect fix stdout:', stdout)
   if (stderr) console.error('redirect fix stderr:', stderr)
@@ -126,6 +135,10 @@ export const insertIndexRedirect = (options: Options) => {
 
   const indexPath = join(options.unpackedZimDir, 'index.html')
   const wikiIndexPath = join(options.unpackedZimDir, 'wiki', 'index.html')
+
+  if (existsSync(indexPath)) {
+    unlinkSync(indexPath)
+  }
 
   writeFileSync(
     indexPath,
