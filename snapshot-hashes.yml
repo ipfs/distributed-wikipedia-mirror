@@ -8,12 +8,6 @@ en:
   date: 2017-05-11
   ipns:
   ipfs: https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco
-ku:
-  name: Kurdish
-  original: ku.wikipedia.org
-  date: 2017-05-10
-  ipns:
-  ipfs: https://ipfs.io/ipfs/QmWY4KZXKTuspGSwYVDNbNLLZcmSiQ63Mdmz7eRd4KzBbb
 tr:
   name: Turkish
   original: tr.wikipedia.org
