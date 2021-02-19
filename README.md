@@ -210,6 +210,14 @@ node ./bin/run ./tmp/wikipedia_tr_all_maxi_2021-02 \
 
 ### Step 6: Import website directory to IPFS
 
+#### Increase the limitation of opening files
+
+In some cases, you will meet an error like `could not create socket: Too many open files` when you add files to the IPFS store. It happens when IPFS needs to open more files than it is allowed by the operating system and you can temporarily increase this limitation to avoid this error using this command.
+
+```sh
+ulimit -n 65536
+```
+
 #### Add immutable copy
 
 Add all the data to your node using `ipfs add`. Use the following command, replacing `$unpacked_wiki` with the path to the website that you created in Step 4 (`./tmp/wikipedia_en_all_maxi_2018-10`).
