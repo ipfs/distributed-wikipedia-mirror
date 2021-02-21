@@ -1,16 +1,17 @@
 import { exec } from 'child_process'
-import { Url } from 'url'
+import { URL } from 'url'
 
-export const downloadFile = (url: Url, dest: string) => {
+export const downloadFile = (url: URL, dest: string) => {
   return new Promise((resolve, reject) => {
-    const wget = `wget --continue -O "${dest}" "${url.href}"`
+    const wget = `wget --continue -O "${dest}" "${url}"`
 
-    exec(wget, err => {
+    exec(wget, (err, stdout, stderr) => {
       if (err) {
+        if (stderr) console.error(stderr)
         reject(err)
       }
 
-      resolve()
+      resolve(stdout)
     })
   })
 }

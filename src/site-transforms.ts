@@ -11,6 +11,7 @@ import {
   renameSync,
   closeSync,
   openSync,
+  opendirSync,
   unlinkSync,
   writeFileSync
 } from 'fs'
@@ -114,6 +115,42 @@ export const fixRedirects = async ({
   if (stderr) console.error('redirect fix stderr:', stderr)
 }
 
+// https://github.com/ipfs/distributed-wikipedia-mirror/issues/80
+export const fixExceptions = async ({
+  unpackedZimDir,
+  wikiFolder
+}: Directories) => {
+
+  /* TODO this needs more work
+  // Articles with "/" in namei like "foo/bar" produce conflicts and those are saved under
+  // url-escaped flat-files in exceptions directory
+  // What we do here is to take every "foo" exception and rename it to foo/index.html,
+  // so it loads fine under own name
+  const exceptionsDir = join(unpackedZimDir, '_exceptions')
+  if (!existsSync(exceptionsDir)) {
+    return
+  }
+  const dir = opendirSync(exceptionsDir)
+  for await (let file of dir) {
+    const articleName = decodeURIComponent(file.name)
+    console.log(articleName)
+    const segments = articleName.split('/')
+    if (segments[0] !== 'A') continue
+    segments[0] = 'wiki'
+
+    const articleDir = join(unpackedZimDir, ...segments)
+    if (!existsSync(articleDir)) {
+      // problem:  articleDir may not exist and neither its parent,
+      // and the root one is a file and not a dir (eg A/Australia/Foo/index.html blocked by A/Australia flat article)
+      mkdirSync(articleDir, { recursive: true })
+    }
+    const articleSrc = join(exceptionsDir, file.name)
+    const articleDest = join(articleDir, 'index.html')
+    renameSync(articleSrc, articleDest)
+  }
+  */
+  // TODO: remove _exceptions?
+}
 
 export const includeSourceZim = ({
   zimFile,
@@ -274,7 +311,7 @@ export const generateMainPage = async (
 
       // eslint-disable-next-line no-await-in-loop
       await downloadFile(
-        new URL(`http:${src}`),
+        new URL(src),
         join(imagesFolder, decodeURIComponent(filename))
       )
       $externalImage.attribs.src = `../I/${filename}`
