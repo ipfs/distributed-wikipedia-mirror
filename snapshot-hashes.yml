@@ -14,3 +14,9 @@ tr:
   date: 2021-02-19
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeieuutdavvf55sh3jktq2dpi2hkle6dtmebe7uklod3ramihyf3xa4
+my:
+  name: Myanmar
+  original: my.wikipedia.org
+  date: 2021-02-22
+  ipns:
+  ipfs: https://dweb.link/ipfs/bafybeib66xujztkiq7lqbupfz6arzhlncwagva35dx54nj7ipyoqpyozhy
