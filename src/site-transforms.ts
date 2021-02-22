@@ -6,6 +6,7 @@ import {
   existsSync,
   lstatSync,
   mkdirSync,
+  rmdirSync,
   readdirSync,
   readFileSync,
   renameSync,
@@ -219,9 +220,7 @@ export const generateMainPage = async (
   options: Options,
   { wikiFolder, imagesFolder }: Directories
 ) => {
-  const kiwixMainpage = readFileSync(
-    join(wikiFolder, `${options.kiwixMainPage}`)
-  )
+
 
   // We copy "kiwix main page" to /wiki/index.html
   // This way original one can still be loaded if needed
@@ -231,6 +230,21 @@ export const generateMainPage = async (
   const mainPagePath = join(wikiFolder, 'index.html')
 
   cli.action.start(`  Generating main page into ${mainPagePath} `)
+
+  const kiwixMainPageSrc = join(wikiFolder, `${options.kiwixMainPage}`)
+
+  // This is a crude fix that replaces exploded dir with single html
+  // just to fix main pages that happen to end up in _exceptions.
+  // A proper fix is needed for regular articles:  https://github.com/ipfs/distributed-wikipedia-mirror/issues/80
+  if (lstatSync(kiwixMainPageSrc).isDirectory()) {
+    const exceptionsPage = join(options.unpackedZimDir, '_exceptions', `A%2f${options.kiwixMainPage}`)
+    if (existsSync(exceptionsPage)) {
+      rmdirSync(kiwixMainPageSrc, { recursive: true })
+      renameSync(exceptionsPage, kiwixMainPageSrc)
+    }
+  }
+
+  const kiwixMainpage = readFileSync(kiwixMainPageSrc)
 
   const $kiwixMainPageHtml = cheerio.load(kiwixMainpage.toString())
 
@@ -311,7 +325,7 @@ export const generateMainPage = async (
 
       // eslint-disable-next-line no-await-in-loop
       await downloadFile(
-        new URL(src),
+        new URL(`http:${src}`),
         join(imagesFolder, decodeURIComponent(filename))
       )
       $externalImage.attribs.src = `../I/${filename}`
