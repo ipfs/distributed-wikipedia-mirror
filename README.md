@@ -283,7 +283,7 @@ $ ipfs resolve -r /ipns/tr.wikipedia-on-ipfs.org
 /ipfs/bafy..
 ```
 
-CID can then be opened via `ipfs://bafy..` in a web browser with [IPFS Companion](https://github.com/ipfs-shipyard/ipfs-desktop) extension
+CID can then be opened via `ipfs://bafy..` in a web browser with [IPFS Companion](https://github.com/ipfs-shipyard/ipfs-companion) extension
 resolving IPFS addresses via [IPFS Desktop](https://docs.ipfs.io/install/ipfs-desktop/) node.
 
 You can also try [Brave browser](https://brave.com), which ships with [native support for IPFS](https://brave.com/ipfs-support/).
