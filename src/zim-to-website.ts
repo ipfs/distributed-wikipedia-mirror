@@ -7,6 +7,7 @@ import {
   copyImageAssetsIntoWiki,
   fixFavicon,
   fixRedirects,
+  fixExceptions,
   generateMainPage,
   insertIndexRedirect,
   moveArticleFolderToWiki,
@@ -48,6 +49,7 @@ export const zimToWebsite = async (options: Options) => {
   copyImageAssetsIntoWiki('./assets', directories)
   fixFavicon(directories)
   moveArticleFolderToWiki(directories)
+  await fixExceptions(directories)
   await fixRedirects(directories)
   insertIndexRedirect(options)
   appendJavascript(options, directories)

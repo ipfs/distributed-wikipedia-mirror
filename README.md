@@ -7,7 +7,7 @@
 Putting Wikipedia Snapshots on IPFS and working towards making it fully read-write.
 <br />
 <br />
- Existing Mirrors: https://en.wikipedia-on-ipfs.org, https://tr.wikipedia-on-ipfs.org
+ Existing Mirrors: https://en.wikipedia-on-ipfs.org, https://tr.wikipedia-on-ipfs.org, https://my.wikipedia-on-ipfs.org
 </p>
 
 - [Purpose](#purpose)
