@@ -103,23 +103,15 @@ It is advised to use separate IPFS node for this:
 
 ```console
 $ export IPFS_PATH=/path/to/IPFS_PATH_WIKIPEDIA_MIRROR
+$ ipfs init -p server,local-discovery,flatfs,randomports --empty-repo
 ```
 
-#### Bader datastore
+#### Tune datastore for speed
 
-Make sure repo is initialized with [datastore backed by BadgerDB](https://github.com/ipfs/go-ds-badger) for improved performance: 
+Make sure repo uses `flatfs` datastore with `sync` set to `false` for improved performance.
 
-```
-ipfs init -p badgerds --empty-repo
-```
-
-
-Existing repository can be converted to badgerds with [ipfs-ds-convert](https://github.com/ipfs/ipfs-ds-convert):
-
-```sh
-$ ipfs config profile apply badgerds
-$ ipfs-ds-convert convert
-```
+**NOTE:** While badgerv1 datastore _is_ faster, we avoid using it with bigger builds like English because of [memory issues due to the number of files](https://github.com/ipfs/distributed-wikipedia-mirror/issues/85).
+With `flatfs` having `sync` set to `false` and a fast SSD one should be able to import 300GB of English wikipedia under 5 hours, which is still acceptable, and way easier on CPU/memory.
 
 #### Enable HAMT sharding
 
