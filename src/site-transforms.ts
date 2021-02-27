@@ -188,6 +188,14 @@ export const resolveDirectories = (options: Options) => {
   return directories
 }
 
+
+// This is usually not used nor needed, but we keep this code around
+// in case we need to generate some language quickly and there is a bug in ZIM
+// that makes main page unusable.
+// With this, we are able to fetch corresponding revision from upstream wikipedia
+// and replace ZIM article with upstream one + fixup links and images.
+// (This is no longer needed for most ZIMs after we switched to upstream zim-tools)
+/*
 export const generateMainPage = async (
   options: Options,
   { wikiFolder, imagesFolder }: Directories
@@ -355,6 +363,7 @@ export const generateMainPage = async (
     cli.error(error)
   }
 }
+*/
 
 export const appendJavscript = (
   options: Options,
