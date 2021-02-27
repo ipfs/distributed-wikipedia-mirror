@@ -82,8 +82,11 @@ if [ -z ${MAIN_PAGE_VERSION+x} ]; then
 	MAIN_PAGE_VERSION=""
 fi
 
+printf "\nEnsure zimdump is present...\n"
+PATH=$PATH:$(realpath ./bin)
+which zimdump &> /dev/null || (curl --progress-bar -L https://ipfs.io/ipfs/bafybeialu4jsuhs3c3po7juutkwow6kdxeieqcbd6ipjc2tg7qqu7rmsm4 -o ./bin/zimdump && chmod +x ./bin/zimdump)
 
-printf "\nDownload the zim file...\n"
+printf "\nDownload and verify the zim file...\n"
 ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
 ZIM_FILE=$(echo $ZIM_FILE_SOURCE_URL | rev | cut -d'/' -f1 | rev)
 TMP_DIRECTORY="./tmp/$(echo $ZIM_FILE | cut -d'.' -f1)"

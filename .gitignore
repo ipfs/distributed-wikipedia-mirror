@@ -17,3 +17,5 @@ notes.md
 node_modules
 /zim-tools
 /kiwix-tools
+
+bin/zimdump
