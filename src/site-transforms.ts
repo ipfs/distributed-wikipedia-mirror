@@ -148,7 +148,13 @@ export const fixExceptions = async ({
   }
   const dir = opendirSync(exceptionsDir)
   for await (let file of dir) {
-    const articleName = decodeURIComponent(file.name)
+    let articleName
+    try {
+      articleName = decodeURIComponent(file.name)
+    } catch (e) {
+      console.error(`unable to decodeURIComponent(${file.name}): `, e)
+      continue
+    }
     const segments = articleName.split('/')
 
     // only process exceptions from A/ namespace
