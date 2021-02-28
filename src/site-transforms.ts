@@ -25,6 +25,7 @@ import {
   appendHtmlPostfix,
   makeScriptLinksRelativeToWiki,
   moveRelativeLinksUpOneLevel,
+  moveRelativeLinksDownOneLevel,
   prefixRelativeRoot,
   reworkLinks,
   reworkScriptSrcs
@@ -122,7 +123,21 @@ export const fixExceptions = async ({
   wikiFolder
 }: Directories) => {
 
-  /* TODO this needs more work
+  /*
+    for every FOO directory in wiki/FOO
+      find article _exceptions/A%2fFOO
+        if exists, move it to wiki/FOO/index.html
+
+    for every file matching _exceptions/A%2f*
+      split name into segments
+        for each but the last segment
+          check if wiki/FOO exists,
+            if exists and is a directory, do nothing
+            if does not exist, create a dir
+            if exists, but is a file, replace file with a dir, and move file to  FOO/index.html
+        finally, write last segment under wiki/FOO/bar
+  */
+
   // Articles with "/" in namei like "foo/bar" produce conflicts and those are saved under
   // url-escaped flat-files in exceptions directory
   // What we do here is to take every "foo" exception and rename it to foo/index.html,
@@ -134,22 +149,77 @@ export const fixExceptions = async ({
   const dir = opendirSync(exceptionsDir)
   for await (let file of dir) {
     const articleName = decodeURIComponent(file.name)
-    console.log(articleName)
     const segments = articleName.split('/')
-    if (segments[0] !== 'A') continue
-    segments[0] = 'wiki'
 
-    const articleDir = join(unpackedZimDir, ...segments)
-    if (!existsSync(articleDir)) {
-      // problem:  articleDir may not exist and neither its parent,
-      // and the root one is a file and not a dir (eg A/Australia/Foo/index.html blocked by A/Australia flat article)
-      mkdirSync(articleDir, { recursive: true })
+    // only process exceptions from A/ namespace
+    if (segments[0] !== 'A') continue
+    segments.shift() // remove A/
+
+    // only process exceptions where segments have 1+ length
+    // and can be represented as directories
+    if (!segments.length || segments.some(s => !s.length)) continue
+
+    console.log('processing: ' + articleName)
+    const suffixFile = segments.pop() || ''
+
+    // creation of index.html breaks links created by zimdump:
+    // needs manual adjustment of relative links to be prefixed with ../
+    const fixRelativeLinks = (filePath: string, depth: number) => {
+      const fileBytes = readFileSync(filePath)
+      const $fileHtml = cheerio.load(fileBytes.toString())
+
+      const linkFixups = Array.from({ length: depth }, (x, i) => moveRelativeLinksDownOneLevel)
+      reworkLinks($fileHtml, 'a:not(a[href^="http"]):not(a[href^="//"])', linkFixups)
+      reworkLinks($fileHtml, 'link[href^="../"]', linkFixups)
+      reworkScriptSrcs($fileHtml, 'img', linkFixups)
+      reworkScriptSrcs($fileHtml, 'script', linkFixups)
+
+      console.log(`    fixed relative paths in ${filePath}`)
+      renameSync(filePath, `${filePath}.original`)
+      writeFileSync(filePath, $fileHtml.html())
     }
+
+    // if article is not A/foo but A/FOO/bar parent dirs need to be inspected
+    if (segments.length) {
+      // ensure dir at each level exists and has no conflict
+      for (let i = 1; i < segments.length+1; i++) {
+        const parentDir = join(wikiFolder, ...segments.slice(0,i))
+        console.log(' checking parentDir: ' + parentDir)
+        if (existsSync(parentDir)) {
+          if (lstatSync(parentDir).isFile()) {
+            // If a file exists under the name of a directory we need,
+            // move file into a newly created dir
+            const articleTmp = `${parentDir}.tmp`
+            const articleDst = join(parentDir, 'index.html')
+            console.log(`  parentDir is a file, renaming to ${articleDst}`)
+            renameSync(parentDir, articleTmp)
+            mkdirSync(parentDir, { recursive: true })
+            renameSync(articleTmp, articleDst)
+            fixRelativeLinks(articleDst, i)
+          }
+        } else {
+          console.log(`  created parentDir`)
+          mkdirSync(parentDir, { recursive: true })
+        }
+      }
+    }
+
     const articleSrc = join(exceptionsDir, file.name)
-    const articleDest = join(articleDir, 'index.html')
-    renameSync(articleSrc, articleDest)
-  }
-  */
+    const articleDir = join(wikiFolder, ...segments)
+    const articleDst = join(articleDir, suffixFile)
+
+    console.log(` renaming ${articleSrc}`)
+
+    if (existsSync(articleDst) && lstatSync(articleDst).isDirectory()) {
+        console.log(`  directory already, renaming to ${articleDst}/index.html`)
+        const movedArticleDst = join(articleDst, 'index.html')
+        renameSync(articleSrc, movedArticleDst)
+        fixRelativeLinks(movedArticleDst, 1)
+      } else {
+        console.log(`  renamed to ${articleDst}`)
+        renameSync(articleSrc, articleDst)
+      }
+    }
   // TODO: remove _exceptions?
 }
 
@@ -223,7 +293,6 @@ export const resolveDirectories = (options: Options) => {
 // With this, we are able to fetch corresponding revision from upstream wikipedia
 // and replace ZIM article with upstream one + fixup links and images.
 // (This is no longer needed for most ZIMs after we switched to upstream zim-tools)
-/*
 export const generateMainPage = async (
   options: Options,
   { wikiFolder, imagesFolder }: Directories
@@ -237,7 +306,7 @@ export const generateMainPage = async (
   // /wiki/Anasayfa is https://tr.wikipedia.org/wiki/Anasayfa
   const mainPagePath = join(wikiFolder, 'index.html')
 
-  cli.action.start(`  Generating main page into ${mainPagePath} `)
+  cli.action.start(`  Generating main page into /wiki/`)
 
   const kiwixMainPageSrc = join(wikiFolder, `${options.kiwixMainPage}`)
 
@@ -248,9 +317,15 @@ export const generateMainPage = async (
     const exceptionsPage = join(options.unpackedZimDir, '_exceptions', `A%2f${options.kiwixMainPage}`)
     if (existsSync(exceptionsPage)) {
       rmdirSync(kiwixMainPageSrc, { recursive: true })
-      renameSync(exceptionsPage, kiwixMainPageSrc)
+      copyFileSync(exceptionsPage, kiwixMainPageSrc)
     }
   }
+
+  cli.action.stop()
+
+/*
+
+  cli.action.start(`  Generating main page into ${mainPagePath} `)
 
   const kiwixMainpage = readFileSync(kiwixMainPageSrc)
 
@@ -390,8 +465,8 @@ export const generateMainPage = async (
   } catch (error) {
     cli.error(error)
   }
+  */
 }
-*/
 
 export const appendJavscript = (
   options: Options,
