@@ -84,7 +84,7 @@ fi
 
 printf "\nEnsure zimdump is present...\n"
 PATH=$PATH:$(realpath ./bin)
-which zimdump &> /dev/null || (curl --progress-bar -L https://ipfs.io/ipfs/bafybeialu4jsuhs3c3po7juutkwow6kdxeieqcbd6ipjc2tg7qqu7rmsm4 -o ./bin/zimdump && chmod +x ./bin/zimdump)
+which zimdump &> /dev/null || (curl --progress-bar -L https://ipfs.io/ipfs/bafybeibotxexiycu4luq7b6d6sh3oi2t2cvpvbimms6rpmbalbbyfrddyq -o ./bin/zimdump && chmod +x ./bin/zimdump)
 
 printf "\nDownload and verify the zim file...\n"
 ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
