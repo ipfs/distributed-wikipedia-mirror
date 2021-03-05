@@ -8,6 +8,7 @@ import {
   fixFavicon,
   fixExceptions,
   // generateMainPage,
+  useKiwixLandingPage,
   insertIndexRedirect,
   moveArticleFolderToWiki,
   resolveDirectories
@@ -51,7 +52,9 @@ export const zimToWebsite = async (options: Options) => {
   await fixExceptions(directories)
   insertIndexRedirect(options)
   appendJavascript(options, directories)
-  // usually main page is ok, so we dont need below
+  await useKiwixLandingPage(options, directories)
+
+  // usually main page from kiwix is ok, so we dont need below
   // await generateMainPage(options, directories)
 
   cli.log('done')
