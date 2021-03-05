@@ -25,6 +25,7 @@ import {
   appendHtmlPostfix,
   makeScriptLinksRelativeToWiki,
   moveRelativeLinksUpOneLevel,
+  moveRelativeLinksDownOneLevel,
   prefixRelativeRoot,
   reworkLinks,
   reworkScriptSrcs
@@ -94,7 +95,21 @@ export const fixExceptions = async ({
   wikiFolder
 }: Directories) => {
 
-  /* TODO this needs more work
+  /*
+    for every FOO directory in wiki/FOO
+      find article _exceptions/A%2fFOO
+        if exists, move it to wiki/FOO/index.html
+
+    for every file matching _exceptions/A%2f*
+      split name into segments
+        for each but the last segment
+          check if wiki/FOO exists,
+            if exists and is a directory, do nothing
+            if does not exist, create a dir
+            if exists, but is a file, replace file with a dir, and move file to  FOO/index.html
+        finally, write last segment under wiki/FOO/bar
+  */
+
   // Articles with "/" in namei like "foo/bar" produce conflicts and those are saved under
   // url-escaped flat-files in exceptions directory
   // What we do here is to take every "foo" exception and rename it to foo/index.html,
@@ -105,23 +120,84 @@ export const fixExceptions = async ({
   }
   const dir = opendirSync(exceptionsDir)
   for await (let file of dir) {
-    const articleName = decodeURIComponent(file.name)
-    console.log(articleName)
-    const segments = articleName.split('/')
-    if (segments[0] !== 'A') continue
-    segments[0] = 'wiki'
-
-    const articleDir = join(unpackedZimDir, ...segments)
-    if (!existsSync(articleDir)) {
-      // problem:  articleDir may not exist and neither its parent,
-      // and the root one is a file and not a dir (eg A/Australia/Foo/index.html blocked by A/Australia flat article)
-      mkdirSync(articleDir, { recursive: true })
+    let articleName
+    try {
+      articleName = decodeURIComponent(file.name)
+    } catch (e) {
+      console.error(`[fixExceptions] unable to decodeURIComponent(${file.name}), skipping `)
+      continue
     }
+    const segments = articleName.split('/')
+
+    // only process exceptions from A/ namespace
+    if (segments[0] !== 'A') continue
+    segments.shift() // remove A/
+
+    // only process exceptions where segments have 1+ length
+    // and can be represented as directories
+    if (!segments.length || segments.some(s => !s.length)) continue
+
+    // console.log('processing: ' + articleName)
+    const suffixFile = segments.pop() || ''
+
+    // creation of index.html breaks links created by zimdump:
+    // needs manual adjustment of relative links to be prefixed with ../
+    const fixRelativeLinks = (filePath: string, depth: number) => {
+      const fileBytes = readFileSync(filePath)
+      const $fileHtml = cheerio.load(fileBytes.toString())
+
+      const linkFixups = Array.from({ length: depth }, (x, i) => moveRelativeLinksDownOneLevel)
+      reworkLinks($fileHtml, 'a:not(a[href^="http"]):not(a[href^="//"])', linkFixups)
+      reworkLinks($fileHtml, 'link[href^="../"]', linkFixups)
+      reworkScriptSrcs($fileHtml, 'img', linkFixups)
+      reworkScriptSrcs($fileHtml, 'script', linkFixups)
+
+      // console.log(`    fixed relative paths in ${filePath}`)
+      // renameSync(filePath, `${filePath}.original`)
+      writeFileSync(filePath, $fileHtml.html())
+    }
+
+    // if article is not A/foo but A/FOO/bar parent dirs need to be inspected
+    if (segments.length) {
+      // ensure dir at each level exists and has no conflict
+      for (let i = 1; i < segments.length+1; i++) {
+        const parentDir = join(wikiFolder, ...segments.slice(0,i))
+        // console.log(' checking parentDir: ' + parentDir)
+        if (existsSync(parentDir)) {
+          if (lstatSync(parentDir).isFile()) {
+            // If a file exists under the name of a directory we need,
+            // move file into a newly created dir
+            const articleTmp = `${parentDir}.tmp`
+            const articleDst = join(parentDir, 'index.html')
+            // console.log(`  parentDir is a file, renaming to ${articleDst}`)
+            renameSync(parentDir, articleTmp)
+            mkdirSync(parentDir, { recursive: true })
+            renameSync(articleTmp, articleDst)
+            fixRelativeLinks(articleDst, i)
+          }
+        } else {
+          // console.log(`  created parentDir`)
+          mkdirSync(parentDir, { recursive: true })
+        }
+      }
+    }
+
     const articleSrc = join(exceptionsDir, file.name)
-    const articleDest = join(articleDir, 'index.html')
-    renameSync(articleSrc, articleDest)
-  }
-  */
+    const articleDir = join(wikiFolder, ...segments)
+    const articleDst = join(articleDir, suffixFile)
+
+    // console.log(` renaming ${articleSrc}`)
+
+    if (existsSync(articleDst) && lstatSync(articleDst).isDirectory()) {
+        // console.log(`  directory already, renaming to ${articleDst}/index.html`)
+        const movedArticleDst = join(articleDst, 'index.html')
+        renameSync(articleSrc, movedArticleDst)
+        fixRelativeLinks(movedArticleDst, 1)
+      } else {
+        // console.log(`  renamed to ${articleDst}`)
+        renameSync(articleSrc, articleDst)
+      }
+    }
   // TODO: remove _exceptions?
 }
 
@@ -161,6 +237,8 @@ export const insertIndexRedirect = (options: Options) => {
     unlinkSync(wikiIndexPath)
   }
 
+  // note that this is temporary stub, we most likely
+  // override this template with a better landing during later steps
   writeFileSync(
     wikiIndexPath,
     template({
@@ -188,7 +266,91 @@ export const resolveDirectories = (options: Options) => {
   return directories
 }
 
-export const generateMainPage = async (
+// Gets path to an article after unpacking and fixExceptions fixups
+const unpackedArticlePath = (wikiFolder: string, article: string) => {
+  let articlePath = join(wikiFolder, article)
+  if (!existsSync(articlePath)) throw new Error(`unpacked '/wiki/${article}' is missing`)
+  if (lstatSync(articlePath).isDirectory()) {
+    const fixedSrc = join(articlePath, 'index.html')
+    if (existsSync(fixedSrc)) {
+      return fixedSrc
+    } else {
+      throw new Error(`unpacked '/wiki/${article}' is a dir without index.html`)
+    }
+  }
+  return articlePath
+}
+
+
+// We copy "kiwix main page" to /wiki/index.html + adjust links.
+// This way original one can still be loaded if needed
+// Example for tr:
+// /wiki/index.html is https://tr.wikipedia.org/wiki/Kullanıcı:The_other_Kiwix_guy/Landing
+// /wiki/Anasayfa is https://tr.wikipedia.org/wiki/Anasayfa
+export const useKiwixLandingPage = async (
+  options: Options,
+  { wikiFolder, imagesFolder }: Directories
+) => {
+
+  cli.action.start(`  Generating landing page at /wiki/ from Kiwix one at /wiki/${options.kiwixMainPage}`)
+
+  const landingPagePath = join(wikiFolder, 'index.html')
+  const originalMainPageSrc = unpackedArticlePath(wikiFolder, options.mainPage)
+  const kiwixMainPageSrc = unpackedArticlePath(wikiFolder, options.kiwixMainPage)
+
+  // Use main page from Kiwix as the landing:
+  // In most cases it is already the best landing available
+  copyFileSync(kiwixMainPageSrc, landingPagePath)
+
+  // Tweak page title of custom landing created by The_other_Kiwix_guy :-)
+  if (kiwixMainPageSrc.includes('The_other_Kiwix_guy') && existsSync(originalMainPageSrc)) {
+    // Set title to one from canonical main page
+    const $landingHtml = cheerio.load(readFileSync(landingPagePath).toString())
+    const canonicalUrlString = $landingHtml('link[rel="canonical"]').attr('href')
+    if (!canonicalUrlString) {
+      throw new Error(`Could not parse out canonical url for ${canonicalUrlString}`)
+    }
+    const canonicalUrl = new URL(canonicalUrlString)
+    canonicalUrl.pathname = `wiki/${options.mainPage}`
+    const response = await fetch(canonicalUrl)
+    const pageBody = await response.text()
+    const $remoteMainPageHtml = cheerio.load(pageBody)
+    const pageTitle = $remoteMainPageHtml('title').text()
+    $landingHtml('title').text(pageTitle)
+    writeFileSync(landingPagePath, $landingHtml.html())
+  }
+
+  // Fixup relative paths, if needed
+  const depth = (options.kiwixMainPage.match(/\//g) || []).length
+  if (depth) {
+    const fixRelativeLinksUp = (filePath: string, depth: number) => {
+      const fileBytes = readFileSync(filePath)
+      const $fileHtml = cheerio.load(fileBytes.toString())
+
+      const linkFixups = Array.from({ length: depth }, (x, i) => moveRelativeLinksUpOneLevel)
+      reworkLinks($fileHtml, 'a:not(a[href^="http"]):not(a[href^="//"])', linkFixups)
+      reworkLinks($fileHtml, 'link[href^="../"]', linkFixups)
+      reworkScriptSrcs($fileHtml, 'img', linkFixups)
+      reworkScriptSrcs($fileHtml, 'script', linkFixups)
+
+      // console.log(`    fixed relative paths in ${filePath}`)
+      // renameSync(filePath, `${filePath}.original`)
+      writeFileSync(filePath, $fileHtml.html())
+    }
+    fixRelativeLinksUp(landingPagePath, depth)
+  }
+
+  cli.action.stop()
+}
+
+// This is usually not used nor needed, but we keep this code around
+// in case we need to generate some language quickly and there is a bug in ZIM
+// that makes main page unusable.
+// With this, we are able to fetch corresponding revision from upstream wikipedia
+// and replace ZIM article with upstream one + fixup links and images.
+// (This is no longer needed for most ZIMs after we switched to upstream zim-tools)
+/*
+export const fetchOriginalMainPage = async (
   options: Options,
   { wikiFolder, imagesFolder }: Directories
 ) => {
@@ -201,18 +363,17 @@ export const generateMainPage = async (
   // /wiki/Anasayfa is https://tr.wikipedia.org/wiki/Anasayfa
   const mainPagePath = join(wikiFolder, 'index.html')
 
-  cli.action.start(`  Generating main page into ${mainPagePath} `)
+  cli.action.start(`  Generating main page into /wiki/`)
 
-  const kiwixMainPageSrc = join(wikiFolder, `${options.kiwixMainPage}`)
+  let kiwixMainPageSrc = join(wikiFolder, `${options.kiwixMainPage}`)
 
-  // This is a crude fix that replaces exploded dir with single html
-  // just to fix main pages that happen to end up in _exceptions.
-  // A proper fix is needed for regular articles:  https://github.com/ipfs/distributed-wikipedia-mirror/issues/80
+  // Handle namespace conflicts resolved in fixExceptions step
   if (lstatSync(kiwixMainPageSrc).isDirectory()) {
-    const exceptionsPage = join(options.unpackedZimDir, '_exceptions', `A%2f${options.kiwixMainPage}`)
-    if (existsSync(exceptionsPage)) {
-      rmdirSync(kiwixMainPageSrc, { recursive: true })
-      renameSync(exceptionsPage, kiwixMainPageSrc)
+    const fixedSrc = `${kiwixMainPageSrc}/index.html`
+    if (existsSync(fixedSrc)) {
+      kiwixMainPageSrc = fixedSrc
+    } else {
+      throw new Error(`kiwixMainPageSrc "${kiwixMainPageSrc}" is a dir without index.html`)
     }
   }
 
@@ -255,7 +416,7 @@ export const generateMainPage = async (
     const $remoteMainPageHtml = cheerio.load(pageBody)
 
     const $remoteContent = $remoteMainPageHtml('#content')
-    const remotePageTitle = $remoteMainPageHtml('title').text()
+    const remotePageTitle = $remoteMainPageHtml('title').text().replace(':The other Kiwix guy/', '')
 
     $remoteContent.addClass('content')
     $remoteContent.find('#siteNotice').remove()
@@ -355,6 +516,7 @@ export const generateMainPage = async (
     cli.error(error)
   }
 }
+*/
 
 export const appendJavscript = (
   options: Options,

@@ -7,7 +7,8 @@ import {
   copyImageAssetsIntoWiki,
   fixFavicon,
   fixExceptions,
-  generateMainPage,
+  // generateMainPage,
+  useKiwixLandingPage,
   insertIndexRedirect,
   moveArticleFolderToWiki,
   resolveDirectories
@@ -24,8 +25,8 @@ export const zimToWebsite = async (options: Options) => {
   cli.log('-------------------------')
   cli.log(`  Unpacked Zim Directory: ${options.unpackedZimDir}`)
   cli.log(`                Zim File: ${options.zimFile}`)
-  cli.log(`               Main Page: ${options.mainPage}`)
-  cli.log(`         Kiwix Main Page: ${options.kiwixMainPage}`)
+  cli.log(`      Original Main Page: ${options.mainPage ? decodeURIComponent(options.mainPage) : null}`)
+  cli.log(`         ZIM's Main Page: ${options.kiwixMainPage}`)
 
   if (options.hostingDNSDomain) {
     cli.log(`      Hosting DNS Domain: ${options.hostingDNSDomain}`)
@@ -51,7 +52,10 @@ export const zimToWebsite = async (options: Options) => {
   await fixExceptions(directories)
   insertIndexRedirect(options)
   appendJavascript(options, directories)
-  await generateMainPage(options, directories)
+  await useKiwixLandingPage(options, directories)
+
+  // usually main page from kiwix is ok, so we dont need below
+  // await generateMainPage(options, directories)
 
   cli.log('done')
 }

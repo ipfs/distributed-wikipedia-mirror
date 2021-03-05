@@ -59,6 +59,9 @@ export const moveRelativeLinksUpOneLevel = (href: string) => {
 }
 
 export const moveRelativeLinksDownOneLevel = (href: string) => {
+  if (!(href.startsWith('../') || href.startsWith('http') || href.startsWith('//'))) {
+    return `../${href}`
+  }
   return href.replace('../', '../../')
 }
 

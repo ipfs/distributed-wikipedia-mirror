@@ -239,7 +239,7 @@ cmd_download_url() {
   log "URL: $URL"
 
   # below is a mixture of https://stackoverflow.com/a/19841872/3990041, my knowledge and guesswork :P
-  SHA256=$(curl -sI "$URL" | grep digest | grep "SHA-256" | sed "s|digest: SHA-256=||g" | base64 -d | od -t x1 -An | tr "\n" " " | sed "s| ||g")
+  SHA256=$(curl -sI "$URL" | grep digest | grep "SHA-256" | sed "s|digest: SHA-256=||g" | base64 -d -i | od -t x1 -An | tr "\n" " " | sed "s| ||g")
 
   log "SHA256: $SHA256"
 }
@@ -257,7 +257,7 @@ cmd_download() {
 
   dl_cycle() {
     log "Downloading $OUTNAME..."
-    wget --continue -P ./snapshots "$URL"
+    wget --continue -q --show-progress --progress=bar:force -P ./snapshots "$URL"
     return $?
   }
 
