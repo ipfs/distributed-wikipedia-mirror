@@ -295,7 +295,6 @@ export const useKiwixLandingPage = async (
   cli.action.start(`  Generating landing page at /wiki/ from Kiwix one at /wiki/${options.kiwixMainPage}`)
 
   const landingPagePath = join(wikiFolder, 'index.html')
-  const originalMainPageSrc = unpackedArticlePath(wikiFolder, options.mainPage)
   const kiwixMainPageSrc = unpackedArticlePath(wikiFolder, options.kiwixMainPage)
 
   // Use main page from Kiwix as the landing:
@@ -303,7 +302,7 @@ export const useKiwixLandingPage = async (
   copyFileSync(kiwixMainPageSrc, landingPagePath)
 
   // Tweak page title of custom landing created by The_other_Kiwix_guy :-)
-  if (kiwixMainPageSrc.includes('The_other_Kiwix_guy') && existsSync(originalMainPageSrc)) {
+  if (kiwixMainPageSrc.includes('The_other_Kiwix_guy')) {
     // Set title to one from canonical main page
     const $landingHtml = cheerio.load(readFileSync(landingPagePath).toString())
     const canonicalUrlString = $landingHtml('link[rel="canonical"]').attr('href')
