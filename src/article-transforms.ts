@@ -130,3 +130,31 @@ export const reworkScriptSrcs = (
     attribs.src = src
   }
 }
+
+export const reworkRedirect = (
+  $html: any,
+  selector = 'meta[http-equiv="refresh"]',
+  fns: ((href: string) => string)[] = [
+    moveRelativeLinksDownOneLevel
+  ]
+) => {
+  const redirects = $html(selector)
+
+  for (const redirect of Object.values<any>(redirects)) {
+    const attribs = redirect.attribs
+
+    if (!attribs || !attribs.content) {
+      continue
+    }
+
+    let { content } = attribs
+
+    let [ delay, url ] = content.split(';url=')
+
+    for (const fn of fns) {
+      url = fn(url)
+    }
+
+    attribs.content = `${delay};url=${url}`
+  }
+}
