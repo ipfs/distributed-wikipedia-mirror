@@ -28,7 +28,8 @@ import {
   moveRelativeLinksDownOneLevel,
   prefixRelativeRoot,
   reworkLinks,
-  reworkScriptSrcs
+  reworkScriptSrcs,
+  reworkRedirect
 } from './article-transforms'
 import { Directories, Options } from './domain'
 import { downloadFile } from './utils/download-file'
@@ -151,6 +152,7 @@ export const fixExceptions = async ({
       reworkLinks($fileHtml, 'link[href^="../"]', linkFixups)
       reworkScriptSrcs($fileHtml, 'img', linkFixups)
       reworkScriptSrcs($fileHtml, 'script', linkFixups)
+      reworkRedirect($fileHtml, 'meta[http-equiv="refresh"]', linkFixups)
 
       // console.log(`    fixed relative paths in ${filePath}`)
       // renameSync(filePath, `${filePath}.original`)
