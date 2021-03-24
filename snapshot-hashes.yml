@@ -20,3 +20,9 @@ my:
   date: 2021-02-22
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeib66xujztkiq7lqbupfz6arzhlncwagva35dx54nj7ipyoqpyozhy
+zh:
+  name: Chinese
+  original: zh.wikipedia.org
+  date: 2021-03-16
+  ipns:
+  ipfs: https://dweb.link/ipfs/bafybeiazgazbrj6qprr4y5hx277u4g2r5nzgo3jnxkhqx56doxdqrzms6y
