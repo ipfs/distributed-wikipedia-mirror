@@ -5,24 +5,35 @@
 en:
   name: English
   original: en.wikipedia.org
+  source:
   date: 2017-05-11
   ipns:
   ipfs: https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco
 tr:
   name: Turkish
   original: tr.wikipedia.org
+  source: wikipedia_tr_all_maxi_2021-02.zim
   date: 2021-02-19
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeieuutdavvf55sh3jktq2dpi2hkle6dtmebe7uklod3ramihyf3xa4
 my:
   name: Myanmar
   original: my.wikipedia.org
+  source: wikipedia_my_all_maxi_2021-02.zim
   date: 2021-02-22
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeib66xujztkiq7lqbupfz6arzhlncwagva35dx54nj7ipyoqpyozhy
 zh:
   name: Chinese
   original: zh.wikipedia.org
+  source: wikipedia_zh_all_maxi_2021-02.zim
   date: 2021-03-16
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeiazgazbrj6qprr4y5hx277u4g2r5nzgo3jnxkhqx56doxdqrzms6y
+ru:
+  name: Russian
+  original: ru.wikipedia.org
+  source: wikipedia_ru_all_maxi_2021-03.zim
+  date: 2021-03-25
+  ipns:
+  ipfs: https://dweb.link/ipfs/bafybeieto6mcuvqlechv4iadoqvnffondeiwxc2bcfcewhvpsd2odvbmvm
