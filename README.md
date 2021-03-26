@@ -13,6 +13,7 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 - https://en.wikipedia-on-ipfs.org
 - https://tr.wikipedia-on-ipfs.org
 - https://my.wikipedia-on-ipfs.org
+- https://ar.wikipedia-on-ipfs.org
 - https://zh.wikipedia-on-ipfs.org
 
 Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the footer.
