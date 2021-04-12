@@ -7,8 +7,19 @@
 Putting Wikipedia Snapshots on IPFS and working towards making it fully read-write.
 <br />
 <br />
- Existing Mirrors: https://en.wikipedia-on-ipfs.org, https://tr.wikipedia-on-ipfs.org, https://my.wikipedia-on-ipfs.org
-</p>
+
+## Existing Mirrors
+
+- https://en.wikipedia-on-ipfs.org
+- https://tr.wikipedia-on-ipfs.org
+- https://my.wikipedia-on-ipfs.org
+- https://ar.wikipedia-on-ipfs.org
+- https://zh.wikipedia-on-ipfs.org
+- https://ru.wikipedia-on-ipfs.org
+
+Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the footer.
+
+## Table of Contents
 
 - [Purpose](#purpose)
 - [How to add new Wikipedia snapshots to IPFS](#how-to-add-new-wikipedia-snapshots-to-ipfs)
@@ -275,7 +286,7 @@ $ ipfs resolve -r /ipns/tr.wikipedia-on-ipfs.org
 /ipfs/bafy..
 ```
 
-CID can then be opened via `ipfs://bafy..` in a web browser with [IPFS Companion](https://github.com/ipfs-shipyard/ipfs-desktop) extension
+CID can then be opened via `ipfs://bafy..` in a web browser with [IPFS Companion](https://github.com/ipfs-shipyard/ipfs-companion) extension
 resolving IPFS addresses via [IPFS Desktop](https://docs.ipfs.io/install/ipfs-desktop/) node.
 
 You can also try [Brave browser](https://brave.com), which ships with [native support for IPFS](https://brave.com/ipfs-support/).
