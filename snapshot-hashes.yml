@@ -20,6 +20,13 @@ my:
   date: 2021-02-22
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeib66xujztkiq7lqbupfz6arzhlncwagva35dx54nj7ipyoqpyozhy
+ar:
+  name: Arabic
+  original: ar.wikipedia.org
+  source: wikipedia_ar_all_maxi_2021-03.zim
+  date: 2021-03-26
+  ipns:
+  ipfs: https://dweb.link/ipfs/bafybeih4a6ylafdki6ailjrdvmr7o4fbbeceeeuty4v3qyyouiz5koqlpi
 zh:
   name: Chinese
   original: zh.wikipedia.org
