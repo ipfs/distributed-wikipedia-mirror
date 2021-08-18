@@ -44,3 +44,10 @@ ru:
   date: 2021-03-25
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeieto6mcuvqlechv4iadoqvnffondeiwxc2bcfcewhvpsd2odvbmvm
+fa:
+  name: Persian
+  original: fa.wikipedia.org
+  source: wikipedia_fa_all_maxi_2021-06.zim
+  date: 2021-08-18
+  ipns:
+  ipfs: https://dweb.link/ipfs/bafybeicpnshmz7lhp5vcowscty4v4br33cjv22nhhqestavb2mww6zbswm
