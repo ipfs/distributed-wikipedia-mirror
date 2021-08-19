@@ -15,7 +15,7 @@
     "cli-ux": "^5.4.4",
     "date-fns": "^2.10.0",
     "handlebars": "^4.7.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "tslib": "^2"
   },
   "devDependencies": {
