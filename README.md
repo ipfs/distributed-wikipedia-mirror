@@ -187,7 +187,7 @@ $ ./tools/find_main_page_name.sh tr.wikiquote.org
 Anasayfa
 ```
 
-To determine the main page in ZIM file open in in a [Kiwix reader](https://www.kiwix.org/en/kiwix-reader) or use `zimdump info` (version 2.2.0 or later) and ignore the `A/` prefix:
+To determine the main page in ZIM file open in in a [Kiwix reader](https://www.kiwix.org/en/kiwix-reader) or use `zimdump info` (version 3.0.0 or later) and ignore the `A/` prefix:
 
 ```console
 $ zimdump info wikipedia_tr_all_maxi_2021-01.zim
