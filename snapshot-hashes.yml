@@ -40,10 +40,10 @@ zh:
 ru:
   name: Russian
   original: ru.wikipedia.org
-  source: wikipedia_ru_all_maxi_2021-03.zim
-  date: 2021-03-25
+  source: wikipedia_ru_all_maxi_2022-02.zim
+  date: 2022-03-02
   ipns:
-  ipfs: https://dweb.link/ipfs/bafybeieto6mcuvqlechv4iadoqvnffondeiwxc2bcfcewhvpsd2odvbmvm
+  ipfs: https://dweb.link/ipfs/bafybeibhec35gm2xxrmq3dm2ww7h7jy2ucoq67ipecizw6aze2gj222nfa
 fa:
   name: Persian
   original: fa.wikipedia.org
