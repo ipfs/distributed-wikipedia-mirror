@@ -37,6 +37,13 @@ zh:
   date: 2021-03-16
   ipns:
   ipfs: https://dweb.link/ipfs/bafybeiazgazbrj6qprr4y5hx277u4g2r5nzgo3jnxkhqx56doxdqrzms6y
+uk:
+  name: Ukrainian
+  original: uk.wikipedia.org
+  source: wikipedia_uk_all_maxi_2022-03.zim
+  date: 2022-03-09
+  ipns:
+  ipfs: https://dweb.link/ipfs/bafybeibiqlrnmws6psog7rl5ofeci3ontraitllw6wyyswnhxbwdkmw4ka
 ru:
   name: Russian
   original: ru.wikipedia.org

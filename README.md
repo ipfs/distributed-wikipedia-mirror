@@ -15,6 +15,7 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 - https://my.wikipedia-on-ipfs.org
 - https://ar.wikipedia-on-ipfs.org
 - https://zh.wikipedia-on-ipfs.org
+- https://uk.wikipedia-on-ipfs.org
 - https://ru.wikipedia-on-ipfs.org
 - https://fa.wikipedia-on-ipfs.org
 
@@ -115,24 +116,31 @@ It is advised to use separate IPFS node for this:
 
 ```console
 $ export IPFS_PATH=/path/to/IPFS_PATH_WIKIPEDIA_MIRROR
-$ ipfs init -p server,local-discovery,badgerds,randomports --empty-repo
+$ ipfs init -p server,local-discovery,flatfs,randomports --empty-repo
+```
+
+#### Tune DHT for speed
+
+Wikipedia has a lot of blocks, to publish them as fast as possible,
+enable [Accelerated DHT Client](https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#accelerated-dht-client):
+
+```console
+$ ipfs config --json Experimental.AcceleratedDHTClient true
 ```
 
 #### Tune datastore for speed
 
-Make sure repo is initialized with datastore backed by `badgerds` for improved performance, or if you choose to use slower `flatfs` at least use it with  `sync` set to `false`.
+Make sure repo uses `flatfs` with  `sync` set to `false`:
 
-**NOTE:** While badgerv1 datastore _is_ faster, one may choose to avoid using it with bigger builds like English because of [memory issues due to the number of files](https://github.com/ipfs/distributed-wikipedia-mirror/issues/85). Potential workaround is to use [`filestore`](https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipfs-filestore) that avoids duplicating data and reuses unpacked files as-is.
-
-#### Enable HAMT sharding
-
-Configure your IPFS node to enable directory sharding
-
-```sh
-$ ipfs config --json 'Experimental.ShardingEnabled' true
+```console
+$ ipfs config --json 'Datastore.Spec.mounts' "$(ipfs config 'Datastore.Spec.mounts' | jq -c '.[0].child.sync=false')"
 ```
 
-This step won't be necessary when automatic sharding lands in go-ipfs (wip).
+**NOTE:** While badgerv1 datastore is faster is nome configurations, we choose to avoid using it with bigger builds like English because of [memory issues due to the number of files](https://github.com/ipfs/distributed-wikipedia-mirror/issues/85). Potential workaround is to use [`filestore`](https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipfs-filestore) that avoids duplicating data and reuses unpacked files as-is.
+
+#### HAMT sharding
+
+Make sure you use go-ipfs 0.12 or later, it has automatic sharding of big directories.
 
 ### Step 3: Download the latest snapshot from kiwix.org
 
