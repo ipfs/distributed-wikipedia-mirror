@@ -47,10 +47,10 @@ uk:
 ru:
   name: Russian
   original: ru.wikipedia.org
-  source: wikipedia_ru_all_maxi_2022-02.zim
-  date: 2022-03-02
+  source: wikipedia_ru_all_maxi_2022-03.zim
+  date: 2022-03-12
   ipns:
-  ipfs: https://dweb.link/ipfs/bafybeibhec35gm2xxrmq3dm2ww7h7jy2ucoq67ipecizw6aze2gj222nfa
+  ipfs: https://dweb.link/ipfs/bafybeiezqkklnjkqywshh4lg65xblaz2scbbdgzip4vkbrc4gn37horokq
 fa:
   name: Persian
   original: fa.wikipedia.org
