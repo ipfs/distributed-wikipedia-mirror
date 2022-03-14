@@ -1,0 +1,72 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      language-code:
+        description: 'the language of the wikimedia property e.g. tr - turkish, en - english'
+        required: true
+        default: 'en'
+      wiki-type:
+        description: 'the type of the wikimedia property e.g. wikipedia, wikiquote'
+        required: true
+        default: 'wikipedia'
+      tag:
+        description: 'the tag of the wikimedia property e.g. all, top'
+        required: true
+        default: 'all'
+      edition:
+        description: 'the edition of the wikimedia property e.g. maxi, mini'
+        required: true
+        default: 'maxi'
+      date:
+        description: 'the date of the wikimedia property e.g. latest'
+        required: true
+        default: 'latest'
+      hosting-dns-domain:
+        description: 'the DNS domain name the mirror will be hosted at e.g. tr.wikipedia-on-ipfs.org'
+        required: false
+        default: ''
+      hosting-ipns-hash:
+        description: 'the IPNS hash the mirror will be hosted at e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W'
+        required: false
+        default: ''
+      main-page-version:
+        description: 'an override hack used on Turkish Wikipedia, it sets the main page version as there are issues with the Kiwix version id'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_S3_BUCKET: wikipedia-on-ipfs
+      AWS_REGION: eu-central-1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          language-code: ${{ github.event.inputs.language-code }}
+          wiki-type: ${{ github.event.inputs.wiki-type }}
+          tag: ${{ github.event.inputs.tag }}
+          edition: ${{ github.event.inputs.edition }}
+          date: ${{ github.event.inputs.date }}
+          hosting-dns-domain: ${{ github.event.inputs.hosting-dns-domain }}
+          hosting-ipns-hash: ${{ github.event.inputs.hosting-ipns-hash }}
+          main-page-version: ${{ github.event.inputs.main-page-version }}
+      - run: |
+          sudo chown -R $USER tmp
+          cd tmp
+          for d in *; do
+            if [[ -d "${d}" ]]; then
+              echo "Processing ${d} ..."
+              tar -czf "${d}.tar.gz" "${d}"
+              aws s3 cp "${d}.tar.gz" "s3://${{ env.AWS_S3_BUCKET }}/website-packages/${d}.tar.gz" \
+                --acl 'public-read' --metadata "Name=${d},Url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              echo "::notice name=You can now publish $d::publish_website_from_s3.sh '${d}'"
+            fi
+          done
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
