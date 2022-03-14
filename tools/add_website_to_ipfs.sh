@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# This script adds website that was created at <unpacked zim dir>
+#  from <zim file name> to ipfs
+
 usage() {
 	echo "USAGE:"
 	echo "	$0 <zim file name> <unpacked zim dir> [<extra ipfs add flags>]";

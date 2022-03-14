@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# This scripts downloads <website name> from s3://wikipedia-on-ipfs,
+#  unpacks it and adds it to ipfs
+
 usage() {
 	echo "USAGE:"
 	echo "	$0 <website name>";

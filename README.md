@@ -136,7 +136,7 @@ This step won't be necessary when automatic sharding lands in go-ipfs (wip).
 
 ### Step 3: Download the latest snapshot from kiwix.org
 
-Source of ZIM files is at https://download.kiwix.org/zim/wikipedia/  
+Source of ZIM files is at https://download.kiwix.org/zim/wikipedia/
 Make sure you download `_all_maxi_` snapshots, as those include images.
 
 To automate this, you can also use the `getzim.sh` script:
@@ -164,8 +164,8 @@ $ zimdump dump ./snapshots/wikipedia_tr_all_maxi_2021-01.zim --dir ./tmp/wikiped
 
 > ### ℹ️ ZIM's main page
 >
-> Each ZIM file has "main page" attribute which defines the landing page set for the ZIM archive.  
-> It is often different than the "main page" of upstream Wikipedia.  
+> Each ZIM file has "main page" attribute which defines the landing page set for the ZIM archive.
+> It is often different than the "main page" of upstream Wikipedia.
 > Kiwix Main page needs to be passed in the next step, so until there is an automated way to determine "main page" of ZIM, you need to open ZIM in Kiwix reader and eyeball the name of the landing page.
 
 ### Step 5: Convert the unpacked zim directory to a website with mirror info
@@ -242,7 +242,7 @@ Make sure at least two full reliable copies exist before updating DNSLink.
 
 ## mirrorzim.sh
 
-It is possible to automate steps 3-6 via a wrapper script named `mirrorzim.sh`.  
+It is possible to automate steps 3-6 via a wrapper script named `mirrorzim.sh`.
 It will download the latest snapshot of specified language (if needed), unpack it, and add it to IPFS.
 
 To see how the script behaves try running it on one of the smallest wikis, such as `cu`:
@@ -253,9 +253,9 @@ $ ./mirrorzim.sh --languagecode=cu --wikitype=wikipedia --hostingdnsdomain=cu.wi
 
 ## Docker build
 
-A `Dockerfile` with all the software requirements is provided.  
+A `Dockerfile` with all the software requirements is provided.
 For now it is only a handy container for running the process on non-Linux
-systems or if you don't want to pollute your system with all the dependencies.  
+systems or if you don't want to pollute your system with all the dependencies.
 In the future it will be end-to-end blackbox that takes ZIM and spits out CID
 and repo.
 
@@ -340,3 +340,7 @@ We are working on improving deduplication between snapshots, but for now YMMV.
 ## Code
 
 If you would like to contribute more to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted).
+
+## GitHub Actions Workflow
+
+The GitHub Actions workflow that is available in this repository takes information about the wiki website that you want to mirror, downloads its' zim, unpacks it, converts it to a website and uploads it to S3 as a tar.gz package which is publicly accessible.

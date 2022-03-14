@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# This script starts ipfs daemon
+# If ipfs was not initialised before, this script also initialises ipfs
+
 if ! ipfs repo stat; then
   ipfs init -p server,local-discovery,flatfs,randomports --empty-repo
   ipfs config --json Experimental.AcceleratedDHTClient true
