@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if ! ipfs repo stat; then
+  ipfs init -p server,local-discovery,flatfs,randomports --empty-repo
+  ipfs config --json Experimental.AcceleratedDHTClient true
+  ipfs config --json 'Datastore.Spec.mounts' "$(ipfs config 'Datastore.Spec.mounts' | jq -c '.[0].child.sync=false')"
+  ipfs config Addresses.Swarm '["/ip4/0.0.0.0/tcp/4001","/ip6/::/tcp/4001"]' --json
+fi
+
+ipfs daemon
