@@ -1,5 +1,5 @@
 # --> wikipedia-on-ipfs.amazon-ebs.wikipedia-on-ipfs: AMIs were created:
-# eu-central-1: ami-09f8b0969385baafa
+# eu-central-1: ami-02ff7a8cff61c5d41
 
 packer {
   required_plugins {
