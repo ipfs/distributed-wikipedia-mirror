@@ -1,28 +1,26 @@
-FROM debian:stable
+# docker build . -f Dockerfile -t distributed-wikipedia-mirror
+# docker run --rm -v $(pwd)/snapshots:/github/workspace/snapshots -v $(pwd)/tmp:/github/workspace/tmp distributed-wikipedia-mirror <mirrorzim.sh arguments>
 
-ENV DEBIAN_FRONTEND=noninteractive
+FROM openzim/zim-tools:3.1.0 AS openzim
 
-RUN apt update
-RUN apt -y install --no-install-recommends git ca-certificates curl wget apt-utils
+FROM node:16.14.0-buster-slim
 
-# install:
-# - node and yarn
-# - go-ipfs
-RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh \
-    && bash nodesource_setup.sh \
-    && apt -y install --no-install-recommends nodejs \
-    && npm install -g yarn \
-    && wget -nv https://dist.ipfs.io/go-ipfs/v0.8.0/go-ipfs_v0.8.0_linux-amd64.tar.gz \
-    && tar xvfz go-ipfs_v0.8.0_linux-amd64.tar.gz \
-    && mv go-ipfs/ipfs /usr/local/bin/ipfs \
-    && rm -r go-ipfs && rm go-ipfs_v0.8.0_linux-amd64.tar.gz \
-    && ipfs init -p server,local-discovery,flatfs,randomports --empty-repo \
-    && ipfs config --json 'Experimental.ShardingEnabled' true
+RUN apt update && apt upgrade && apt install -y curl wget rsync
 
-# TODO: move repo init after external volume is mounted
+COPY --from=openzim /usr/local/bin/zimdump /usr/local/bin
 
-ENV DEBIAN_FRONTEND=dialog
+COPY tools/docker_entrypoint.sh /usr/local/bin
 
-RUN mkdir /root/distributed-wikipedia-mirror
-VOLUME ["/root/distributed-wikipedia-mirror"]
-WORKDIR /root/distributed-wikipedia-mirror
+RUN mkdir -p /github/distributed-wikipedia-mirror
+RUN mkdir -p /github/distributed-wikipedia-mirror/snapshots
+RUN mkdir -p /github/distributed-wikipedia-mirror/tmp
+RUN mkdir -p /github/workspace
+
+COPY . /github/distributed-wikipedia-mirror
+
+RUN cd /github/distributed-wikipedia-mirror && yarn
+
+VOLUME [ "/github/workspace" ]
+
+WORKDIR /github/distributed-wikipedia-mirror
+ENTRYPOINT [ "docker_entrypoint.sh" ]
