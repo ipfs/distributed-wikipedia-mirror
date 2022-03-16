@@ -254,21 +254,25 @@ $ ./mirrorzim.sh --languagecode=cu --wikitype=wikipedia --hostingdnsdomain=cu.wi
 ## Docker build
 
 A `Dockerfile` with all the software requirements is provided.
-For now it is only a handy container for running the process on non-Linux
-systems or if you don't want to pollute your system with all the dependencies.
-In the future it will be end-to-end blackbox that takes ZIM and spits out CID
-and repo.
+It is a handy container for running the process on non-Linux systems, if you don't want to pollute your system with all the dependencies or if you want to run the process in the cloud.
+It is an end-to-end blackbox that takes mirrorzim.sh arguments, spits out CID and runs IPFS daemon.
 
-To build the docker image:
+To run the publicly available docker image:
 
 ```sh
-docker build . -t distributed-wikipedia-mirror-build
+docker run --ulimit nofile=65536:65536 -p 4001:4001/tcp -p 4001:4001/udp public.ecr.aws/c4h1q7d1/distributed-wikipedia-mirror:latest <mirrorzim_arguments>
 ```
 
-To use it as a development environment:
+Alternatively, to build the docker image:
 
 ```sh
-docker run -it -v $(pwd):/root/distributed-wikipedia-mirror --net=host --entrypoint bash distributed-wikipedia-mirror-build
+docker build . --platform=linux/amd64 -f Dockerfile -t distributed-wikipedia-mirror
+```
+
+And then, to run it:
+
+```sh
+docker run --ulimit nofile=65536:65536 -p 4001:4001/tcp -p 4001:4001/udp distributed-wikipedia-mirror <mirrorzim_arguments>
 ```
 
 # How to Help
@@ -340,7 +344,3 @@ We are working on improving deduplication between snapshots, but for now YMMV.
 ## Code
 
 If you would like to contribute more to this effort, look at the [issues](https://github.com/ipfs/distributed-wikipedia-mirror/issues) in this github repo. Especially check for [issues marked with the "wishlist" label](https://github.com/ipfs/distributed-wikipedia-mirror/labels/wishlist) and issues marked ["help wanted"](https://github.com/ipfs/distributed-wikipedia-mirror/labels/help%20wanted).
-
-## GitHub Actions Workflow
-
-The GitHub Actions workflow that is available in this repository takes information about the wiki website that you want to mirror, downloads its' zim, unpacks it, converts it to a website and uploads it to S3 as a tar.gz package which is publicly accessible.

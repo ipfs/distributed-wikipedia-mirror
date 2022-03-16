@@ -19,3 +19,8 @@ node_modules
 /kiwix-tools
 
 bin/zimdump
+
+*.tfstate
+*.tfstate.*
+*.terraform
+*.terraform.*
