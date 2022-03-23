@@ -9,6 +9,10 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 <br />
 
 ## Existing Mirrors
+  
+Below are [DNSLink names](https://docs.ipfs.io/concepts/dnslink/) that point at the latest CIDs from [snapshot-hashes.yml](https://github.com/ipfs/distributed-wikipedia-mirror/blob/main/snapshot-hashes.yml).
+
+There  various way one can access IPFS mirror (either with DNSLink, or direct CID), [read about them here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
 
 - https://en.wikipedia-on-ipfs.org
 - https://tr.wikipedia-on-ipfs.org
@@ -19,7 +23,10 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 - https://ru.wikipedia-on-ipfs.org
 - https://fa.wikipedia-on-ipfs.org
 
-Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the footer.
+
+
+Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the footer.  
+The ZIM file can be dowloaded and opened outside of  regular browser with [Kiwix Reader](https://www.kiwix.org/en/download/) 
 
 ## Table of Contents
 
