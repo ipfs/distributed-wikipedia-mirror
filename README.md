@@ -9,10 +9,10 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 <br />
 
 ## Existing Mirrors
-  
-Below are [DNSLink names](https://docs.ipfs.io/concepts/dnslink/) that point at the latest CIDs from [snapshot-hashes.yml](https://github.com/ipfs/distributed-wikipedia-mirror/blob/main/snapshot-hashes.yml).
 
-There  various way one can access IPFS mirror (either with DNSLink, or direct CID), [read about them here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
+There are various ways one can access the mirrors: through a DNSLink, public gateway or directly with a CID. You can [read all about the available methods here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
+
+### [DNSLink](https://docs.ipfs.io/concepts/dnslink/)s
 
 - https://en.wikipedia-on-ipfs.org
 - https://tr.wikipedia-on-ipfs.org
@@ -23,10 +23,13 @@ There  various way one can access IPFS mirror (either with DNSLink, or direct CI
 - https://ru.wikipedia-on-ipfs.org
 - https://fa.wikipedia-on-ipfs.org
 
+### [CID](https://docs.ipfs.io/concepts/content-addressing/)s
 
+The latest CIDs that the DNSLinks point at can be found in [snapshot-hashes.yml](snapshot-hashes.yml).
 
-Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the footer.  
-The ZIM file can be dowloaded and opened outside of  regular browser with [Kiwix Reader](https://www.kiwix.org/en/download/) 
+---
+
+Each mirror has a link to the original [Kiwix](https://kiwix.org) ZIM archive in the footer. It can be dowloaded and opened offline with the [Kiwix Reader](https://www.kiwix.org/en/download/).
 
 ## Table of Contents
 
@@ -151,7 +154,7 @@ Make sure you use go-ipfs 0.12 or later, it has automatic sharding of big direct
 
 ### Step 3: Download the latest snapshot from kiwix.org
 
-Source of ZIM files is at https://download.kiwix.org/zim/wikipedia/  
+Source of ZIM files is at https://download.kiwix.org/zim/wikipedia/
 Make sure you download `_all_maxi_` snapshots, as those include images.
 
 To automate this, you can also use the `getzim.sh` script:
@@ -179,8 +182,8 @@ $ zimdump dump ./snapshots/wikipedia_tr_all_maxi_2021-01.zim --dir ./tmp/wikiped
 
 > ### ℹ️ ZIM's main page
 >
-> Each ZIM file has "main page" attribute which defines the landing page set for the ZIM archive.  
-> It is often different than the "main page" of upstream Wikipedia.  
+> Each ZIM file has "main page" attribute which defines the landing page set for the ZIM archive.
+> It is often different than the "main page" of upstream Wikipedia.
 > Kiwix Main page needs to be passed in the next step, so until there is an automated way to determine "main page" of ZIM, you need to open ZIM in Kiwix reader and eyeball the name of the landing page.
 
 ### Step 5: Convert the unpacked zim directory to a website with mirror info
@@ -257,7 +260,7 @@ Make sure at least two full reliable copies exist before updating DNSLink.
 
 ## mirrorzim.sh
 
-It is possible to automate steps 3-6 via a wrapper script named `mirrorzim.sh`.  
+It is possible to automate steps 3-6 via a wrapper script named `mirrorzim.sh`.
 It will download the latest snapshot of specified language (if needed), unpack it, and add it to IPFS.
 
 To see how the script behaves try running it on one of the smallest wikis, such as `cu`:
@@ -268,9 +271,9 @@ $ ./mirrorzim.sh --languagecode=cu --wikitype=wikipedia --hostingdnsdomain=cu.wi
 
 ## Docker build
 
-A `Dockerfile` with all the software requirements is provided.  
+A `Dockerfile` with all the software requirements is provided.
 For now it is only a handy container for running the process on non-Linux
-systems or if you don't want to pollute your system with all the dependencies.  
+systems or if you don't want to pollute your system with all the dependencies.
 In the future it will be end-to-end blackbox that takes ZIM and spits out CID
 and repo.
 
