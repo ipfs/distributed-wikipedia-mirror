@@ -42,11 +42,27 @@ zh:
     date: 2021-03-16
     source: wikipedia_zh_all_maxi_2021-02.zim
     cid: bafybeiazgazbrj6qprr4y5hx277u4g2r5nzgo3jnxkhqx56doxdqrzms6y
+uk:
+  name: Ukrainian
+  original: uk.wikipedia.org
+  dnslink: uk.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2022-03-09
+    source: wikipedia_uk_all_maxi_2022-03.zim
+    cid: bafybeibiqlrnmws6psog7rl5ofeci3ontraitllw6wyyswnhxbwdkmw4ka
 ru:
   name: Russian
   original: ru.wikipedia.org
   dnslink: ru.wikipedia-on-ipfs.org
   snapshot:
-    date: 2021-03-25
-    source: wikipedia_ru_all_maxi_2021-03.zim
-    cid: bafybeieto6mcuvqlechv4iadoqvnffondeiwxc2bcfcewhvpsd2odvbmvm
+    date: 2022-03-12
+    source: wikipedia_ru_all_maxi_2022-03.zim
+    cid: bafybeiezqkklnjkqywshh4lg65xblaz2scbbdgzip4vkbrc4gn37horokq
+fa:
+  name: Persian
+  original: fa.wikipedia.org
+  dnslink: fa.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2021-08-18
+    source: wikipedia_fa_all_maxi_2021-06.zim
+    cid: bafybeicpnshmz7lhp5vcowscty4v4br33cjv22nhhqestavb2mww6zbswm

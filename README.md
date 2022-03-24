@@ -15,7 +15,9 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 - https://my.wikipedia-on-ipfs.org
 - https://ar.wikipedia-on-ipfs.org
 - https://zh.wikipedia-on-ipfs.org
+- https://uk.wikipedia-on-ipfs.org
 - https://ru.wikipedia-on-ipfs.org
+- https://fa.wikipedia-on-ipfs.org
 
 Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the footer.
 
@@ -40,7 +42,7 @@ Each mirror has a link to original [Kiwix](https://kiwix.org) ZIM archive in the
 
 The idea of putting Wikipedia on IPFS has been around for a while. Every few months or so someone revives the threads. You can find such discussions in [this github issue about archiving wikipedia](https://github.com/ipfs/archives/issues/20), [this issue about possible integrations with Wikipedia](https://github.com/ipfs/notes/issues/46), and [this proposal for a new project](https://github.com/ipfs/notes/issues/47#issuecomment-140587530).
 
-We have two consecutive goals regarding Wikipedia on IPFS: Our first goal is to create periodic read-only snapshots of Wikipedia. A second goal will be to create a full-fledged read-write version of Wikipedia. This second goal would connect with the Wikimedia Foundation’s bigger, longer-running conversation about decentralizing Wikipedia, which you can read about at https://strategy.m.wikimedia.org/wiki/Proposal:Distributed_Wikipedia
+We have two consecutive goals regarding Wikipedia on IPFS: Our first goal is to create periodic read-only snapshots of Wikipedia. A second goal will be to create a full-fledged read-write version of Wikipedia. This second goal would connect with the Wikimedia Foundation’s bigger, longer-running conversation about decentralizing Wikipedia, which you can read about at https://strategy.wikimedia.org/wiki/Proposal:Distributed_Wikipedia
 
 ### (Goal 1) Read-Only Wikipedia on IPFS
 
@@ -117,21 +119,28 @@ $ export IPFS_PATH=/path/to/IPFS_PATH_WIKIPEDIA_MIRROR
 $ ipfs init -p server,local-discovery,flatfs,randomports --empty-repo
 ```
 
-#### Tune datastore for speed
+#### Tune DHT for speed
 
-Make sure repo uses `flatfs` datastore with `sync` set to `false` for improved performance.
+Wikipedia has a lot of blocks, to publish them as fast as possible,
+enable [Accelerated DHT Client](https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#accelerated-dht-client):
 
-**NOTE:** While badgerv1 datastore _is_ faster, we avoid using it with bigger builds like English because of [memory issues due to the number of files](https://github.com/ipfs/distributed-wikipedia-mirror/issues/85).
-With `flatfs` having `sync` set to `false` and a fast SSD one should be able to import 300GB of English wikipedia under 5 hours, which is still acceptable, and way easier on CPU/memory.
-
-#### Enable HAMT sharding
-
-Configure your IPFS node to enable directory sharding
-
-```sh
-$ ipfs config --json 'Experimental.ShardingEnabled' true
+```console
+$ ipfs config --json Experimental.AcceleratedDHTClient true
 ```
 
+#### Tune datastore for speed
+
+Make sure repo uses `flatfs` with  `sync` set to `false`:
+
+```console
+$ ipfs config --json 'Datastore.Spec.mounts' "$(ipfs config 'Datastore.Spec.mounts' | jq -c '.[0].child.sync=false')"
+```
+
+**NOTE:** While badgerv1 datastore is faster is nome configurations, we choose to avoid using it with bigger builds like English because of [memory issues due to the number of files](https://github.com/ipfs/distributed-wikipedia-mirror/issues/85). Potential workaround is to use [`filestore`](https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipfs-filestore) that avoids duplicating data and reuses unpacked files as-is.
+
+#### HAMT sharding
+
+Make sure you use go-ipfs 0.12 or later, it has automatic sharding of big directories.
 
 ### Step 3: Download the latest snapshot from kiwix.org
 
@@ -186,7 +195,7 @@ $ ./tools/find_main_page_name.sh tr.wikiquote.org
 Anasayfa
 ```
 
-To determine the main page in ZIM file open in in a [Kiwix reader](https://www.kiwix.org/en/kiwix-reader) or use `zimdump info` (version 2.2.0 or later) and ignore the `A/` prefix:
+To determine the main page in ZIM file open in in a [Kiwix reader](https://www.kiwix.org/en/kiwix-reader) or use `zimdump info` (version 3.0.0 or later) and ignore the `A/` prefix:
 
 ```console
 $ zimdump info wikipedia_tr_all_maxi_2021-01.zim
