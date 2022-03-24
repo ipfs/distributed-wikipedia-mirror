@@ -1,6 +1,7 @@
 %YAML 1.2
 ---
-# TODO: link here to the blog post explaining how to access mirror via DNSLink and CID
+# How to access mirror via DNSLink and CID?
+#  https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors
 
 en:
   name: English
