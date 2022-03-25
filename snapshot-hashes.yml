@@ -1,60 +1,69 @@
 %YAML 1.2
 ---
-# This is a stopgap measure for keeping track of hashes until we set up a better system.
+# How to access mirror via DNSLink and CID?
+#  https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors
 
 en:
   name: English
   original: en.wikipedia.org
-  date: 2021-03-09
-  source: wikipedia_en_all_maxi_2021-02.zim
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze
+  dnslink: en.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2021-03-09
+    source: wikipedia_en_all_maxi_2021-02.zim
+    cid: bafybeiaysi4s6lnjev27ln5icwm6tueaw2vdykrtjkwiphwekaywqhcjze
 tr:
   name: Turkish
   original: tr.wikipedia.org
-  source: wikipedia_tr_all_maxi_2021-02.zim
-  date: 2021-02-19
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeieuutdavvf55sh3jktq2dpi2hkle6dtmebe7uklod3ramihyf3xa4
+  dnslink: tr.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2021-02-19
+    source: wikipedia_tr_all_maxi_2021-02.zim
+    cid: bafybeieuutdavvf55sh3jktq2dpi2hkle6dtmebe7uklod3ramihyf3xa4
 my:
   name: Myanmar
   original: my.wikipedia.org
-  source: wikipedia_my_all_maxi_2021-02.zim
-  date: 2021-02-22
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeib66xujztkiq7lqbupfz6arzhlncwagva35dx54nj7ipyoqpyozhy
+  dnslink: my.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2021-02-22
+    source: wikipedia_my_all_maxi_2021-02.zim
+    cid: bafybeib66xujztkiq7lqbupfz6arzhlncwagva35dx54nj7ipyoqpyozhy
 ar:
   name: Arabic
   original: ar.wikipedia.org
-  source: wikipedia_ar_all_maxi_2021-03.zim
-  date: 2021-03-26
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeih4a6ylafdki6ailjrdvmr7o4fbbeceeeuty4v3qyyouiz5koqlpi
+  dnslink: ar.wikipedia-on-ipfs.org
+  snapshot:
+    source: wikipedia_ar_all_maxi_2021-03.zim
+    date: 2021-03-26
+    cid: bafybeih4a6ylafdki6ailjrdvmr7o4fbbeceeeuty4v3qyyouiz5koqlpi
 zh:
   name: Chinese
   original: zh.wikipedia.org
-  source: wikipedia_zh_all_maxi_2021-02.zim
-  date: 2021-03-16
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeiazgazbrj6qprr4y5hx277u4g2r5nzgo3jnxkhqx56doxdqrzms6y
+  dnslink: zh.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2021-03-16
+    source: wikipedia_zh_all_maxi_2021-02.zim
+    cid: bafybeiazgazbrj6qprr4y5hx277u4g2r5nzgo3jnxkhqx56doxdqrzms6y
 uk:
   name: Ukrainian
   original: uk.wikipedia.org
-  source: wikipedia_uk_all_maxi_2022-03.zim
-  date: 2022-03-09
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeibiqlrnmws6psog7rl5ofeci3ontraitllw6wyyswnhxbwdkmw4ka
+  dnslink: uk.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2022-03-09
+    source: wikipedia_uk_all_maxi_2022-03.zim
+    cid: bafybeibiqlrnmws6psog7rl5ofeci3ontraitllw6wyyswnhxbwdkmw4ka
 ru:
   name: Russian
   original: ru.wikipedia.org
-  source: wikipedia_ru_all_maxi_2022-03.zim
-  date: 2022-03-12
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeiezqkklnjkqywshh4lg65xblaz2scbbdgzip4vkbrc4gn37horokq
+  dnslink: ru.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2022-03-12
+    source: wikipedia_ru_all_maxi_2022-03.zim
+    cid: bafybeiezqkklnjkqywshh4lg65xblaz2scbbdgzip4vkbrc4gn37horokq
 fa:
   name: Persian
   original: fa.wikipedia.org
-  source: wikipedia_fa_all_maxi_2021-06.zim
-  date: 2021-08-18
-  ipns:
-  ipfs: https://dweb.link/ipfs/bafybeicpnshmz7lhp5vcowscty4v4br33cjv22nhhqestavb2mww6zbswm
+  dnslink: fa.wikipedia-on-ipfs.org
+  snapshot:
+    date: 2021-08-18
+    source: wikipedia_fa_all_maxi_2021-06.zim
+    cid: bafybeicpnshmz7lhp5vcowscty4v4br33cjv22nhhqestavb2mww6zbswm
