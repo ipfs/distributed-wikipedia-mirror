@@ -10,9 +10,11 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 
 ## Existing Mirrors
 
-There are various ways one can access the mirrors: through a DNSLink, public gateway or directly with a CID. You can [read all about the available methods here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
+There are various ways one can access the mirrors: through a [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink), public [gateway](https://docs.ipfs.io/concepts/glossary/#gateway) or directly with a [CID](https://docs.ipfs.io/concepts/glossary/#cid). 
 
-### [DNSLink](https://docs.ipfs.io/concepts/dnslink/)s
+You can [read all about the available methods here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
+
+### DNSLinks
 
 - https://en.wikipedia-on-ipfs.org
 - https://tr.wikipedia-on-ipfs.org
@@ -23,7 +25,7 @@ There are various ways one can access the mirrors: through a DNSLink, public gat
 - https://ru.wikipedia-on-ipfs.org
 - https://fa.wikipedia-on-ipfs.org
 
-### [CID](https://docs.ipfs.io/concepts/content-addressing/)s
+### CIDs
 
 The latest CIDs that the DNSLinks point at can be found in [snapshot-hashes.yml](snapshot-hashes.yml).
 
