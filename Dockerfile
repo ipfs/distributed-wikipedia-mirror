@@ -1,28 +1,37 @@
-FROM debian:stable
+# This Dockerfile creates a self-contained image in which mirrorzim.sh can be executed.
+#  It also runs ipfs daemon.
+#
+# You can build the image as follows (remember to use this repo as context for the build):
+#  docker build . --platform=linux/amd64 -f Dockerfile -t distributed-wikipedia-mirror
+#
+# You can then run the container anywhere as follows:
+#  docker run -v $(pwd)/tmp:/root/tmp --ulimit nofile=65536:65536 -p 4001:4001/tcp -p 4001:4001/udp distributed-wikipedia-mirror <mirrorzim_arguments>
 
-ENV DEBIAN_FRONTEND=noninteractive
+FROM stedolan/jq:latest AS jq
+FROM openzim/zim-tools:3.1.0 AS zimdump
+FROM ipfs/go-ipfs:v0.12.0 AS ipfs
+FROM node:16
 
-RUN apt update
-RUN apt -y install --no-install-recommends git ca-certificates curl wget apt-utils
+# if false, ipfs daemon will not be started
+ENV IPFS_DAEMON_ENABLED true
 
-# install:
-# - node and yarn
-# - go-ipfs
-RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh \
-    && bash nodesource_setup.sh \
-    && apt -y install --no-install-recommends nodejs \
-    && npm install -g yarn \
-    && wget -nv https://dist.ipfs.io/go-ipfs/v0.8.0/go-ipfs_v0.8.0_linux-amd64.tar.gz \
-    && tar xvfz go-ipfs_v0.8.0_linux-amd64.tar.gz \
-    && mv go-ipfs/ipfs /usr/local/bin/ipfs \
-    && rm -r go-ipfs && rm go-ipfs_v0.8.0_linux-amd64.tar.gz \
-    && ipfs init -p server,local-discovery,flatfs,randomports --empty-repo \
-    && ipfs config --json 'Experimental.ShardingEnabled' true
+RUN apt-get update && apt-get install --no-install-recommends --assume-yes rsync moreutils
 
-# TODO: move repo init after external volume is mounted
+COPY --from=jq /usr/local/bin/jq /usr/local/bin/
+COPY --from=zimdump /usr/local/bin/zimdump /usr/local/bin/
+COPY --from=ipfs /usr/local/bin/ipfs /usr/local/bin/
 
-ENV DEBIAN_FRONTEND=dialog
+COPY assets /root/assets
+COPY bin /root/bin
+COPY src /root/src
+COPY tools /root/tools
+COPY mirrorzim.sh package.json tsconfig.json /root/
 
-RUN mkdir /root/distributed-wikipedia-mirror
-VOLUME ["/root/distributed-wikipedia-mirror"]
-WORKDIR /root/distributed-wikipedia-mirror
+RUN mkdir /root/snapshots /root/tmp
+RUN cd /root && yarn
+
+EXPOSE 4001/tcp
+EXPOSE 4001/udp
+
+WORKDIR /root
+ENTRYPOINT [ "tools/entrypoint.sh" ]

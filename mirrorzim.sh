@@ -11,19 +11,23 @@ usage() {
 	echo ""
 	echo "SYNOPSIS"
 	echo " $0 --languagecode=<LANGUAGE_CODE> --wikitype=<WIKI_TYPE>"
+	echo "    [--tag=<TAG>]"
+	echo "    [--edition=<EDITION>]"
 	echo "    [--hostingdnsdomain=<HOSTING_DNS_DOMAIN>]"
 	echo "    [--hostingipnshash=<HOSTING_IPNS_HASH>]"
 	echo "    [--mainpageversion=<MAIN_PAGE_VERSION>]"
 	echo ""
 	echo "OPTIONS"
 	echo ""
-	echo "  -l, --languagecode       string - the language of the wikimedia property e.g. tr - turkish, en - english"
-	echo "  -w, --wikitype           string - the type of the wikimedia property e.g. wikipedia, wikiquote"
-	echo "  -d, --hostingdnsdomain   string - the DNS domain name the mirror will be hosted at e.g. tr.wikipedia-on-ipfs.org"
-	echo "  -i, --hostingipnshash    string - the IPNS hash the mirror will be hosted at e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W"
-	echo "  -v, --mainpageversion    string - an override hack used on Turkish Wikipedia, it sets the main page version as there are issues with the Kiwix version id"
-
-	exit 2
+	echo "  -l, --languagecode       string     - the language of the wikimedia property e.g. tr - turkish, en - english"
+	echo "  -w, --wikitype           string     - the type of the wikimedia property e.g. wikipedia, wikiquote"
+    echo "  -t, --tag                string     - the tag of the wikimedia property e.g. all, top (defaults to all)"
+    echo "  -e, --edition            string     - the edition of the wikimedia property e.g. maxi, mini (defaults to maxi)"
+	echo "  -c, --date               string     - the date of the wikimedia property e.g. latest (defaults to latest)"
+    echo "  -d, --hostingdnsdomain   string     - the DNS domain name the mirror will be hosted at e.g. tr.wikipedia-on-ipfs.org"
+	echo "  -i, --hostingipnshash    string     - the IPNS hash the mirror will be hosted at e.g. QmVH1VzGBydSfmNG7rmdDjAeBZ71UVeEahVbNpFQtwZK8W"
+	echo "  -v, --mainpageversion    string     - an override hack used on Turkish Wikipedia, it sets the main page version as there are issues with the Kiwix version id"
+    exit 2
 }
 
 
@@ -36,6 +40,18 @@ case $i in
     ;;
     -w=*|--wikitype=*)
     WIKI_TYPE="${i#*=}"
+    shift
+    ;;
+    -t=*|--tag=*)
+    TAG="${i#*=}"
+    shift
+    ;;
+    -e=*|--edition=*)
+    EDITION="${i#*=}"
+    shift
+    ;;
+    -c=*|--date=*)
+    DATE="${i#*=}"
     shift
     ;;
     -d=*|--hostingdnsdomain=*)
@@ -70,6 +86,18 @@ if [ -z ${WIKI_TYPE+x} ]; then
 	usage
 fi
 
+if [ -z ${TAG+x} ]; then
+	TAG="all"
+fi
+
+if [ -z ${EDITION+x} ]; then
+	EDITION="maxi"
+fi
+
+if [ -z ${DATE+x} ]; then
+	DATE="latest"
+fi
+
 if [ -z ${HOSTING_DNS_DOMAIN+x} ]; then
 	HOSTING_DNS_DOMAIN=""
 fi
@@ -87,7 +115,7 @@ PATH=$PATH:$(realpath ./bin)
 which zimdump &> /dev/null || (curl --progress-bar -L https://download.openzim.org/release/zim-tools/zim-tools_linux-x86_64-3.1.0.tar.gz | tar -xvz --strip-components=1 -C ./bin zim-tools_linux-x86_64-3.1.0/zimdump && chmod +x ./bin/zimdump)
 
 printf "\nDownload and verify the zim file...\n"
-ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
+ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE $TAG $EDITION $DATE | grep 'URL:' | cut -d' ' -f3)"
 ZIM_FILE=$(echo $ZIM_FILE_SOURCE_URL | rev | cut -d'/' -f1 | rev)
 TMP_DIRECTORY="./tmp/$(echo $ZIM_FILE | cut -d'.' -f1)"
 
@@ -116,11 +144,8 @@ node ./bin/run $TMP_DIRECTORY \
   ${HOSTING_IPNS_HASH:+--hostingipnshash=$HOSTING_IPNS_HASH} \
   ${MAIN_PAGE_VERSION:+--mainpageversion=$MAIN_PAGE_VERSION}
 
-printf "\n-------------------------\n"
-printf "\nIPFS_PATH=$IPFS_PATH\n"
-
 printf "\nAdding the processed tmp directory to IPFS\n(this part may take long time on a slow disk):\n"
-CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)
+CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Q -p $TMP_DIRECTORY)
 MFS_DIR="/${ZIM_FILE}__$(date +%F_%T)"
 
 # pin by adding to MFS under a meaningful name

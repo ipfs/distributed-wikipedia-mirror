@@ -10,7 +10,7 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 
 ## Existing Mirrors
 
-There are various ways one can access the mirrors: through a [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink), public [gateway](https://docs.ipfs.io/concepts/glossary/#gateway) or directly with a [CID](https://docs.ipfs.io/concepts/glossary/#cid). 
+There are various ways one can access the mirrors: through a [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink), public [gateway](https://docs.ipfs.io/concepts/glossary/#gateway) or directly with a [CID](https://docs.ipfs.io/concepts/glossary/#cid).
 
 You can [read all about the available methods here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
 
@@ -274,21 +274,24 @@ $ ./mirrorzim.sh --languagecode=cu --wikitype=wikipedia --hostingdnsdomain=cu.wi
 ## Docker build
 
 A `Dockerfile` with all the software requirements is provided.
-For now it is only a handy container for running the process on non-Linux
-systems or if you don't want to pollute your system with all the dependencies.
-In the future it will be end-to-end blackbox that takes ZIM and spits out CID
-and repo.
+It is a handy container for running the process on non-Linux systems, if you don't want to pollute your system with all the dependencies or if you want to run the process in the cloud.
+It is an end-to-end blackbox that takes mirrorzim.sh arguments, spits out CID and runs IPFS daemon.
 
 To build the docker image:
 
 ```sh
-docker build . -t distributed-wikipedia-mirror-build
+docker build . --platform=linux/amd64 -f Dockerfile -t distributed-wikipedia-mirror
 ```
 
-To use it as a development environment:
+And then, to run it:
 
 ```sh
-docker run -it -v $(pwd):/root/distributed-wikipedia-mirror --net=host --entrypoint bash distributed-wikipedia-mirror-build
+docker run -v $(pwd)/tmp:/root/tmp --ulimit nofile=65536:65536 -p 4001:4001/tcp -p 4001:4001/udp distributed-wikipedia-mirror <mirrorzim_arguments>
+```
+
+If you don't care for hosting the mirror out of the Docker container, you can run this instead:
+```sh
+docker run -e IPFS_DAEMON_ENABLED=false -v $(pwd)/tmp:/root/tmp --ulimit nofile=65536:65536 -p 4001:4001/tcp -p 4001:4001/udp distributed-wikipedia-mirror <mirrorzim_arguments>
 ```
 
 # How to Help
