@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://camo.githubusercontent.com/cb217efab8ea638d8169e4ec15b006f194ae6e02/68747470733a2f2f697066732e696f2f697066732f516d62344b4b615a79524b3168677837465575746977556641335a4d3269777a433651757144356a59454465426a2f77696b6970656469612d6f6e2d697066732e706e67" width="40%" />
+<img src="https://bafybeia6plrlomsxobezyatrbie3f7rgucidbomfeuyv6lcqhv3pdc24qi.ipfs.dweb.link/?filename=wikipedia-on-ipfs.jpg" width="40%" />
 </p>
 
 <h1 align="center">Distributed Wikipedia Mirror Project</h1>
@@ -10,9 +10,9 @@ Putting Wikipedia Snapshots on IPFS and working towards making it fully read-wri
 
 ## Existing Mirrors
 
-There are various ways one can access the mirrors: through a [DNSLink](https://docs.ipfs.io/concepts/glossary/#dnslink), public [gateway](https://docs.ipfs.io/concepts/glossary/#gateway) or directly with a [CID](https://docs.ipfs.io/concepts/glossary/#cid). 
+There are various ways one can access the mirrors: through a [DNSLink](https://docs.ipfs.tech/concepts/glossary/#dnslink), public [gateway](https://docs.ipfs.tech/concepts/glossary/#gateway) or directly with a [CID](https://docs.ipfs.tech/concepts/glossary/#cid). 
 
-You can [read all about the available methods here](https://blog.ipfs.io/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
+You can [read all about the available methods here](https://blog.ipfs.tech/2021-05-31-distributed-wikipedia-mirror-update/#improved-access-to-wikipedia-mirrors).
 
 ### DNSLinks
 
@@ -60,7 +60,7 @@ We have two consecutive goals regarding Wikipedia on IPFS: Our first goal is to 
 
 The easy way to get Wikipedia content on IPFS is to periodically -- say every week -- take snapshots of all the content and add it to IPFS. That way the majority of Wikipedia users -- who only read wikipedia and don’t edit -- could use all the information on wikipedia with all the benefits of IPFS. Users couldn't edit it, but users could download and archive swaths of articles, or even the whole thing. People could serve it to each other peer-to-peer, reducing the bandwidth load on Wikipedia servers. People could even distribute it to each other in closed, censored, or resource-constrained networks -- with IPFS, peers do not need to be connected to the original source of the content, being connected to anyone who has the content is enough. Effectively, the content can jump from computer to computer in a peer-to-peer way, and avoid having to connect to the content source or even the internet backbone. We've been in discussions with many groups about the potential of this kind of thing, and how it could help billions of people around the world to access information better -- either free of censorship, or circumventing serious bandwidth or latency constraints.
 
-So far, we have achieved part of this goal: we have static snapshots of all of Wikipedia on IPFS. This is already a huge result that will help people access, keep, archive, cite, and distribute lots of content. In particular, we hope that this distribution helps people in Turkey, who find themselves in a tough situation. We are still working out a process to continue updating these snapshots, we hope to have someone at Wikimedia in the loop as they are the authoritative source of the content. **If you could help with this, please get in touch with us at wikipedia-project@ipfs.io.**
+So far, we have achieved part of this goal: we have static snapshots of all of Wikipedia on IPFS. This is already a huge result that will help people access, keep, archive, cite, and distribute lots of content. In particular, we hope that this distribution helps people in Turkey, who find themselves in a tough situation. We are still working out a process to continue updating these snapshots, we hope to have someone at Wikimedia in the loop as they are the authoritative source of the content. **If you could help with this, please get in touch with us at `wikipedia-project <AT> ipfs.io`**
 
 ### (Goal 2) Fully Read-Write Wikipedia on IPFS
 
@@ -85,8 +85,8 @@ create their own wikipedia snapshots and add them to IPFS, making sure those
 builds are deterministic and auditable, but our first emphasis has been to get
 the initial snapshots onto the network. This means some of the steps aren't as
 easy as we want them to be. If you run into trouble, seek help through a github
-issue, commenting in the `#ipfs` channel on IRC, or by posting a thread on
-https://discuss.ipfs.io.
+issue, commenting in [chat](https://docs.ipfs.tech/community/#chat), or by posting a thread on
+[https://discuss.ipfs.tech](https://discuss.ipfs.tech/c/help/13).
 
 ## Manual build
 
@@ -308,7 +308,7 @@ $ ipfs resolve -r /ipns/tr.wikipedia-on-ipfs.org
 ```
 
 CID can then be opened via `ipfs://bafy..` in a web browser with [IPFS Companion](https://github.com/ipfs-shipyard/ipfs-companion) extension
-resolving IPFS addresses via [IPFS Desktop](https://docs.ipfs.io/install/ipfs-desktop/) node.
+resolving IPFS addresses via [IPFS Desktop](https://docs.ipfs.tech/install/ipfs-desktop/) node.
 
 You can also try [Brave browser](https://brave.com), which ships with [native support for IPFS](https://brave.com/ipfs-support/).
 
