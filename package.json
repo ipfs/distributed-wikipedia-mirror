@@ -14,7 +14,7 @@
     "cheerio": "^1.0.0-rc.3",
     "cli-ux": "^5.4.4",
     "date-fns": "^2.10.0",
-    "handlebars": "^4.7.3",
+    "handlebars": "^4.7.7",
     "node-fetch": "^2.6.0",
     "tslib": "^2"
   },
