@@ -322,7 +322,7 @@ export const useKiwixLandingPage = async (
   }
 
   // Fixup relative paths, if needed
-  const depth = (options.kiwixMainPage.match(/\//g) || []).length
+  const depth = (kiwixMainPageSrc.substring(wikiFolder.length + 1).match(/\//g) || []).length
   if (depth) {
     const fixRelativeLinksUp = (filePath: string, depth: number) => {
       const fileBytes = readFileSync(filePath)
