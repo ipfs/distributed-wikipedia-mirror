@@ -120,7 +120,7 @@ printf "\n-------------------------\n"
 printf "\nIPFS_PATH=$IPFS_PATH\n"
 
 printf "\nAdding the processed tmp directory to IPFS\n(this part may take long time on a slow disk):\n"
-CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)
+CID=$(ipfs add -r --cid-version 1 --nocopy -Qp $TMP_DIRECTORY)
 MFS_DIR="/${ZIM_FILE}__$(date +%F_%T)"
 
 # pin by adding to MFS under a meaningful name
