@@ -84,7 +84,7 @@ fi
 
 printf "\nEnsure zimdump is present...\n"
 PATH=$PATH:$(realpath ./bin)
-which zimdump &> /dev/null || (curl --progress-bar -L https://download.openzim.org/release/zim-tools/zim-tools_linux-x86_64-3.1.0.tar.gz | tar -xvz --strip-components=1 -C ./bin zim-tools_linux-x86_64-3.1.0/zimdump && chmod +x ./bin/zimdump)
+which zimdump &> /dev/null || (curl --progress-bar -L https://download.openzim.org/release/zim-tools/zim-tools_linux-x86_64-3.4.0-2.tar.gz | tar -xvz --strip-components=1 -C ./bin zim-tools_linux-x86_64-3.4.0-2/zimdump && chmod +x ./bin/zimdump)
 
 printf "\nDownload and verify the zim file...\n"
 ZIM_FILE_SOURCE_URL="$(./tools/getzim.sh download $WIKI_TYPE $WIKI_TYPE $LANGUAGE_CODE all maxi latest | grep 'URL:' | cut -d' ' -f3)"
@@ -120,7 +120,7 @@ printf "\n-------------------------\n"
 printf "\nIPFS_PATH=$IPFS_PATH\n"
 
 printf "\nAdding the processed tmp directory to IPFS\n(this part may take long time on a slow disk):\n"
-CID=$(ipfs add -r --cid-version 1 --pin=false --offline -Qp $TMP_DIRECTORY)
+CID=$(ipfs add -r --cid-version 1 --nocopy -Qp $TMP_DIRECTORY)
 MFS_DIR="/${ZIM_FILE}__$(date +%F_%T)"
 
 # pin by adding to MFS under a meaningful name
