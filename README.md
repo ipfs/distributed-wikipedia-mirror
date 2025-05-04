@@ -325,7 +325,7 @@ the entire thing.
 To cohost a lazy copy, execute:
 
 ```console
-$ export LNG="tr"
+$ LNG="tr"
 $ ipfs files mkdir -p /wikipedia-mirror/$LNG
 $ ipfs files cp $(ipfs resolve -r /ipns/$LNG.wikipedia-on-ipfs.org) /wikipedia-mirror/$LNG/$LNG_$(date +%F_%T)
 ```
@@ -339,15 +339,15 @@ Steps are the same as  for a lazy copy, but you execute additional preload
 after a lazy copy is in place:
 
 ```console
-$ # export LNG="tr"
+$ # LNG="tr"
 $ ipfs refs -r /ipns/$LNG.wikipedia-on-ipfs.org
 ```
 
 Before you execute this, check if you have enough disk space to fit `CumulativeSize`:
 
 ```console
-$ # export LNG="tr"
-$ ipfs object stat --human /ipns/$LNG.wikipedia-on-ipfs.org                                                                                                                                 ...rror MM?fix/build-2021
+$ # LNG="tr"
+$ ipfs object stat --human /ipns/$LNG.wikipedia-on-ipfs.org
 NumLinks:       5
 BlockSize:      281
 LinksSize:      251
