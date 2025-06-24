@@ -134,10 +134,11 @@ $ ipfs init -p server,local-discovery,flatfs,randomports --empty-repo
 #### Tune DHT for speed
 
 Wikipedia has a lot of blocks, to publish them as fast as possible,
-enable [Accelerated DHT Client](https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#accelerated-dht-client):
+enable [Accelerated DHT Client](https://github.com/ipfs/kubo/blob/ace0b0b987f5abe6a4480d3f9e14f55bb233785e/docs/config.md#routingaccelerateddhtclient):
+
 
 ```console
-$ ipfs config --json Experimental.AcceleratedDHTClient true
+$ ipfs config --json Routing.AcceleratedDHTClient true
 ```
 
 #### Tune datastore for speed
